@@ -49,18 +49,16 @@ void data::_set_knots()
     int  N_knots = bspline_data["n_basis"].get<int>() + bspline_data["order"].get<int>();
 
     int N_middle = N_knots - 2 * (bspline_data["order"].get<int>() - 2);
-    std::complex<double> step_size = grid_data["grid_size"].get<double>() / (N_middle-1);
-    std::vector<std::complex<double>> knots_middle;
+    double step_size = grid_data["grid_size"].get<double>() / (N_middle-1);
+    std::vector<double> knots_middle;
     for (int idx = 0; idx < N_middle; ++idx) 
     {
-        knots_middle.push_back(std::complex<double>(idx) * step_size);
+        knots_middle.push_back(idx * step_size);
     }
     knots_middle.back() = grid_data["grid_size"].get<double>();
 
-
-
-    std::vector<std::complex<double>> knots_start(bspline_data["order"].get<int>() - 2, 0.0);
-    std::vector<std::complex<double>> knots_end(bspline_data["order"].get<int>() - 2, grid_data["grid_size"].get<double>());
+    std::vector<double> knots_start(bspline_data["order"].get<int>() - 2, 0.0);
+    std::vector<double> knots_end(bspline_data["order"].get<int>() - 2, grid_data["grid_size"].get<double>());
 
     knots.insert(knots.end(), knots_start.begin(), knots_start.end());
     knots.insert(knots.end(), knots_middle.begin(), knots_middle.end());
@@ -75,23 +73,23 @@ void data::_set_degree()
 
 void data::_set_R0()
 {   
-    std::complex<double> R0 = bspline_data["R0"].get<double>();
+    double R0 = bspline_data["R0"].get<double>();
 
-    double min_val = std::abs(knots[0].real() - R0.real());
-    std::complex<double> knot_val = knots[0];
+    double min_val = std::abs(knots[0] - R0);
+    double knot_val = knots[0];
 
 
     for (int idx = 1; idx < knots.size(); ++ idx)
     {   
 
-        double diff = std::abs(knots[idx].real() - R0.real());
+        double diff = std::abs(knots[idx] - R0);
         if (diff < min_val)
         {
             min_val = diff;
             knot_val = knots[idx];
         }
     }
-    bspline_data["R0"] = knot_val.real();
+    bspline_data["R0"] = knot_val;
 }
 
 void data::_process_laser_data()

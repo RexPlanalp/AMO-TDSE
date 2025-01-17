@@ -22,7 +22,7 @@ struct data
     nlohmann::json state_data;
     nlohmann::json misc_data;
 
-    std::vector<std::complex<double>> knots;
+    std::vector<double> knots;
     std::map<std::pair<int,int>,int> lm_to_block;
 
     data(std::string& filename);
