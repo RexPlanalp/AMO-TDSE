@@ -7,6 +7,7 @@
 #include "bsplines.h"
 
 #include <string>
+#include <iostream>
 
 int main(int argc, char **argv) {
     PetscErrorCode ierr;
@@ -24,6 +25,8 @@ int main(int argc, char **argv) {
     basis.save_debug_info_bsplines(rank);
 
 
+
+    
 
     
     ierr = SlepcFinalize(); CHKERRQ(ierr);
