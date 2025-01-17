@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/petsc-3.22.2-ozvcqeydah6xpb4a6dyvjghay2kc3bo4/include",
+                "/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/petsc-3.22.2-ayxfwzf3eirore42gky6x4p6filormxl/include",
                 "/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/slepc-3.22.2-w3hjjvayvk5slg6ooxkmslo7mnwsknjn/include",
                 "/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/nlohmann-json-3.11.3-ldjbn3gihvzeu5bjq44t5plaotqmirom/include",
                 "${workspaceFolder}/header_files"

@@ -81,6 +81,6 @@ struct data
     void _xy_expansion();
     void _zxy_expansion();
 
-    void save_debug_info(int rank, bool debug);
+    void save_debug_info(int rank);
     
 };

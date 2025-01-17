@@ -260,9 +260,9 @@ void data::_zxy_expansion()
     }
 }
 
-void data::save_debug_info(int rank, bool debug)
+void data::save_debug_info(int rank)
 {
-    if (!debug) return; // Only save if debugging is enabled
+    if (!misc_data["debug"].get<int>()) return; // Only save if debugging is enabled
 
     if (rank == 0)
     {
