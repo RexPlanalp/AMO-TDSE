@@ -6,7 +6,7 @@
 
 bsplines::bsplines(std::string& filename) : data(filename)
 {
-
+    _compute_complex_knots();
 }
 
 std::complex<double> bsplines::ecs_x(double x)
@@ -43,10 +43,6 @@ void bsplines::_compute_complex_knots()
     }
 }
 
-void bsplines::setup_bsplines()
-{
-    _compute_complex_knots();
-}
 
 
 std::complex<double> bsplines::B(int i, int degree, std::complex<double> x)
@@ -96,7 +92,7 @@ std::complex<double> bsplines::dB(int i, int degree, std::complex<double> x)
     }
     if (denom2.real()>0)
     {
-        term2 = std::complex<double>(-degree)/(denom2) * B(i+1,degree-1,x);
+        term2 = -std::complex<double>(degree)/(denom2) * B(i+1,degree-1,x);
     }
 
     return term1+term2;
@@ -113,16 +109,12 @@ void bsplines::save_debug_info_bsplines(int rank)
         double rmax = space_range[1];
         double dr = space_range[2];
 
-        std::ofstream file("bsplines.txt");
-        if (!file.is_open())
+        std::ofstream file1("bsplines.txt");
+        if (!file1.is_open())
         {
             std::cerr << "Error: could not open file bsplines.txt" << std::endl;
             return;
         }
-
-        std::cout << knots.size() << std::endl;
-        std::cout << complex_knots.size() << std::endl;
-
 
         for (int i = 0; i <bspline_data["n_basis"].get<int>(); i++)
         {
@@ -131,11 +123,31 @@ void bsplines::save_debug_info_bsplines(int rank)
                 double x_val = rmin + idx * dr;
                 std::complex<double> x = ecs_x(x_val);
                 std::complex<double> val = B(i,bspline_data["degree"].get<int>(),x);
-                file << val.real() << "\t" << val.imag() << "\n";
+                file1 << val.real() << "\t" << val.imag() << "\n";
             }
-            file << "\n";
+            file1 << "\n";
         }
-        file.close();
+        file1.close();
+
+        std::ofstream file2("dbsplines.txt");
+        if (!file2.is_open())
+        {
+            std::cerr << "Error: could not open file bsplines.txt" << std::endl;
+            return;
+        }
+
+        for (int i = 0; i <bspline_data["n_basis"].get<int>(); i++)
+        {
+            for (int idx = 0; idx < grid_data["Nr"].get<int>(); ++idx)
+            {
+                double x_val = rmin + idx * dr;
+                std::complex<double> x = ecs_x(x_val);
+                std::complex<double> val = dB(i,bspline_data["degree"].get<int>(),x);
+                file2 << val.real() << "\t" << val.imag() << "\n";
+            }
+            file2 << "\n";
+        }
+        file2.close();
     }
 }
     

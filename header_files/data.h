@@ -27,9 +27,7 @@ struct data
 
     data(std::string& filename);
 
-    void process_data();
     
-
 
     void _process_bspline_data();
     

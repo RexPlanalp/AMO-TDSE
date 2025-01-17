@@ -26,15 +26,14 @@ data::data(std::string& filename)
     laser_data = input_par["laser"];
     state_data = input_par["state"];
     misc_data = input_par["misc"];
-}
 
-void data::process_data()
-{
     _process_bspline_data();
     _process_laser_data();
     _process_grid_data();
     _process_angular_data();
 }
+
+
 
 void data::_process_bspline_data()
 {   
