@@ -8,7 +8,7 @@
     "bspline_data": {
         "R0": 14.999999999999998,
         "degree": 6,
-        "eta": 0.25,
+        "eta": 0,
         "n_basis": 30,
         "order": 7
     },
