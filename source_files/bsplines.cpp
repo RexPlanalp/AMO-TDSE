@@ -5,7 +5,6 @@
 bsplines::bsplines(std::string& filename) : data(filename)
 {
     complex_knots = _compute_complex_knots();
-    complex_weights = _compute_complex_weights();
 }
 
 std::complex<double> bsplines::ecs_x(double x)
@@ -46,16 +45,33 @@ std::vector<std::complex<double>> bsplines::_compute_complex_knots()
     return complex_knots;
 }
 
-std::vector<std::complex<double>> bsplines::_compute_complex_weights()
+std::complex<double> bsplines::B(int i, int degree, std::complex<double> x)
 {
-    std::vector<std::complex<double>> complex_weights;
-    std::vector<double> weights = gauss::get_weights(bspline_data["order"].get<int>());
-    
-    for (int i = 0; i < weights.size(); i++)
+    if (degree == 0)
     {
-        complex_weights.push_back(this->ecs_w(this->knots[i], weights[i])); // Use 'this->' to access inherited members
+        return (complex_knots[i].real() <= x.real() && x.real() < complex_knots[i+1].real() ? 1.0 : 0.0);
     }
 
-    return complex_weights;
+
+    std::complex<double> denom1 = complex_knots[i + degree] - complex_knots[i];
+    std::complex<double> denom2 = complex_knots[i + degree + 1] - complex_knots[i + 1];
+
+    std::complex<double> term1 = 0.0;
+    std::complex<double> term2 = 0.0;
+
+    if (denom1.real() > 0)
+    {
+        term1 = (x-complex_knots[i]) / (denom1) * B(i,degree-1,x);
+    }
+    if (denom2.real()>0)
+    {
+        term2 = (complex_knots[i+degree+1] -x ) / (denom2) * B(i+1,degree-1,x);
+    }
+
+    return term1+term2;
+
+
 }
+
+
 

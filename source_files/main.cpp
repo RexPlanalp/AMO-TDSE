@@ -4,6 +4,7 @@
 #include <petscsys.h>
 
 #include "data.h"
+#include "bsplines.h"
 
 #include <string>
 
@@ -15,9 +16,15 @@ int main(int argc, char **argv) {
 
     // Define input file string
     std::string input_file = "input.json";
+
+
     data sim_data(input_file);
     sim_data.process_data();
-    sim_data.save_debug_info(rank,true);
+    sim_data.save_debug_info(rank);
+
+    bsplines basis(input_file);
+
+
 
     
     ierr = SlepcFinalize(); CHKERRQ(ierr);
