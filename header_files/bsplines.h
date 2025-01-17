@@ -16,6 +16,8 @@ struct bsplines : public data
     std::vector<std::complex<double>> _compute_complex_weights();
 
     std::complex<double> B(int i, int degree, std::complex<double> x);
+    std::complex<double> dB(int i, int degree, std::complex<double> x);
+    void save_debug_info(int rank);
 
 
 

@@ -180,6 +180,7 @@ void data::_set_time()
     grid_data.erase("time_spacing");
     std::array<double,3> time_range = {0.0,time_size,dt};
     grid_data["time_range"] = time_range;
+    grid_data["Nt"] = Nt;
 }
 
 void data::_set_space()
@@ -192,6 +193,7 @@ void data::_set_space()
     grid_data.erase("grid_size");
     std::array<double,3> space_range = {dx,grid_size,dx};
     grid_data["space_range"] = space_range;
+    grid_data["Nr"] = Nr;
 }
 
 void data::_process_angular_data()
