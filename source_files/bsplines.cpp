@@ -6,7 +6,7 @@
 
 bsplines::bsplines(std::string& filename) : data(filename)
 {
-    complex_knots = _compute_complex_knots();
+
 }
 
 std::complex<double> bsplines::ecs_x(double x)
@@ -35,17 +35,19 @@ std::complex<double> bsplines::ecs_w(double x, double w)
     }
 }
 
-std::vector<std::complex<double>> bsplines::_compute_complex_knots()
-{
-    std::vector<std::complex<double>> complex_knots;
-    
+void bsplines::_compute_complex_knots()
+{   
     for (int i = 0; i < this->knots.size(); i++)  
     {
         complex_knots.push_back(this->ecs_x(this->knots[i])); // Use 'this->' to access inherited members
     }
-
-    return complex_knots;
 }
+
+void bsplines::setup_bsplines()
+{
+    _compute_complex_knots();
+}
+
 
 std::complex<double> bsplines::B(int i, int degree, std::complex<double> x)
 {
@@ -100,12 +102,12 @@ std::complex<double> bsplines::dB(int i, int degree, std::complex<double> x)
     return term1+term2;
 }
 
-void bsplines::save_debug_info(int rank)
+void bsplines::save_debug_info_bsplines(int rank)
 {
     if (!misc_data["debug"].get<int>()) return; // Only save if debugging is enabled
 
     if (rank == 0)
-    {
+    {   
         auto space_range = grid_data["space_range"].get<std::array<double,3>>();
         double rmin = space_range[0];
         double rmax = space_range[1];
@@ -118,10 +120,13 @@ void bsplines::save_debug_info(int rank)
             return;
         }
 
+        std::cout << knots.size() << std::endl;
+        std::cout << complex_knots.size() << std::endl;
+
 
         for (int i = 0; i <bspline_data["n_basis"].get<int>(); i++)
         {
-            for (int idx = 0; idx < grid_data["Nx"].get<int>(); ++idx)
+            for (int idx = 0; idx < grid_data["Nr"].get<int>(); ++idx)
             {
                 double x_val = rmin + idx * dr;
                 std::complex<double> x = ecs_x(x_val);

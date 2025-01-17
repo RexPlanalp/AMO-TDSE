@@ -6,17 +6,19 @@
         "nmax": 10
     },
     "bspline_data": {
-        "R0": 1994.6524064171124,
+        "R0": 14.999999999999998,
         "degree": 6,
         "eta": 0.25,
-        "n_basis": 1500,
+        "n_basis": 30,
         "order": 7
     },
     "grid_data": {
         "N": 20,
+        "Nr": 3000,
+        "Nt": 29568,
         "space_range": [
             0.01,
-            2000.0,
+            30.0,
             0.01
         ],
         "time_range": [
@@ -59,7 +61,8 @@
             1
         ],
         "HHG": 0,
-        "SLICE": "XZ"
+        "SLICE": "XZ",
+        "debug": 1
     },
     "state_data": [
         1,

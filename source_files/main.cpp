@@ -18,11 +18,16 @@ int main(int argc, char **argv) {
     std::string input_file = "input.json";
 
 
-    data sim_data(input_file);
-    sim_data.process_data();
-    sim_data.save_debug_info(rank);
+    // data sim_data(input_file);
+    // sim_data.process_data();
+    // sim_data.save_debug_info(rank);
 
     bsplines basis(input_file);
+    basis.process_data();
+    basis.setup_bsplines();
+    
+    basis.save_debug_info(rank);
+    basis.save_debug_info_bsplines(rank);
 
 
 

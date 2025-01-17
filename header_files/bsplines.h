@@ -12,12 +12,15 @@ struct bsplines : public data
 
     std::vector<std::complex<double>> complex_knots;
     std::vector<std::complex<double>> complex_weights;
-    std::vector<std::complex<double>> _compute_complex_knots();
-    std::vector<std::complex<double>> _compute_complex_weights();
+    void _compute_complex_knots();
+
+    void setup_bsplines();
+
 
     std::complex<double> B(int i, int degree, std::complex<double> x);
     std::complex<double> dB(int i, int degree, std::complex<double> x);
-    void save_debug_info(int rank);
+    
+    void save_debug_info_bsplines(int rank);
 
 
 
