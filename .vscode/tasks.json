@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build with Spack and mpicxx",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "spack load petsc slepc && export PKG_CONFIG_PATH=$(spack location -i petsc)/lib/pkgconfig:$(spack location -i slepc)/lib/pkgconfig:$PKG_CONFIG_PATH && mpicxx -std=c++14 -o example source_files/*.cpp -Iheader_files -I/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/nlohmann-json-3.11.3-ldjbn3gihvzeu5bjq44t5plaotqmirom/include $(pkg-config --cflags --libs petsc slepc)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Build task with Spack environment loaded and static MPI configuration."
+        },
+        {
+            "label": "Check MPI Version",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "spack load petsc slepc && which mpicxx && mpicxx --version"
+            ],
+            "problemMatcher": [],
+            "detail": "Check which MPI version is being used in the VS Code task."
+        }
+    ]
+}

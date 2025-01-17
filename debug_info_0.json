@@ -1,0 +1,77 @@
+{
+    "angular_data": {
+        "lmax": 15,
+        "mmax": 15,
+        "mmin": -15,
+        "nmax": 10
+    },
+    "bspline_data": {
+        "R0": 1994.6524064171124,
+        "degree": 6,
+        "eta": 0.25,
+        "n_basis": 1500,
+        "order": 7
+    },
+    "grid_data": {
+        "N": 20,
+        "space_range": [
+            0.01,
+            2000.0,
+            0.01
+        ],
+        "time_range": [
+            0.0,
+            1478.3965428657848,
+            0.05
+        ]
+    },
+    "laser_data": {
+        "A_0": 0.28085153931353674,
+        "CEP": 0,
+        "I": 20000000000000.0,
+        "center": 0,
+        "components": [
+            1.0,
+            1.0,
+            0.0
+        ],
+        "ell": 0,
+        "ellipticity": [
+            0.7071067811865475,
+            -0.7071067811865475,
+            0.0
+        ],
+        "polarization": [
+            0.7071067811865475,
+            0.7071067811865475,
+            0.0
+        ],
+        "poynting": [
+            0.0,
+            0.0,
+            1.0
+        ],
+        "w": 0.085
+    },
+    "misc_data": {
+        "E": [
+            0.001,
+            1
+        ],
+        "HHG": 0,
+        "SLICE": "XZ"
+    },
+    "state_data": [
+        1,
+        0,
+        0
+    ],
+    "tdse_data": {
+        "save_checkpoints": 0,
+        "tolerance": 1e-15
+    },
+    "tise_data": {
+        "max_iter": 2000,
+        "tolerance": 1e-08
+    }
+}
