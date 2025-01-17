@@ -3,6 +3,7 @@
 #include "gauss.h"
 #include <fstream>
 #include <iostream>
+#include <functional>
 
 bsplines::bsplines(std::string& filename) : data(filename)
 {
@@ -42,8 +43,6 @@ void bsplines::_compute_complex_knots()
         complex_knots.push_back(this->ecs_x(this->knots[i])); // Use 'this->' to access inherited members
     }
 }
-
-
 
 std::complex<double> bsplines::B(int i, int degree, std::complex<double> x)
 {
@@ -151,3 +150,50 @@ void bsplines::save_debug_info_bsplines(int rank)
     }
 }
     
+std::complex<double> bsplines::integrate_matrix_element(int i, int j, std::function<std::complex<double>(int,int,std::complex<double>)> integrand)
+{
+
+    std::complex<double> total = 0.0;
+    int lower = std::min(i, j);
+    int upper = std::max(i, j);
+
+    std::vector<double> roots = gauss::get_roots(bspline_data["order"].get<int>());
+    std::vector<double> weights = gauss::get_weights(bspline_data["order"].get<int>());
+
+    for (int k = lower; k<=upper+bspline_data["degree"].get<int>(); ++k)
+    {
+        double a = knots[k];
+        double b = knots[k+1];
+
+        if (a==b)
+        {
+            continue;
+        }
+
+        double half_b_minus_a = 0.5*(b-a);
+        double half_b_plus_a = 0.5*(b+a);
+
+        for (int r = 0; r<roots.size(); ++r)
+        {
+            double x_val = half_b_minus_a * roots[r] + half_b_plus_a;
+            double weight_val = weights[r];
+
+            std::complex<double> x = ecs_x(x_val);
+            std::complex<double> weight = ecs_w(x_val, weight_val)*half_b_minus_a;
+            total += weight*integrand(i,j,x);
+
+            
+        }
+
+
+    }
+        
+    return total;
+}
+
+std::complex<double> bsplines::overlap_integrand(int i, int j, std::complex<double> x)
+{
+    return bsplines::B(i,bspline_data["degree"].get<int>(),x)*bsplines::B(j,bspline_data["degree"].get<int>(),x);
+}
+
+

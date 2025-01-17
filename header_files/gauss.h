@@ -20,11 +20,27 @@ namespace gauss {
     };
 
     // Function to get weights for a given order
-    inline std::vector<double> get_weights(int order) {
-        if (rules.find(order) != rules.end()) {
+    std::vector<double> get_weights(int order) 
+    {
+        if (rules.find(order) != rules.end()) 
+        {
             return rules[order].weights;
-        } else {
+        } 
+        else 
+        {
             return {};  // Return empty vector if not found
+        }
+    }
+
+    std::vector<double> get_roots(int order) 
+    {
+        if (rules.find(order) != rules.end()) 
+        {
+            return rules[order].roots;
+        } 
+        else 
+        {
+            return {};  
         }
     }
 };
