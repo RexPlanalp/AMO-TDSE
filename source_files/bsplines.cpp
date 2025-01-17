@@ -197,8 +197,3 @@ std::complex<double> bsplines::overlap_integrand(int i, int j, std::complex<doub
 }
 
 
-// std::complex<double> result = basis.integrate_matrix_element(29, 29, 
-//     [&basis](int i, int j, std::complex<double> x) -> std::complex<double> { 
-//         return basis.overlap_integrand(i, j, x); 
-//     }
-// );

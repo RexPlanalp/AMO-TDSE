@@ -5,17 +5,17 @@
 
 void matrix::set_quantum_type(std::string quantum_type)
 {
-    quantum_type = quantum_type;
+    this->quantum_type = quantum_type;
 }
 
 void matrix::set_type(std::string type)
 {
-    matrix_type = type;
+    this->matrix_type = type;
 }
 
 void matrix::set_nnz(int nnz)
 {
-    nnz = nnz;
+    this->nnz = nnz;
 }
 
 std::array<int,2> matrix::get_local_range()
@@ -56,7 +56,7 @@ PetscErrorCode matrix::setup_matrix(bsplines basis)
         status = MatSeqAIJSetPreallocation(petsc_mat,nnz,NULL);
         CHKERRQ(status);
     }
-    else if (matrix_type == "aij")
+    else if (matrix_type == "mpi")
     {
         status = MatMPIAIJSetPreallocation(petsc_mat,nnz,NULL,nnz,NULL);
         CHKERRQ(status);
@@ -74,3 +74,8 @@ PetscErrorCode matrix::setup_matrix(bsplines basis)
     return status;  
 }
 
+void matrix::assemble_matrix()
+{
+    MatAssemblyBegin(petsc_mat,MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(petsc_mat,MAT_FINAL_ASSEMBLY);
+}

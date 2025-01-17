@@ -9,7 +9,9 @@
 struct tise : public data
 {
 
-matrix compute_overlap_matrix(std::string matrix_type);
+
+tise(std::string& filename);
+matrix compute_overlap_matrix(std::string matrix_type,bsplines basis);
 
 
 

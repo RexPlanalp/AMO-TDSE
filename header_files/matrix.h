@@ -22,6 +22,8 @@ struct matrix
 
     PetscErrorCode setup_matrix(bsplines basis);
     std::array<int,2> get_local_range();
+
+    void assemble_matrix();
     
     Mat petsc_mat;
 
