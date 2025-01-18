@@ -25,6 +25,10 @@ namespace bsplines
 
     void save_debug_bsplines(int rank, const simulation& sim);
 
-    PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand);
-    PetscErrorCode construct_overlap(const simulation& sim, Mat& S);
+    PetscErrorCode construct_matrix(simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,bool use_mpi,bool disable_ecs);
+    PetscErrorCode construct_overlap(simulation& sim, Mat& S,bool use_mpi,bool disable_ecs);
+    PetscErrorCode construct_kinetic(simulation& sim, Mat& K,bool use_mpi,bool disable_ecs);
+    PetscErrorCode construct_invr(simulation& sim, Mat& Inv_r,bool use_mpi,bool disable_ecs);
+    PetscErrorCode construct_invr2(simulation& sim, Mat& Inv_r2,bool use_mpi,bool disable_ecs);
+    PetscErrorCode construct_der(simulation& sim, Mat& D,bool use_mpi,bool disable_ecs);
 };

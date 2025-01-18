@@ -161,19 +161,42 @@ std::complex<double> der_integrand(int i, int j, std::complex<double> x, const s
 }
 
 
-PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand)
+PetscErrorCode construct_matrix(simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,bool use_mpi,bool disable_ecs)
 {
     PetscErrorCode ierr;
-    ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
-    ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
-    ierr = MatSetFromOptions(M); CHKERRQ(ierr);
-
     int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
-    ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
-    ierr = MatSetUp(M); CHKERRQ(ierr);
 
-    int start_row, end_row;
-    ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
+    double original_eta = sim.bspline_data.value("eta", 0.0);
+
+    if (disable_ecs)
+    {
+        sim.bspline_data["eta"] = 0.0;
+    }
+
+    if (use_mpi)
+    {
+        ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
+        ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(M); CHKERRQ(ierr);
+    }
+    else
+    {
+        ierr = MatCreate(PETSC_COMM_SELF, &M); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(M, nnz_per_row, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(M); CHKERRQ(ierr);
+    }
+    
+    int start_row,end_row;
+    if (use_mpi) {
+        ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
+    } else {
+        start_row = 0;
+        end_row = sim.bspline_data.value("n_basis", 0);
+    }
 
     for (int i = start_row; i < end_row; i++) 
     {
@@ -189,17 +212,35 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
 
     ierr = MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
     ierr = MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+    sim.bspline_data["eta"] = original_eta;
 
     return ierr;
 }
 
 
-PetscErrorCode construct_overlap(const simulation& sim, Mat& S)
+PetscErrorCode construct_overlap(simulation& sim, Mat& S,bool use_mpi,bool disable_ecs)
 {
-    return construct_matrix(sim, S, bsplines::overlap_integrand);
+    return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi, disable_ecs);
 }
 
-
-
-
+PetscErrorCode construct_kinetic(simulation& sim, Mat& K,bool use_mpi,bool disable_ecs)
+{
+    return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi, disable_ecs);
 }
+
+PetscErrorCode construct_invr(simulation& sim, Mat& Inv_r,bool use_mpi,bool disable_ecs)
+{
+    return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi, disable_ecs);
+}
+
+PetscErrorCode construct_invr2(simulation& sim, Mat& Inv_r2,bool use_mpi,bool disable_ecs)
+{
+    return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi, disable_ecs);
+}
+
+PetscErrorCode construct_der(simulation& sim, Mat& D,bool use_mpi,bool disable_ecs)
+{
+    return construct_matrix(sim, D, bsplines::der_integrand, use_mpi, disable_ecs);
+}
+
+} // namespace bsplines
