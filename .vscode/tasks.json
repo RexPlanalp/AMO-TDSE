@@ -7,7 +7,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "spack load petsc slepc && export PKG_CONFIG_PATH=$(spack location -i petsc)/lib/pkgconfig:$(spack location -i slepc)/lib/pkgconfig:$PKG_CONFIG_PATH && mpicxx -std=c++14 -o build/example source_files/*.cpp -Iheader_files -I/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/nlohmann-json-3.11.3-ldjbn3gihvzeu5bjq44t5plaotqmirom/include $(pkg-config --cflags --libs petsc slepc)"
+                "spack load petsc slepc && export PKG_CONFIG_PATH=$(spack location -i petsc)/lib/pkgconfig:$(spack location -i slepc)/lib/pkgconfig:$PKG_CONFIG_PATH && mpicxx -std=c++14 -o build/example src/*.cpp -Iheaders -I/home/becker/dopl4670/spack/opt/spack/linux-rhel7-broadwell/gcc-6.3.0/nlohmann-json-3.11.3-ldjbn3gihvzeu5bjq44t5plaotqmirom/include $(pkg-config --cflags --libs petsc slepc)"
             ],
             "group": {
                 "kind": "build",
