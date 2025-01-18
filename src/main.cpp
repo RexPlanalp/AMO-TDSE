@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     Mat S;
     tise tise_solver;
     double start = MPI_Wtime();
-    tise_solver.construct_overlap(sim,S);
+    tise::construct_overlap(sim,S);
     double end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to construct overlap matrix %.3f\n",end-start);
     
