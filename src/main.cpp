@@ -34,27 +34,10 @@ int main(int argc, char **argv) {
     PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 
 
-    start = MPI_Wtime();
-    bsplines::integrate_matrix_element(1000,1000,bsplines::overlap_integrand,sim);
-    end = MPI_Wtime();
-
-    PetscPrintf(PETSC_COMM_WORLD,"Time to integrate overlap %.3f\n",(end-start)*1000);
 
 
 
-    
-
-
-
-
-
-
-   
-    
-   
-   
     ierr = SlepcFinalize(); CHKERRQ(ierr);
     return 0;
 }
-
 
