@@ -4,7 +4,7 @@
 #SBATCH --partition=compute 
 #SBATCH --exclude=photon13,photon11
 #SBATCH --nodes 1
-#SBATCH --ntasks 2
+#SBATCH --ntasks 1
 #SBATCH --mem=32G
 
 source ~/spack/share/spack/setup-env.sh

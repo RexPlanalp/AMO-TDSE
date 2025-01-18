@@ -324,7 +324,7 @@ void simulation::save_debug_info(int rank)
         
 
         // Construct the filename using the rank
-        std::string filename = "debug_info_" + std::to_string(rank) + ".json";
+        std::string filename = "output.json";
 
         // Save to file
         std::ofstream file(filename);
