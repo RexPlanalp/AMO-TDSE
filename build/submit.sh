@@ -5,7 +5,7 @@
 #SBATCH --exclude=photon13,photon11
 #SBATCH --nodes 1
 #SBATCH --ntasks 24
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 
 source ~/spack/share/spack/setup-env.sh
 

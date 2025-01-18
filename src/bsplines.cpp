@@ -174,10 +174,6 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
     PetscErrorCode ierr;
     int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
 
-    double original_eta = sim.bspline_data.value("eta", 0.0);
-
-    
-
     if (use_mpi)
     {
         ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
@@ -211,10 +207,6 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
         for (int j = col_start; j < col_end; j++) 
         {
             std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim);
-            if (i == 99 && j == 99)
-            {
-                std::cout << "result: " << result << std::endl;
-            }
             ierr = MatSetValue(M, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
         }
     }
@@ -252,34 +244,34 @@ PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi)
 
 
 
-PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
-    PetscErrorCode ierr;
-    PetscInt m, n;
+// PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
+//     PetscErrorCode ierr;
+//     PetscInt m, n;
 
-    // Get matrix dimensions
-    ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
+//     // Get matrix dimensions
+//     ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
 
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return PETSC_ERR_FILE_OPEN;
-    }
+//     std::ofstream file(filename);
+//     if (!file.is_open()) {
+//         std::cerr << "Error opening file: " << filename << std::endl;
+//         return PETSC_ERR_FILE_OPEN;
+//     }
 
-    // Write matrix values row by row
-    for (PetscInt i = 0; i < m; ++i) {
-        for (PetscInt j = 0; j < n; ++j) {
-            PetscScalar value;
-            ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
-            file << value;
-            if (j < n - 1) {
-                file << ", ";  // Add CSV separator
-            }
-        }
-        file << "\n"; // Newline for next row
-    }
+//     // Write matrix values row by row
+//     for (PetscInt i = 0; i < m; ++i) {
+//         for (PetscInt j = 0; j < n; ++j) {
+//             PetscScalar value;
+//             ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
+//             file << value;
+//             if (j < n - 1) {
+//                 file << ", ";  // Add CSV separator
+//             }
+//         }
+//         file << "\n"; // Newline for next row
+//     }
 
-    file.close();
-    return ierr;
-}
+//     file.close();
+//     return ierr;
+// }
 
 } // namespace bsplines

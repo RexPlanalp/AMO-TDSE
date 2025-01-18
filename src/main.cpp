@@ -31,20 +31,9 @@ int main(int argc, char **argv) {
     double start = MPI_Wtime();
     tise::solve_tise(sim);
     double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to construct overlap matrix %.3f\n",end-start);
+    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 
 
-
-    // std::complex<double> value1 = bsplines::integrate_matrix_element(0,0,bsplines::overlap_integrand,sim);
-    // PetscPrintf(PETSC_COMM_WORLD,"Overlap matrix element %f %f\n",real(value1),imag(value1));
-
-    // std::complex<double> value2 = bsplines::integrate_matrix_element(99,99,bsplines::overlap_integrand,sim);
-    // PetscPrintf(PETSC_COMM_WORLD,"Overlap matrix element %f %f\n",real(value2),imag(value2));
-
-    // Mat S;
-    // bsplines::construct_overlap(sim,S,true);
-    // bsplines::SaveMatrixToCSV(S,"overlap.csv");
-    
 
     
 

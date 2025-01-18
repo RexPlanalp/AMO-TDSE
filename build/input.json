@@ -1,15 +1,15 @@
 {
     "grid": {
-        "grid_size": 100,
+        "grid_size": 2000,
         "grid_spacing": 0.01,
         "N": 20,
         "time_spacing": 0.05
     },
 
     "bsplines": {
-        "n_basis": 100,
+        "n_basis": 2000,
         "order": 7,
-        "R0_input": 95,
+        "R0_input": 1995,
         "eta": 0.25,
         "debug": 0
     },

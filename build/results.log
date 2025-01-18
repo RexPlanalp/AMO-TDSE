@@ -1,14 +1,66 @@
-result: (0.0814399,0.0814399)
-result: (0.81051,-0.81051)
-result: (8.99787e-06,7.81365e-06)
-result: (0.00085702,0.000798773)
-Eigenvalues Requested 10, Eigenvalues Converged: 11 
-Eigenvalues Requested 9, Eigenvalues Converged: 11 
-Eigenvalues Requested 8, Eigenvalues Converged: 9 
-Eigenvalues Requested 7, Eigenvalues Converged: 9 
-Eigenvalues Requested 6, Eigenvalues Converged: 8 
+Eigenvalues Requested 10, Eigenvalues Converged: 10 
+Saving Eigenvalue 1:(-0.500,0.000) 
+Saving Eigenvalue 2:(-0.125,-0.000) 
+Saving Eigenvalue 3:(-0.056,-0.000) 
+Saving Eigenvalue 4:(-0.031,-0.000) 
+Saving Eigenvalue 5:(-0.020,-0.000) 
+Saving Eigenvalue 6:(-0.014,0.000) 
+Saving Eigenvalue 7:(-0.010,-0.000) 
+Saving Eigenvalue 8:(-0.008,0.000) 
+Saving Eigenvalue 9:(-0.006,-0.000) 
+Saving Eigenvalue 10:(-0.005,-0.000) 
+Eigenvalues Requested 9, Eigenvalues Converged: 9 
+Saving Eigenvalue 1:(-0.125,0.000) 
+Saving Eigenvalue 2:(-0.056,-0.000) 
+Saving Eigenvalue 3:(-0.031,0.000) 
+Saving Eigenvalue 4:(-0.020,0.000) 
+Saving Eigenvalue 5:(-0.014,0.000) 
+Saving Eigenvalue 6:(-0.010,0.000) 
+Saving Eigenvalue 7:(-0.008,-0.000) 
+Saving Eigenvalue 8:(-0.006,0.000) 
+Saving Eigenvalue 9:(-0.005,-0.000) 
+Eigenvalues Requested 8, Eigenvalues Converged: 8 
+Saving Eigenvalue 1:(-0.056,0.000) 
+Saving Eigenvalue 2:(-0.031,0.000) 
+Saving Eigenvalue 3:(-0.020,-0.000) 
+Saving Eigenvalue 4:(-0.014,0.000) 
+Saving Eigenvalue 5:(-0.010,0.000) 
+Saving Eigenvalue 6:(-0.008,-0.000) 
+Saving Eigenvalue 7:(-0.006,0.000) 
+Saving Eigenvalue 8:(-0.005,0.000) 
+Eigenvalues Requested 7, Eigenvalues Converged: 7 
+Saving Eigenvalue 1:(-0.031,0.000) 
+Saving Eigenvalue 2:(-0.020,-0.000) 
+Saving Eigenvalue 3:(-0.014,-0.000) 
+Saving Eigenvalue 4:(-0.010,0.000) 
+Saving Eigenvalue 5:(-0.008,0.000) 
+Saving Eigenvalue 6:(-0.006,-0.000) 
+Saving Eigenvalue 7:(-0.005,0.000) 
+Eigenvalues Requested 6, Eigenvalues Converged: 6 
+Saving Eigenvalue 1:(-0.020,0.000) 
+Saving Eigenvalue 2:(-0.014,-0.000) 
+Saving Eigenvalue 3:(-0.010,0.000) 
+Saving Eigenvalue 4:(-0.008,0.000) 
+Saving Eigenvalue 5:(-0.006,-0.000) 
+Saving Eigenvalue 6:(-0.005,-0.000) 
 Eigenvalues Requested 5, Eigenvalues Converged: 5 
-Eigenvalues Requested 4, Eigenvalues Converged: 7 
-Eigenvalues Requested 3, Eigenvalues Converged: 5 
-Eigenvalues Requested 2, Eigenvalues Converged: 4 
+Saving Eigenvalue 1:(-0.014,-0.000) 
+Saving Eigenvalue 2:(-0.010,0.000) 
+Saving Eigenvalue 3:(-0.008,0.000) 
+Saving Eigenvalue 4:(-0.006,0.000) 
+Saving Eigenvalue 5:(-0.005,0.000) 
+Eigenvalues Requested 4, Eigenvalues Converged: 4 
+Saving Eigenvalue 1:(-0.010,0.000) 
+Saving Eigenvalue 2:(-0.008,0.000) 
+Saving Eigenvalue 3:(-0.006,0.000) 
+Saving Eigenvalue 4:(-0.005,-0.000) 
+Eigenvalues Requested 3, Eigenvalues Converged: 3 
+Saving Eigenvalue 1:(-0.008,-0.000) 
+Saving Eigenvalue 2:(-0.006,-0.000) 
+Saving Eigenvalue 3:(-0.005,-0.000) 
+Eigenvalues Requested 2, Eigenvalues Converged: 2 
+Saving Eigenvalue 1:(-0.006,0.000) 
+Saving Eigenvalue 2:(-0.005,-0.000) 
 Eigenvalues Requested 1, Eigenvalues Converged: 1 
+Saving Eigenvalue 1:(-0.005,0.000) 
+Time to construct overlap matrix 59.718

@@ -39,7 +39,7 @@ namespace tise
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
         ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-8),sim.tise_data.value("max_iter",2000)); CHKERRQ(ierr);
 
-        for (int l = 0; sim.angular_data.value("lmax",0); ++l)
+        for (int l = 0; l<=sim.angular_data.value("lmax",0); ++l)
         {
             ierr = MatDuplicate(K,MAT_COPY_VALUES,&temp); CHKERRQ(ierr);
             ierr = MatAXPY(temp, l*(l+1)*0.5,Inv_r2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
@@ -61,6 +61,7 @@ namespace tise
             {
                 std::complex<double> eigenvalue;
                 ierr = EPSGetEigenvalue(eps,i,&eigenvalue,NULL); CHKERRQ(ierr);
+                PetscPrintf(PETSC_COMM_WORLD,"Saving Eigenvalue %d:(%.3f,%.3f) \n",i+1,eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
 
              
 
