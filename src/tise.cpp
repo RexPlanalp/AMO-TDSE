@@ -21,10 +21,15 @@ namespace tise
         EPS eps;
         int nconv;
 
-        ierr = bsplines::construct_overlap(sim,S,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_kinetic(sim,K,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr2(sim,Inv_r2,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr(sim,Inv_r,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_overlap(sim,S,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_kinetic(sim,K,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr2(sim,Inv_r2,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr(sim,Inv_r,true); CHKERRQ(ierr);
+
+        // ierr= bsplines::SaveMatrixToCSV(S,"S.csv"); CHKERRQ(ierr);
+        // ierr= bsplines::SaveMatrixToCSV(K,"K.csv"); CHKERRQ(ierr);
+        // ierr= bsplines::SaveMatrixToCSV(Inv_r2,"Inv_r2.csv"); CHKERRQ(ierr);
+        // ierr= bsplines::SaveMatrixToCSV(Inv_r,"Inv_r.csv"); CHKERRQ(ierr);
 
         ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 

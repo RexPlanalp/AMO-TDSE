@@ -113,13 +113,22 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
             continue;
         }
 
+     
+
+
         double half_b_minus_a = 0.5 * (b - a);
         double half_b_plus_a = 0.5 * (b + a);
 
         for (size_t r = 0; r < roots.size(); ++r)
         {
+            
+
             double x_val = half_b_minus_a * roots[r] + half_b_plus_a;
             double weight_val = weights[r];
+
+            
+
+            
 
             std::complex<double> x = sim.ecs_x(x_val);
             std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
@@ -160,18 +169,14 @@ std::complex<double> der_integrand(int i, int j, std::complex<double> x, const s
            bsplines::dB(j, sim.bspline_data.value("degree", 0), x, sim);
 }
 
-
-PetscErrorCode construct_matrix(simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,bool use_mpi)
 {
     PetscErrorCode ierr;
     int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
 
     double original_eta = sim.bspline_data.value("eta", 0.0);
 
-    if (disable_ecs)
-    {
-        sim.bspline_data["eta"] = 0.0;
-    }
+    
 
     if (use_mpi)
     {
@@ -206,41 +211,75 @@ PetscErrorCode construct_matrix(simulation& sim, Mat& M, std::function<std::comp
         for (int j = col_start; j < col_end; j++) 
         {
             std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim);
+            if (i == 99 && j == 99)
+            {
+                std::cout << "result: " << result << std::endl;
+            }
             ierr = MatSetValue(M, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
         }
     }
 
     ierr = MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
     ierr = MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    sim.bspline_data["eta"] = original_eta;
-
     return ierr;
 }
 
-
-PetscErrorCode construct_overlap(simulation& sim, Mat& S,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_overlap(const simulation& sim, Mat& S,bool use_mpi)
 {
-    return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi, disable_ecs);
+    return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi);
 }
 
-PetscErrorCode construct_kinetic(simulation& sim, Mat& K,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_kinetic(const simulation& sim, Mat& K,bool use_mpi)
 {
-    return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi, disable_ecs);
+    return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi);
 }
 
-PetscErrorCode construct_invr(simulation& sim, Mat& Inv_r,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_invr(const simulation& sim, Mat& Inv_r,bool use_mpi)
 {
-    return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi, disable_ecs);
+    return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi);
 }
 
-PetscErrorCode construct_invr2(simulation& sim, Mat& Inv_r2,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_invr2(const simulation& sim, Mat& Inv_r2,bool use_mpi)
 {
-    return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi, disable_ecs);
+    return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi);
 }
 
-PetscErrorCode construct_der(simulation& sim, Mat& D,bool use_mpi,bool disable_ecs)
+PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi)
 {
-    return construct_matrix(sim, D, bsplines::der_integrand, use_mpi, disable_ecs);
+    return construct_matrix(sim, D, bsplines::der_integrand, use_mpi);
+}
+
+
+
+
+PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
+    PetscErrorCode ierr;
+    PetscInt m, n;
+
+    // Get matrix dimensions
+    ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
+
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return PETSC_ERR_FILE_OPEN;
+    }
+
+    // Write matrix values row by row
+    for (PetscInt i = 0; i < m; ++i) {
+        for (PetscInt j = 0; j < n; ++j) {
+            PetscScalar value;
+            ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
+            file << value;
+            if (j < n - 1) {
+                file << ", ";  // Add CSV separator
+            }
+        }
+        file << "\n"; // Newline for next row
+    }
+
+    file.close();
+    return ierr;
 }
 
 } // namespace bsplines

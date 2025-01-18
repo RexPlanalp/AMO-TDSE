@@ -1,1 +1,14 @@
-Debug information saved to output.json
+result: (0.0814399,0.0814399)
+result: (0.81051,-0.81051)
+result: (8.99787e-06,7.81365e-06)
+result: (0.00085702,0.000798773)
+Eigenvalues Requested 10, Eigenvalues Converged: 11 
+Eigenvalues Requested 9, Eigenvalues Converged: 11 
+Eigenvalues Requested 8, Eigenvalues Converged: 9 
+Eigenvalues Requested 7, Eigenvalues Converged: 9 
+Eigenvalues Requested 6, Eigenvalues Converged: 8 
+Eigenvalues Requested 5, Eigenvalues Converged: 5 
+Eigenvalues Requested 4, Eigenvalues Converged: 7 
+Eigenvalues Requested 3, Eigenvalues Converged: 5 
+Eigenvalues Requested 2, Eigenvalues Converged: 4 
+Eigenvalues Requested 1, Eigenvalues Converged: 1 
