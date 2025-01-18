@@ -27,9 +27,9 @@ int main(int argc, char **argv) {
     bsplines::save_debug_bsplines(rank,sim);
 
     Mat S;
-    tise tise_solver;
+    //tise tise_solver;
     double start = MPI_Wtime();
-    tise::construct_overlap(sim,S);
+    bsplines::construct_overlap(sim,S);
     double end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to construct overlap matrix %.3f\n",end-start);
     
