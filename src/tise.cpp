@@ -61,7 +61,7 @@ namespace tise
             {
                 std::complex<double> eigenvalue;
                 ierr = EPSGetEigenvalue(eps,i,&eigenvalue,NULL); CHKERRQ(ierr);
-                PetscPrintf(PETSC_COMM_WORLD,"Saving Eigenvalue %d:(%.3f,%.3f) \n",i+1,eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
+                
 
              
 
@@ -91,6 +91,18 @@ namespace tise
                 ierr = MatCreateVecs(temp,&eigenvector, NULL); CHKERRQ(ierr);
                 ierr = EPSGetEigenvector(eps,i,eigenvector,NULL); CHKERRQ(ierr);
 
+                std::complex<double> norm;
+                Vec y;
+                ierr = VecDuplicate(eigenvector,&y); CHKERRQ(ierr);
+                ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
+                ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
+                ierr = VecScale(eigenvector,1.0/std::sqrt(norm.real())); CHKERRQ(ierr);
+
+                ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
+                ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
+
+                PetscPrintf(PETSC_COMM_WORLD,"Saving Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
+
                 std::string eigenvector_name = std::string("psi_l_") + std::to_string(i+l+1) + "_" + std::to_string(l);
                 ierr = PetscViewerHDF5PushGroup(viewTISE, "/eigenvectors"); CHKERRQ(ierr);
                 ierr = PetscObjectSetName((PetscObject)eigenvector,eigenvector_name.c_str()); CHKERRQ(ierr);
@@ -98,6 +110,7 @@ namespace tise
                 ierr = PetscViewerHDF5PopGroup(viewTISE); CHKERRQ(ierr);
 
                 ierr = VecDestroy(&eigenvector); CHKERRQ(ierr);
+                ierr = VecDestroy(&y); CHKERRQ(ierr);
 
             }
             ierr = MatDestroy(&temp); CHKERRQ(ierr);
