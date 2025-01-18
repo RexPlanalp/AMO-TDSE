@@ -160,4 +160,22 @@ std::complex<double> bsplines::overlap_integrand(int i, int j, std::complex<doub
     return bsplines::B(i,sim.bspline_data.value("degree",0),x,sim)*bsplines::B(j,sim.bspline_data.value("degree",0),x,sim);
 }
 
+std::complex<double> bsplines::kinetic_integrand(int i, int j, std::complex<double> x,const simulation& sim)
+{
+    return 0.5*bsplines::dB(i,sim.bspline_data.value("degree",0),x,sim)*bsplines::dB(j,sim.bspline_data.value("degree",0),x,sim);
+}
 
+std::complex<double> bsplines::inv_r_integrand(int i, int j, std::complex<double> x,const simulation& sim)
+{
+    return bsplines::B(i,sim.bspline_data.value("degree",0),x,sim)*bsplines::B(j,sim.bspline_data.value("degree",0),x,sim)/(x+1E-25);
+}
+
+std::complex<double> bsplines::inv_r2_integrand(int i, int j, std::complex<double> x,const simulation& sim)
+{
+    return bsplines::B(i,sim.bspline_data.value("degree",0),x,sim)*bsplines::B(j,sim.bspline_data.value("degree",0),x,sim)/(x*x+1E-25);
+}
+
+std::complex<double> bsplines::der_integrand(int i, int j, std::complex<double> x,const simulation& sim)
+{
+    return bsplines::B(i,sim.bspline_data.value("degree",0),x,sim)*bsplines::dB(j,sim.bspline_data.value("degree",0),x,sim);
+}

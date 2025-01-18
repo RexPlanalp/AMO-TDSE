@@ -30,14 +30,51 @@ int main(int argc, char **argv) {
 
     bsplines basis;
     basis.save_debug_bsplines(rank,sim);
+     start = MPI_Wtime(); 
+   Mat S;
+ierr = MatCreate(PETSC_COMM_WORLD, &S); CHKERRQ(ierr);
+ierr = MatSetSizes(S, PETSC_DECIDE, PETSC_DECIDE, 
+                   sim.bspline_data.value("n_basis",0), 
+                   sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+ierr = MatSetFromOptions(S); CHKERRQ(ierr);
+
+// Preallocate memory for nonzero entries
+PetscInt nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
+ierr = MatMPIAIJSetPreallocation(S, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
+
+// Set up the matrix
+ierr = MatSetUp(S); CHKERRQ(ierr);
+
+// Get the range of rows owned by the current process
+PetscInt start_row, end_row;
+ierr = MatGetOwnershipRange(S, &start_row, &end_row); CHKERRQ(ierr);
+
+// Iterate over locally owned rows
+for (PetscInt i = start_row; i < end_row; i++) {
+    PetscInt col_start = std::max(static_cast<PetscInt>(0), i - sim.bspline_data.value("order",0) + 1);
+    PetscInt col_end = std::min(sim.bspline_data.value("n_basis",0), i + sim.bspline_data.value("order",0));
+
+    for (PetscInt j = col_start; j < col_end; j++) {
+        // Compute the matrix element
+        std::complex<double> result = basis.integrate_matrix_element(
+            i, j,
+            [&](int i, int j, std::complex<double> x) { return basis.overlap_integrand(i, j, x, sim); },
+            sim
+        );
+
+        // Insert only the real part (or full complex value if PETSc supports complex numbers)
+        ierr = MatSetValue(S, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
+    }
+}
+
+// Assemble the matrix
+ierr = MatAssemblyBegin(S, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+ierr = MatAssemblyEnd(S, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
 
-    
-    
-    start = MPI_Wtime();
-    std::complex<double> result = basis.integrate_matrix_element(1000, 1000,[&](int i, int j, std::complex<double> x) {return basis.overlap_integrand(i, j, x, sim);}, sim);
+   
     end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to integrate %.3f\n",(end-start)*1000);
+    PetscPrintf(PETSC_COMM_WORLD,"Time to construct %.3f\n",(end-start));
 
 
     
