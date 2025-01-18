@@ -63,7 +63,7 @@ std::complex<double> dB(int i, int degree, std::complex<double> x, const simulat
 
 void save_debug_bsplines(int rank, const simulation& sim)
 {
-    if (!sim.bspline_data.value("debug", 0)) return; // Only save if debugging is enabled
+    if (!sim.misc_data.value("debug", 0)) return; // Only save if debugging is enabled
 
     if (rank == 0)
     {

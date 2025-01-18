@@ -10,8 +10,7 @@
         "n_basis": 2000,
         "order": 7,
         "R0_input": 1995,
-        "eta": 0.25,
-        "debug": 0
+        "eta": 0.25
     },
 
 
