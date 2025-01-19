@@ -5,6 +5,7 @@
 
 #include "simulation.h"
 #include "bsplines.h"
+#include "laser.h"
 #include "tise.h"
 
 
@@ -23,15 +24,17 @@ int main(int argc, char **argv) {
     simulation sim(input_file);
     sim.save_debug_info(rank);
 
-    
+
+    laser::save_debug_laser(rank,sim);
     bsplines::save_debug_bsplines(rank,sim);
+
 
    
 
-    double start = MPI_Wtime();
-    tise::solve_tise(sim,rank);
-    double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
+    // double start = MPI_Wtime();
+    // tise::solve_tise(sim,rank);
+    // double end = MPI_Wtime();
+    // PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 
 
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "misc.h"
+#include <complex>
 
 class simulation 
 {
