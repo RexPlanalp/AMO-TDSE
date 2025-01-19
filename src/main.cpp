@@ -5,8 +5,9 @@
 
 #include "simulation.h"
 #include "bsplines.h"
-#include "laser.h"
+#include "laser.h"  
 #include "tise.h"
+#include "tdse.h"
 
 
 #include <string>
@@ -28,6 +29,9 @@ int main(int argc, char **argv) {
     laser::save_debug_laser(rank,sim);
     bsplines::save_debug_bsplines(rank,sim);
 
+
+    Vec tdse_state;
+    ierr = tdse::load_starting_state(sim,tdse_state); CHKERRQ(ierr);
 
    
 

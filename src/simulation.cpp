@@ -241,6 +241,7 @@ void simulation::_process_angular_data()
 {
     this->_lm_expansion();
     this->qn_map.set_block_to_lm();
+    this->angular_data["n_blocks"] = this->qn_map.block_to_lm.size();
 }
 
 void simulation::_lm_expansion()
