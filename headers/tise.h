@@ -6,6 +6,6 @@
 
 namespace tise 
 {
-    PetscErrorCode solve_tise(simulation& sim);
+    PetscErrorCode solve_tise(const simulation& sim,int rank);
 }
 

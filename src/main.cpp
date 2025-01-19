@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
    
 
     double start = MPI_Wtime();
-    tise::solve_tise(sim);
+    tise::solve_tise(sim,rank);
     double end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 

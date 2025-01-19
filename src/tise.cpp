@@ -6,10 +6,14 @@
 #include "simulation.h"
 #include "bsplines.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <iostream>
+
 
 namespace tise
 {
-    PetscErrorCode solve_tise(simulation& sim)
+    PetscErrorCode solve_tise(const simulation& sim,int rank)
     {
         PetscErrorCode ierr;
         PetscViewer viewTISE;
@@ -22,18 +26,30 @@ namespace tise
         EPS eps;
         int nconv;
 
+        if (rank == 0) 
+        {
+            if (mkdir("TISE_files", 0777) == 0) 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n", "TISE_files");
+            } 
+            else 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n", "TISE_files");
+            }
+        }
+
         ierr = bsplines::construct_overlap(sim,S,true); CHKERRQ(ierr);
         ierr = bsplines::construct_kinetic(sim,K,true); CHKERRQ(ierr);
         ierr = bsplines::construct_invr2(sim,Inv_r2,true); CHKERRQ(ierr);
         ierr = bsplines::construct_invr(sim,Inv_r,true); CHKERRQ(ierr);
         ierr = bsplines::construct_der(sim,Der,true); CHKERRQ(ierr);
 
-        ierr = bsplines::save_matrix(K,"K.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(Inv_r2,"Inv_r2.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(Inv_r,"Inv_r.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(S,"S.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
 
-        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
+        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TISE_files/tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
         ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
         ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);

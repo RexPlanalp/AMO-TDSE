@@ -23,8 +23,8 @@
 
 
     "TISE": {
-        "tolerance": 1.0E-8,
-        "max_iter": 2000
+        "tolerance": 1.0E-15,
+        "max_iter": 3000
     },
 
     "state": [1, 0, 0],
