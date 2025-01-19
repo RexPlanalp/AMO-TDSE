@@ -17,6 +17,7 @@ namespace tise
         Mat Inv_r2;
         Mat Inv_r;
         Mat S;
+        Mat Der;
         Mat temp;
         EPS eps;
         int nconv;
@@ -25,11 +26,12 @@ namespace tise
         ierr = bsplines::construct_kinetic(sim,K,true); CHKERRQ(ierr);
         ierr = bsplines::construct_invr2(sim,Inv_r2,true); CHKERRQ(ierr);
         ierr = bsplines::construct_invr(sim,Inv_r,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_der(sim,Der,true); CHKERRQ(ierr);
 
-        // ierr= bsplines::SaveMatrixToCSV(S,"S.csv"); CHKERRQ(ierr);
-        // ierr= bsplines::SaveMatrixToCSV(K,"K.csv"); CHKERRQ(ierr);
-        // ierr= bsplines::SaveMatrixToCSV(Inv_r2,"Inv_r2.csv"); CHKERRQ(ierr);
-        // ierr= bsplines::SaveMatrixToCSV(Inv_r,"Inv_r.csv"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(K,"K.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r2,"Inv_r2.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r,"Inv_r.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(S,"S.bin"); CHKERRQ(ierr);
 
         ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
@@ -101,7 +103,7 @@ namespace tise
                 ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
                 ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
 
-                PetscPrintf(PETSC_COMM_WORLD,"Saving Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
+                PetscPrintf(PETSC_COMM_WORLD,"Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
 
                 std::string eigenvector_name = std::string("psi_l_") + std::to_string(i+l+1) + "_" + std::to_string(l);
                 ierr = PetscViewerHDF5PushGroup(viewTISE, "/eigenvectors"); CHKERRQ(ierr);

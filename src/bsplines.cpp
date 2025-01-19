@@ -241,7 +241,22 @@ PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi)
     return construct_matrix(sim, D, bsplines::der_integrand, use_mpi);
 }
 
+PetscErrorCode save_matrix(Mat A, const char *filename)
+    {
+        PetscErrorCode ierr;
+        PetscViewer viewer;
 
+        // Open a binary viewer in write mode
+        ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE, &viewer); CHKERRQ(ierr);
+
+        // Write the matrix to the file in parallel
+        ierr = MatView(A, viewer); CHKERRQ(ierr);
+
+        // Clean up the viewer
+        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
+
+        return ierr;
+    }
 
 
 // PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {

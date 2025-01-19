@@ -32,5 +32,7 @@ namespace bsplines
     PetscErrorCode construct_invr2(const simulation& sim, Mat& Inv_r2,bool use_mpi);
     PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi);
 
+    PetscErrorCode save_matrix(Mat A, const char *filename);
+
     PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename);
 };
