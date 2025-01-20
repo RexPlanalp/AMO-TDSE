@@ -8,6 +8,7 @@
 #include "laser.h"  
 #include "tise.h"
 #include "tdse.h"
+#include <petscviewerhdf5.h>
 
 
 #include <string>
@@ -30,16 +31,16 @@ int main(int argc, char **argv) {
     bsplines::save_debug_bsplines(rank,sim);
 
 
-    Vec tdse_state;
-    ierr = tdse::load_starting_state(sim,tdse_state); CHKERRQ(ierr);
+  
+    double start = MPI_Wtime();
+    tise::solve_tise(sim,rank);
+    double end = MPI_Wtime();
+    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 
-   
 
-    // double start = MPI_Wtime();
-    // tise::solve_tise(sim,rank);
-    // double end = MPI_Wtime();
-    // PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
-
+    ierr = tdse::load_starting_state(sim); CHKERRQ(ierr);
+ 
+    
 
 
 
