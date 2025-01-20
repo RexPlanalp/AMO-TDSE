@@ -33,16 +33,14 @@ int main(int argc, char **argv) {
 
   
     double start = MPI_Wtime();
-    tise::solve_tise(sim,rank);
+    ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
     double end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
 
-
-    ierr = tdse::load_starting_state(sim); CHKERRQ(ierr);
- 
-    
-
-
+    //start = MPI_Wtime();
+    ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
+    //end = MPI_Wtime();
+    //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
 
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

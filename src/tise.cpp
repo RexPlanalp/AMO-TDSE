@@ -119,7 +119,11 @@ namespace tise
                 ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
                 ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
 
-                PetscPrintf(PETSC_COMM_WORLD,"Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
+                if (sim.misc_data.value("debug", 0))
+                {
+                    PetscPrintf(PETSC_COMM_WORLD,"Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
+                }
+                
 
                 std::string eigenvector_name = std::string("psi_") + std::to_string(i+l+1) + "_" + std::to_string(l);
                 ierr = PetscViewerHDF5PushGroup(viewTISE, "/eigenvectors"); CHKERRQ(ierr);
