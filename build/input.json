@@ -7,7 +7,7 @@
     },
 
     "bsplines": {
-        "n_basis": 2000,
+        "n_basis": 1500,
         "order": 7,
         "R0_input": 1995,
         "eta": 0.25
@@ -34,7 +34,7 @@
         "w": 0.085,
         "I": 2.0E13,
         "polarization": [0,0,1],
-        "poynting": [1,0,0],
+        "poynting": [0,1,0],
         "ell": 0,
         "CEP": 0
     },
