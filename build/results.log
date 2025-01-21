@@ -9,7 +9,7 @@ Eigenvalues Requested 4, Eigenvalues Converged: 4
 Eigenvalues Requested 3, Eigenvalues Converged: 3 
 Eigenvalues Requested 2, Eigenvalues Converged: 2 
 Eigenvalues Requested 1, Eigenvalues Converged: 1 
-Time to solve TISE 79.457
+Time to solve TISE 79.234
 Norm of Initial State: (1.0000,0.0000)
-Time to solve TDSE 124.838
-Norm of Final State: (1.0000,0.0000)
+Time to solve TDSE 124.631
+Norm of Final State: (0.999993270437712,0.000000000000000)

@@ -373,7 +373,7 @@ namespace tdse
 
     ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
-    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.4f,%.4f)\n", norm.real(), norm.imag());
+    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
 
     return ierr;
 }
