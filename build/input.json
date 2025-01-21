@@ -8,7 +8,7 @@
     "bsplines": {
         "n_basis": 30,
         "order": 7,
-        "R0_input": 15.0,
+        "R0_input": 30.0,
         "eta": 0.25
     },
     "angular": {

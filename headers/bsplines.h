@@ -12,7 +12,7 @@ namespace bsplines
     std::complex<double> B(int i, int degree, std::complex<double> x, const std::vector<std::complex<double>>& knot_vector);
     std::complex<double> dB(int i, int degree, std::complex<double> x, const std::vector<std::complex<double>>& knot_vector);
 
-    std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim);
+    std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim,bool use_ecs);
 
     std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector);
     std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, const simulation& sim);

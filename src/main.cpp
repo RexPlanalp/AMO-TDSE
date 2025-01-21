@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     sim.save_debug_info(rank);
     bsplines::save_debug_bsplines(rank,sim);
 
-    std::complex<double> result = bsplines::integrate_matrix_element(29, 29, bsplines::overlap_integrand, sim);
+    std::complex<double> result = bsplines::integrate_matrix_element(29, 29, bsplines::overlap_integrand, sim,false);
     if (rank == 0)
     {
         std::cout << "Overlap matrix element: " << result << std::endl;

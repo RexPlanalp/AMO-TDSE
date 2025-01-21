@@ -7,8 +7,9 @@
 #include "bsplines.h"
 #include "simulation.h"
 
-namespace bsplines
+namespace bsplines 
 {
+
 
 void save_debug_bsplines(int rank, const simulation& sim)
 {
@@ -142,12 +143,11 @@ std::complex<double> dB(int i, int degree, std::complex<double> x, const std::ve
 
 
 
-std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim)
+std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim,bool use_ecs)
 {
     std::complex<double> total = 0.0;
     int lower = std::min(i, j);
     int upper = std::max(i, j);
-
 
     for (int k = lower; k <= upper + sim.bspline_data.at("degree").get<int>(); ++k)
     {
@@ -169,11 +169,20 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
             double x_val = half_b_minus_a * sim.roots[r] + half_b_plus_a;
             double weight_val = sim.weights[r];
 
-            std::complex<double> x = sim.ecs_x(x_val);
-            std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
-            std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.complex_knots);
-
-            total += weight * integrand_val;
+            if (use_ecs)
+            {
+                std::complex<double> x = sim.ecs_x(x_val);
+                std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
+                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.complex_knots);
+                total += weight * integrand_val;
+            }
+            else
+            {
+                std::complex<double> x = x_val;
+                std::complex<double> weight = weight_val* half_b_minus_a;
+                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.knots);
+                total += weight * integrand_val;
+            }
         }
     }
 
@@ -186,10 +195,12 @@ std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, int
            bsplines::B(j, degree, x, knot_vector);
 }
 
-// std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, const simulation& sim)
+
+
+// std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
 // {
-//     return 0.5*bsplines::dB(i, sim.bspline_data.value("degree", 0), x, sim) * 
-//            bsplines::dB(j, sim.bspline_data.value("degree", 0), x, sim);
+//     return 0.5*bsplines::dB(i, degree, x, knot_vector) * 
+//            bsplines::dB(j,degree, x, knot_vector);
 // }
 
 // std::complex<double> invr_integrand(int i, int j, std::complex<double> x, const simulation& sim)
@@ -330,4 +341,4 @@ std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, int
 //     return ierr;
 // }
 
-} // namespace bsplines
+}
