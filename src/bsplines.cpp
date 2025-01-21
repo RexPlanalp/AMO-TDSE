@@ -149,10 +149,11 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
     int upper = std::max(i, j);
 
 
-    for (int k = lower; k <= upper + sim.bspline_data.value("degree", 0); ++k)
+    for (int k = lower; k <= upper + sim.bspline_data.at("degree").get<int>(); ++k)
     {
         double a = sim.knots[k].real();
         double b = sim.knots[k + 1].real();
+
 
         if (a == b)
         {
@@ -161,6 +162,7 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
 
         double half_b_minus_a = 0.5 * (b - a);
         double half_b_plus_a = 0.5 * (b + a);
+
 
         for (int r = 0; r < sim.roots.size(); ++r)
         {
@@ -171,7 +173,6 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
             std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
             std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.complex_knots);
 
-            std::cout << weight << integrand_val << std::endl;
             total += weight * integrand_val;
         }
     }
