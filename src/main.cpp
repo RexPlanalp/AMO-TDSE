@@ -28,6 +28,13 @@ int main(int argc, char **argv) {
     sim.save_debug_info(rank);
     bsplines::save_debug_bsplines(rank,sim);
 
+    std::complex<double> result = bsplines::integrate_matrix_element(0, 0, bsplines::overlap_integrand, sim);
+    if (rank == 0)
+    {
+        std::cout << "Overlap matrix element: " << result << std::endl;
+    }
+
+
 
     // laser::save_debug_laser(rank,sim);
     // bsplines::save_debug_bsplines(rank,sim);

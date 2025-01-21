@@ -7,9 +7,60 @@
 #include "bsplines.h"
 #include "simulation.h"
 
-namespace bsplines{
+namespace bsplines
+{
+
+void save_debug_bsplines(int rank, const simulation& sim)
+{
+    if (!sim.debug) return; // Only save if debugging is enabled
+
+    if (rank == 0)
+    {
+        
+
+        std::ofstream file1("debug/bsplines.txt");
+        if (!file1.is_open())
+        {
+            std::cerr << "Error: could not open file bsplines.txt" << std::endl;
+            return;
+        }
+
+        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
+        {
+            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
+            {
+                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
+                std::complex<double> x = sim.ecs_x(x_val);
+                std::complex<double> val = B(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
+                file1 << val.real() << "\t" << val.imag() << "\n";
+            }
+            file1 << "\n";
+        }
+        file1.close();
 
 
+        
+        std::ofstream file2("debug/dbsplines.txt");
+        if (!file2.is_open())
+        {
+            std::cerr << "Error: could not open file dbsplines.txt" << std::endl;
+            return;
+        }
+
+        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
+        {
+            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
+            {
+                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
+                std::complex<double> x = sim.ecs_x(x_val);
+                std::complex<double> val = dB(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
+                file2 << val.real() << "\t" << val.imag() << "\n";
+            }
+            file2 << "\n";
+        }
+        file2.close();
+    }
+}
 
 std::complex<double> B(int i, int degree, std::complex<double> x, const std::vector<std::complex<double>>& knot_vector)
 {
@@ -77,121 +128,62 @@ std::complex<double> dB(int i, int degree, std::complex<double> x, const std::ve
 
 
 
-void save_debug_bsplines(int rank, const simulation& sim)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim)
 {
-    if (!sim.debug) return; // Only save if debugging is enabled
+    std::complex<double> total = 0.0;
+    int lower = std::min(i, j);
+    int upper = std::max(i, j);
 
-    if (rank == 0)
+
+    for (int k = lower; k <= upper + sim.bspline_data.value("degree", 0); ++k)
     {
-        
+        double a = sim.knots[k].real();
+        double b = sim.knots[k + 1].real();
 
-        std::ofstream file1("debug/bsplines.txt");
-        if (!file1.is_open())
+        if (a == b)
         {
-            std::cerr << "Error: could not open file bsplines.txt" << std::endl;
-            return;
+            continue;
         }
 
-        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
-        {
-            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
-            {
-                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
-                std::complex<double> x = sim.ecs_x(x_val);
-                std::complex<double> val = B(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
-                file1 << val.real() << "\t" << val.imag() << "\n";
-            }
-            file1 << "\n";
-        }
-        file1.close();
+        double half_b_minus_a = 0.5 * (b - a);
+        double half_b_plus_a = 0.5 * (b + a);
 
-
-        
-        std::ofstream file2("debug/dbsplines.txt");
-        if (!file2.is_open())
+        for (int r = 0; r < sim.roots.size(); ++r)
         {
-            std::cerr << "Error: could not open file dbsplines.txt" << std::endl;
-            return;
-        }
+            double x_val = half_b_minus_a * sim.roots[r] + half_b_plus_a;
+            double weight_val = sim.weights[r];
 
-        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
-        {
-            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
-            {
-                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
-                std::complex<double> x = sim.ecs_x(x_val);
-                std::complex<double> val = dB(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
-                file2 << val.real() << "\t" << val.imag() << "\n";
-            }
-            file2 << "\n";
+            std::complex<double> x = sim.ecs_x(x_val);
+            std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
+            std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.complex_knots);
+
+            std::cout << weight << integrand_val << std::endl;
+            total += weight * integrand_val;
         }
-        file2.close();
     }
+
+    return total;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,const simulation& sim)
-// {
-//     std::complex<double> total = 0.0;
-//     int lower = std::min(i, j);
-//     int upper = std::max(i, j);
-
-//     std::vector<double> roots = gauss::get_roots(sim.bspline_data.value("order", 0));
-//     std::vector<double> weights = gauss::get_weights(sim.bspline_data.value("order", 0));
-
-//     for (int k = lower; k <= upper + sim.bspline_data.value("degree", 0); ++k)
-//     {
-//         double a = sim.knots[k];
-//         double b = sim.knots[k + 1];
-
-//         if (a == b)
-//         {
-//             continue;
-//         }
-
-     
-
-
-//         double half_b_minus_a = 0.5 * (b - a);
-//         double half_b_plus_a = 0.5 * (b + a);
-
-//         for (size_t r = 0; r < roots.size(); ++r)
-//         {
-            
-
-//             double x_val = half_b_minus_a * roots[r] + half_b_plus_a;
-//             double weight_val = weights[r];
-
-            
-
-            
-
-//             std::complex<double> x = sim.ecs_x(x_val);
-//             std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
-//             total += weight * integrand(i, j, x, sim);  // Direct function call
-//         }
-//     }
-
-//     return total;
-// }
-
-// std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, const simulation& sim)
-// {
-//     return bsplines::B(i, sim.bspline_data.value("degree", 0), x, sim) * 
-//            bsplines::B(j, sim.bspline_data.value("degree", 0), x, sim);
-// }
+std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::B(j, degree, x, knot_vector);
+}
 
 // std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, const simulation& sim)
 // {

@@ -185,7 +185,7 @@ void simulation::_compute_gauss()
         std::pair<std::vector<double>, std::vector<double>> values = gauss[bspline_data.at("order").get<int>()];
 
         // Accessing the first vector
-        std::vector<double> points = values.first;
+        std::vector<double> roots = values.first;
         std::vector<double> weights = values.second;
 
         
