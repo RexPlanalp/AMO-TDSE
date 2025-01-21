@@ -9,8 +9,6 @@
 
 namespace bsplines 
 {
-
-
 void save_debug_bsplines(int rank, const simulation& sim)
 {
     if (!sim.debug) return; // Only save if debugging is enabled
@@ -63,6 +61,8 @@ void save_debug_bsplines(int rank, const simulation& sim)
     }
 }
 
+
+
 std::complex<double> B(int i, int degree, std::complex<double> x, const std::vector<std::complex<double>>& knot_vector)
 {
     if (degree == 0)
@@ -112,36 +112,6 @@ std::complex<double> dB(int i, int degree, std::complex<double> x, const std::ve
 
     return term1 + term2;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 std::complex<double> integrate_matrix_element(int i, int j,std::function<std::complex<double>(int, int, std::complex<double>, int,const std::vector<std::complex<double>>&)> integrand,const simulation& sim,bool use_ecs)
 {
@@ -195,120 +165,118 @@ std::complex<double> overlap_integrand(int i, int j, std::complex<double> x, int
            bsplines::B(j, degree, x, knot_vector);
 }
 
+std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return 0.5*bsplines::dB(i, degree, x, knot_vector) * 
+           bsplines::dB(j,degree, x, knot_vector);
+}
 
+std::complex<double> invr_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::B(j, degree, x, knot_vector) /(x + 1E-25);
+}
 
-// std::complex<double> kinetic_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
-// {
-//     return 0.5*bsplines::dB(i, degree, x, knot_vector) * 
-//            bsplines::dB(j,degree, x, knot_vector);
-// }
+std::complex<double> invr2_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::B(j, degree, x, knot_vector) /(x*x + 1E-25);
+}
 
-// std::complex<double> invr_integrand(int i, int j, std::complex<double> x, const simulation& sim)
-// {
-//     return bsplines::B(i, sim.bspline_data.value("degree", 0), x, sim) * 
-//            bsplines::B(j, sim.bspline_data.value("degree", 0), x, sim) /(x + 1E-25);
-// }
+std::complex<double> der_integrand(int i, int j, std::complex<double> x,int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::dB(j, degree, x, knot_vector);
+}
 
-// std::complex<double> invr2_integrand(int i, int j, std::complex<double> x, const simulation& sim)
-// {
-//     return bsplines::B(i, sim.bspline_data.value("degree", 0), x, sim) * 
-//            bsplines::B(j, sim.bspline_data.value("degree", 0), x, sim) /(x*x + 1E-25);
-// }
+PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, int,std::vector<std::complex<double>>)> integrand,bool use_mpi,bool use_ecs)
+{
+    PetscErrorCode ierr;
+    int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
 
-// std::complex<double> der_integrand(int i, int j, std::complex<double> x, const simulation& sim)
-// {
-//     return bsplines::B(i, sim.bspline_data.value("degree", 0), x, sim) * 
-//            bsplines::dB(j, sim.bspline_data.value("degree", 0), x, sim);
-// }
-
-// PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, const simulation&)> integrand,bool use_mpi)
-// {
-//     PetscErrorCode ierr;
-//     int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
-
-//     if (use_mpi)
-//     {
-//         ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
-//         ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
-//         ierr = MatSetFromOptions(M); CHKERRQ(ierr);
-//         ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
-//         ierr = MatSetUp(M); CHKERRQ(ierr);
-//     }
-//     else
-//     {
-//         ierr = MatCreate(PETSC_COMM_SELF, &M); CHKERRQ(ierr);
-//         ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
-//         ierr = MatSetFromOptions(M); CHKERRQ(ierr);
-//         ierr = MatSeqAIJSetPreallocation(M, nnz_per_row, NULL); CHKERRQ(ierr);
-//         ierr = MatSetUp(M); CHKERRQ(ierr);
-//     }
+    if (use_mpi)
+    {
+        ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
+        ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(M); CHKERRQ(ierr);
+    }
+    else
+    {
+        ierr = MatCreate(PETSC_COMM_SELF, &M); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(M, nnz_per_row, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(M); CHKERRQ(ierr);
+    }
     
-//     int start_row,end_row;
-//     if (use_mpi) {
-//         ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
-//     } else {
-//         start_row = 0;
-//         end_row = sim.bspline_data.value("n_basis", 0);
-//     }
+    int start_row,end_row;
+    if (use_mpi) {
+        ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
+    } else {
+        start_row = 0;
+        end_row = sim.bspline_data.value("n_basis", 0);
+    }
 
-//     for (int i = start_row; i < end_row; i++) 
-//     {
-//         int col_start = std::max(0, i - sim.bspline_data.value("order",0) + 1);
-//         int col_end = std::min(sim.bspline_data.value("n_basis",0), i + sim.bspline_data.value("order",0));
+    for (int i = start_row; i < end_row; i++) 
+    {
+        int col_start = std::max(0, i - sim.bspline_data.value("order",0) + 1);
+        int col_end = std::min(sim.bspline_data.value("n_basis",0), i + sim.bspline_data.value("order",0));
 
-//         for (int j = col_start; j < col_end; j++) 
-//         {
-//             std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim);
-//             ierr = MatSetValue(M, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
-//         }
-//     }
+        for (int j = col_start; j < col_end; j++) 
+        {
+            std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim,use_ecs);
+            ierr = MatSetValue(M, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
+        }
+    }
 
-//     ierr = MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-//     ierr = MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-//     return ierr;
-// }
+    ierr = MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+    ierr = MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+    return ierr;
+}
 
-// PetscErrorCode construct_overlap(const simulation& sim, Mat& S,bool use_mpi)
-// {
-//     return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi);
-// }
+PetscErrorCode construct_overlap(const simulation& sim, Mat& S,bool use_mpi,bool use_ecs)
+{
+    return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi,use_ecs);
+}
 
-// PetscErrorCode construct_kinetic(const simulation& sim, Mat& K,bool use_mpi)
-// {
-//     return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi);
-// }
+PetscErrorCode construct_kinetic(const simulation& sim, Mat& K,bool use_mpi,bool use_ecs)
+{
+    return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi,use_ecs);
+}
 
-// PetscErrorCode construct_invr(const simulation& sim, Mat& Inv_r,bool use_mpi)
-// {
-//     return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi);
-// }
+PetscErrorCode construct_invr(const simulation& sim, Mat& Inv_r,bool use_mpi,bool use_ecs)
+{
+    return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi,use_ecs);
+}
 
-// PetscErrorCode construct_invr2(const simulation& sim, Mat& Inv_r2,bool use_mpi)
-// {
-//     return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi);
-// }
+PetscErrorCode construct_invr2(const simulation& sim, Mat& Inv_r2,bool use_mpi,bool use_ecs)
+{
+    return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi,use_ecs);
+}
 
-// PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi)
-// {
-//     return construct_matrix(sim, D, bsplines::der_integrand, use_mpi);
-// }
+PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi,bool use_ecs)
+{
+    return construct_matrix(sim, D, bsplines::der_integrand, use_mpi,use_ecs);
+}
 
-// PetscErrorCode save_matrix(Mat A, const char *filename)
-//     {
-//         PetscErrorCode ierr;
-//         PetscViewer viewer;
+PetscErrorCode save_matrix(Mat A, const char *filename)
+    {
+        PetscErrorCode ierr;
+        PetscViewer viewer;
 
-//         // Open a binary viewer in write mode
-//         ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE, &viewer); CHKERRQ(ierr);
+        // Open a binary viewer in write mode
+        ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE, &viewer); CHKERRQ(ierr);
 
-//         // Write the matrix to the file in parallel
-//         ierr = MatView(A, viewer); CHKERRQ(ierr);
+        // Write the matrix to the file in parallel
+        ierr = MatView(A, viewer); CHKERRQ(ierr);
 
-//         // Clean up the viewer
-//         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
+        // Clean up the viewer
+        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
-//         return ierr;
-//     }
+        return ierr;
+    }
 
 
 // PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {

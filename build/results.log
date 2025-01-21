@@ -1,3 +1,13 @@
-Debug Directory Created
-Debug information saved to debug/debug.json
-Overlap matrix element: (0.127577,0)
+Directory created: TISE_files
+Eigenvalues Requested 10, Eigenvalues Converged: 10 
+Eigenvalues Requested 9, Eigenvalues Converged: 9 
+Eigenvalues Requested 8, Eigenvalues Converged: 8 
+Eigenvalues Requested 7, Eigenvalues Converged: 7 
+Eigenvalues Requested 6, Eigenvalues Converged: 6 
+Eigenvalues Requested 5, Eigenvalues Converged: 5 
+Eigenvalues Requested 4, Eigenvalues Converged: 4 
+Eigenvalues Requested 3, Eigenvalues Converged: 3 
+Eigenvalues Requested 2, Eigenvalues Converged: 2 
+Eigenvalues Requested 1, Eigenvalues Converged: 1 
+Time to solve TISE 57.681
+Time to prepare matrices 19.303

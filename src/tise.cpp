@@ -38,16 +38,16 @@ namespace tise
             }
         }
 
-        ierr = bsplines::construct_overlap(sim,S,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_kinetic(sim,K,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr2(sim,Inv_r2,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr(sim,Inv_r,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_der(sim,Der,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_overlap(sim,S,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_kinetic(sim,K,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr2(sim,Inv_r2,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr(sim,Inv_r,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_der(sim,Der,true,false); CHKERRQ(ierr);
 
-        ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
-        ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
+        // ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
+        // ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
+        // ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
+        // ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
 
         ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TISE_files/tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
@@ -119,7 +119,7 @@ namespace tise
                 ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
                 ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
 
-                if (sim.misc_data.value("debug", 0))
+                if (sim.debug)
                 {
                     PetscPrintf(PETSC_COMM_WORLD,"Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
                 }
@@ -146,6 +146,36 @@ namespace tise
         ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
         ierr = MatDestroy(&S); CHKERRQ(ierr);
         ierr = MatDestroy(&temp); CHKERRQ(ierr);
+    }
+
+
+    PetscErrorCode prepare_matrices(const simulation& sim,int rank)
+    {
+        PetscErrorCode ierr;
+        Mat K;
+        Mat Inv_r2;
+        Mat Inv_r;
+        Mat S;
+        Mat Der;
+
+        ierr = bsplines::construct_overlap(sim,S,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_kinetic(sim,K,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr2(sim,Inv_r2,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_invr(sim,Inv_r,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_der(sim,Der,true,true); CHKERRQ(ierr);
+
+        ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
+        ierr = bsplines::save_matrix(Der,"TISE_files/Der.bin"); CHKERRQ(ierr);
+
+        ierr = MatDestroy(&K); CHKERRQ(ierr);
+        ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);
+        ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
+        ierr = MatDestroy(&S); CHKERRQ(ierr);
+        ierr = MatDestroy(&Der); CHKERRQ(ierr);
+        
     }
 }
 
