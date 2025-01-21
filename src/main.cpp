@@ -24,23 +24,25 @@ int main(int argc, char **argv) {
     std::string input_file = "input.json";
 
     simulation sim(input_file);
+
     sim.save_debug_info(rank);
-
-
-    laser::save_debug_laser(rank,sim);
     bsplines::save_debug_bsplines(rank,sim);
 
 
-  
-    double start = MPI_Wtime();
-    ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
-    double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
+    // laser::save_debug_laser(rank,sim);
+    // bsplines::save_debug_bsplines(rank,sim);
 
-    //start = MPI_Wtime();
-    ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
-    //end = MPI_Wtime();
-    //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
+
+  
+    // double start = MPI_Wtime();
+    // ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
+    // double end = MPI_Wtime();
+    // PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
+
+    // //start = MPI_Wtime();
+    // ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
+    // //end = MPI_Wtime();
+    // //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
 
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

@@ -1,35 +1,22 @@
 {
     "grid": {
-        "grid_size": 2000,
+        "grid_size": 2000.0,
         "grid_spacing": 0.01,
-        "N": 20,
+        "N": 20.0,
         "time_spacing": 0.05
     },
-
     "bsplines": {
         "n_basis": 1500,
         "order": 7,
         "R0_input": 1995,
         "eta": 0.25
     },
-
-
     "angular": {
         "lmax": 15,
         "mmin": -15,
         "mmax": 15,
         "nmax": 10
     },
-
-
-    "TISE": {
-        "tolerance": 1.0E-15,
-        "max_iter": 3000
-    },
-
-    "state": [1, 0, 0],
-
-
     "laser": {
         "w": 0.085,
         "I": 2.0E13,
@@ -38,17 +25,20 @@
         "ell": 0,
         "CEP": 0
     },
-
+    "TISE": {
+        "tolerance": 1.0E-15,
+        "max_iter": 3000
+    },
     "TDSE": {
         "tolerance": 1.0E-15,
-        "save_checkpoints": 0
+        "save_checkpoints": 0,
+        "state": [1, 0, 0]
     },
-
-    "misc":{
+    "observables":{
         "E": [0.001, 1],
         "SLICE": "XZ",
-        "HHG": 0,
-        "debug": 0
-    }
-    
+        "HHG": 0
+    } ,
+
+    "debug": 1
 }
