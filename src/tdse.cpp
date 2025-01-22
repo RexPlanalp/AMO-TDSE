@@ -6,6 +6,9 @@
 #include <petscvec.h>
 #include <petscviewerhdf5.h>
 #include <petscksp.h>
+#include "laser.h"
+
+using Vec3 = std::array<double, 3>;
 
 namespace tdse 
 {
@@ -315,21 +318,128 @@ namespace tdse
         return ierr;
     }
 
+    double _f(int l, int m)
+    {   
+        int numerator = (l+1)*(l+1) - m*m;
+        int denominator = (2*l + 1)*(2*l+3);
+        return sqrt(numerator/(double)denominator);
+    }
+
+    double _g(int l, int m)
+    {
+        int numerator = l*l - m*m;
+        int denominator = (2*l-1)*(2*l+1);
+        return sqrt(numerator/(double)denominator);
+    }
+
+    PetscErrorCode _construct_z_interaction(const simulation& sim, Mat& H_z)
+    {
+        PetscErrorCode ierr;
+
+        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
+        int degree = sim.bspline_data.at("degree").get<int>();
+
+        Mat H_lm_1;
+        ierr = MatCreate(PETSC_COMM_SELF, &H_lm_1); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_1, PETSC_DECIDE, PETSC_DECIDE, n_blocks, n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_1); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_1, 2, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_1); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime))
+                {
+                    ierr = MatSetValue(H_lm_1, i, j, -PETSC_i * _g(l,m), INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime))
+                {
+                    ierr = MatSetValue(H_lm_1, i, j, -PETSC_i * _f(l,m), INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+
+
+
+        Mat H_lm_2;
+        ierr = MatCreate(PETSC_COMM_SELF, &H_lm_2); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_2, PETSC_DECIDE, PETSC_DECIDE, n_blocks, n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_2); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_2, 2, NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_2); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime))
+                {
+                    ierr = MatSetValue(H_lm_2, i, j, -PETSC_i * _g(l,m) * (-l), INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime))
+                {
+                    ierr = MatSetValue(H_lm_2, i, j, -PETSC_i * _f(l,m) * (l+1), INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+
+        Mat Der,Inv_r;
+        ierr = load_matrix("TISE_files/Der.bin",&Der); CHKERRQ(ierr);
+        ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
+
+        Mat H_z_2;
+        ierr = KroneckerProductParallel(H_lm_1,2,Der,2*degree+1,&H_z); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_2,2,Inv_r,2*degree+1,&H_z_2); CHKERRQ(ierr);
+
+        ierr = MatAXPY(H_z,1.0,H_z_2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
+
+        ierr = MatDestroy(&H_lm_1); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_lm_2); CHKERRQ(ierr);
+        ierr = MatDestroy(&Der); CHKERRQ(ierr);
+        ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_z_2); CHKERRQ(ierr);
+        return ierr;
+    }
+
     PetscErrorCode solve_tdse(const simulation& sim, int rank)
 {
     PetscErrorCode ierr;
-
-    
-
     Vec state;
     ierr = load_starting_state(sim, state); CHKERRQ(ierr);
 
-
+    Vec3 components = sim.laser_data.at("components").get<Vec3>();
+    std::complex<double> alpha = PETSC_i * (sim.grid_data.at("time_spacing").get<double>() / 2.0);
 
     Mat H_atomic, S_atomic, atomic_left, atomic_right;
     ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
     ierr = _construct_H_atomic(sim, H_atomic); CHKERRQ(ierr);
     ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
+
+    Mat H_z;
+    if (components[2])
+    {   
+        ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
+    }
 
     std::complex<double> norm;
     Vec y; 
@@ -347,23 +457,13 @@ namespace tdse
     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
 
 
-    ///
-    if (rank == 0)
-    {
-        PetscScalar value;
-        PetscInt temp_idx = 0;  // First element index
-        ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
-        PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
-    }
-    ///
-
-
-
     Vec state_temp;
     Mat atomic_left_temp, atomic_right_temp;
     ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
     ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
     ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
+
+
 
     
     double start = MPI_Wtime();
@@ -373,11 +473,21 @@ namespace tdse
         {
             PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d\n", idx);
         }
+
+        double t= idx*dt;
         
 
         // Faster copy, assumes nonzero structure does not change
         ierr = MatCopy(atomic_left, atomic_left_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
         ierr = MatCopy(atomic_right, atomic_right_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
+
+        if (components[2])
+        {   
+            double laser_val = laser::A(t,sim,2);
+            ierr = MatAXPY(atomic_left_temp,alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+            ierr = MatAXPY(atomic_right_temp,-alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+        }
+
         ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr); 
 
         ierr = MatMult(atomic_right_temp, state, state_temp); CHKERRQ(ierr);
@@ -394,16 +504,6 @@ namespace tdse
     ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
-
-    ///
-    if (rank == 0)
-    {
-        PetscScalar value;
-        PetscInt temp_idx = 0;  // First element index
-        ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
-        PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
-    }
-    ///
 
     return ierr;
 }

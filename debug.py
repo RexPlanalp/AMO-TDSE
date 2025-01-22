@@ -94,3 +94,14 @@ print(ending_val)
 # w_test = w*factor
 
 # print(w_test)
+
+
+#  ///
+#     if (rank == 0)
+#     {
+#         PetscScalar value;
+#         PetscInt temp_idx = 0;  // First element index
+#         ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
+#         PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
+#     }
+#     ///
