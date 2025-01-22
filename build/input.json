@@ -1,14 +1,14 @@
 {
     "grid": {
-        "grid_size": 30.0,
+        "grid_size": 1500.0,
         "grid_spacing": 0.01,
         "N": 20.0,
         "time_spacing": 0.05
     },
     "bsplines": {
-        "n_basis": 30,
+        "n_basis": 1500,
         "order": 7,
-        "R0_input": 15.0,
+        "R0_input": 1495.0,
         "eta": 0.25
     },
     "angular": {
