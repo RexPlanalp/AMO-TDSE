@@ -44,18 +44,13 @@ namespace tise
         ierr = bsplines::construct_invr(sim,Inv_r,true,false); CHKERRQ(ierr);
         ierr = bsplines::construct_der(sim,Der,true,false); CHKERRQ(ierr);
 
-        // ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
-        // ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
-        // ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
-        // ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
-
         ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TISE_files/tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
         ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
         ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
         ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
-        ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-8),sim.tise_data.value("max_iter",2000)); CHKERRQ(ierr);
+        ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-15),sim.tise_data.value("max_iter",3000)); CHKERRQ(ierr);
 
         for (int l = 0; l<=sim.angular_data.value("lmax",0); ++l)
         {
