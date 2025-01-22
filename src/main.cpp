@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     laser::save_debug_laser(rank,sim);
 
     //start = MPI_Wtime();
-    ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
+    ierr = tdse::solve_tdse(sim,rank); CHKERRQ(ierr);
     //end = MPI_Wtime();
     //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
 

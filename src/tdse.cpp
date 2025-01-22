@@ -315,7 +315,7 @@ namespace tdse
         return ierr;
     }
 
-    PetscErrorCode solve_tdse(const simulation& sim)
+    PetscErrorCode solve_tdse(const simulation& sim, int rank)
 {
     PetscErrorCode ierr;
 
@@ -343,7 +343,19 @@ namespace tdse
 
     KSP ksp;
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
+    ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
+
+
+    ///
+    if (rank == 0)
+    {
+        PetscScalar value;
+        PetscInt temp_idx = 0;  // First element index
+        ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
+        PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
+    }
+    ///
 
 
 
@@ -382,6 +394,16 @@ namespace tdse
     ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
+
+    ///
+    if (rank == 0)
+    {
+        PetscScalar value;
+        PetscInt temp_idx = 0;  // First element index
+        ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
+        PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
+    }
+    ///
 
     return ierr;
 }
