@@ -52,13 +52,13 @@ namespace tise
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
         ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-15),sim.tise_data.value("max_iter",3000)); CHKERRQ(ierr);
 
-        for (int l = 0; l<=sim.angular_data.value("lmax",0); ++l)
+        for (int l = 0; l<= sim.angular_data.at("lmax").get<int>(); ++l)
         {
             ierr = MatDuplicate(K,MAT_COPY_VALUES,&temp); CHKERRQ(ierr);
             ierr = MatAXPY(temp, l*(l+1)*0.5,Inv_r2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
             ierr = MatAXPY(temp,-1.0,Inv_r,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 
-            int num_of_energies = sim.angular_data.value("nmax",0) - l;
+            int num_of_energies = sim.angular_data.at("nmax").get<int>() - l;
             if (num_of_energies <= 0)
             {
                 continue;
