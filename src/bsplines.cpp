@@ -15,51 +15,58 @@ void save_debug_bsplines(int rank, const simulation& sim)
 
     if (rank == 0)
     {
-        
-
         std::ofstream file1("debug/bsplines.txt");
+        std::ofstream file2("debug/dbsplines.txt");
+
         if (!file1.is_open())
         {
             std::cerr << "Error: could not open file bsplines.txt" << std::endl;
             return;
         }
-
-        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
-        {
-            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
-            {
-                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
-                std::complex<double> x = sim.ecs_x(x_val);
-                std::complex<double> val = B(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
-                file1 << val.real() << "\t" << val.imag() << "\n";
-            }
-            file1 << "\n";
-        }
-        file1.close();
-
-
-        
-        std::ofstream file2("debug/dbsplines.txt");
         if (!file2.is_open())
         {
             std::cerr << "Error: could not open file dbsplines.txt" << std::endl;
             return;
         }
 
-        for (int i = 0; i < sim.bspline_data.at("n_basis").get<int>(); i++)
+        int n_basis = sim.bspline_data.at("n_basis").get<int>();
+        int Nr = sim.grid_data.at("Nr").get<int>();
+        double grid_spacing = sim.grid_data.at("grid_spacing").get<double>();
+        int degree = sim.bspline_data.at("degree").get<int>();
+
+        for (int i = 0; i < n_basis; i++)
         {
-            for (int idx = 0; idx < sim.grid_data.at("Nr").get<int>(); ++idx)
+            for (int idx = 0; idx < Nr; ++idx)
             {
-                double x_val = idx * sim.grid_data.at("grid_spacing").get<double>();
-                std::complex<double> x = sim.ecs_x(x_val);
-                std::complex<double> val = dB(i, sim.bspline_data.at("degree").get<int>(), x, sim.complex_knots);
-                file2 << val.real() << "\t" << val.imag() << "\n";
+
+
+                
+                double x_val = idx * grid_spacing;
+
+                if (x_val > sim.knots[i].real() && x_val < sim.knots[i+sim.bspline_data.at("degree").get<int>()+1].real())
+                {
+                    std::complex<double> x = sim.ecs_x(x_val);
+                    std::complex<double> val_B = B(i, degree, x, sim.complex_knots);
+                    std::complex<double> val_dB = dB(i, degree, x, sim.complex_knots);
+                    
+                    file1 << val_B.real() << "\t" << val_B.imag() << "\n";
+                    file2 << val_dB.real() << "\t" << val_dB.imag() << "\n";
+                }
+                else
+                {
+                    file1 << 0.0 << "\t" << 0.0 << "\n";
+                    file2 << 0.0 << "\t" << 0.0 << "\n";
+                }
             }
+            file1 << "\n";
             file2 << "\n";
         }
+
+        file1.close();
         file2.close();
     }
 }
+
 
 
 

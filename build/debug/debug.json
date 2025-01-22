@@ -6,18 +6,18 @@
         "nmax": 10
     },
     "bspline_data": {
-        "R0": 1994.6524064171124,
-        "R0_input": 1995.0,
+        "R0": 14.999999999999998,
+        "R0_input": 15.0,
         "degree": 6,
         "eta": 0.25,
-        "n_basis": 1500,
+        "n_basis": 30,
         "order": 7
     },
     "grid_data": {
         "N": 20.0,
-        "Nr": 200000,
+        "Nr": 3000,
         "Nt": 29568,
-        "grid_size": 2000.0,
+        "grid_size": 30.0,
         "grid_spacing": 0.01,
         "time_size": 1478.3965428657848,
         "time_spacing": 0.05

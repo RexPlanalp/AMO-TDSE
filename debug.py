@@ -6,7 +6,7 @@ import numpy as np
 import sys
 import json
 
-with open("build/input.json") as f:
+with open("build/debug/debug.json") as f:
     data = json.load(f)
 
 if "BSPLINE" in sys.argv:
@@ -19,12 +19,12 @@ if "BSPLINE" in sys.argv:
     dreal = dbspline_data[:,0]
     dimag = dbspline_data[:,1]
 
-    n_basis = data["bsplines"]["n_basis"]
+    n_basis = data["bspline_data"]["n_basis"]
     Nr = data["grid_data"]["Nr"]
     grid_size = data["grid_data"]["grid_size"]
     r = np.linspace(0,grid_size,Nr)
 
-    fig,(ax1,ax2) = plt.subplots(1,2)
+    fig,(ax1,ax2) = plt.subplots(1,2, figsize=(10, 5))
 
     for i in range(n_basis):
         ax1.plot(r,real[i*Nr:(i+1)*Nr],color = "k")
