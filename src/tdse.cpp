@@ -15,11 +15,12 @@ namespace tdse
 
     int n_basis = sim.bspline_data.value("n_basis",0);
     int n_blocks = sim.angular_data.value("n_blocks",0);
-    std::array<int,3> state = sim.state_data;
-    int block_idx = sim.qn_map.lm_to_block.at({state[1],state[2]});
+    std::array<int,3> state = sim.tdse_data.value("state",std::array<int,3>{0,0,0});
+    int block_idx = sim.lm_to_block.at({state[1],state[2]});
+    int total_size = n_basis*n_blocks;
 
     ierr = VecCreate(PETSC_COMM_WORLD, &tdse_state); CHKERRQ(ierr);
-    ierr = VecSetSizes(tdse_state, PETSC_DECIDE, n_basis*n_blocks); CHKERRQ(ierr);
+    ierr = VecSetSizes(tdse_state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
     ierr =  VecSetType(tdse_state, VECMPI); CHKERRQ(ierr);
     ierr = VecSetFromOptions(tdse_state); CHKERRQ(ierr);
     ierr = VecSet(tdse_state, 0.0); CHKERRQ(ierr);
@@ -62,7 +63,8 @@ namespace tdse
     {   
         int global_index = block_idx*n_basis + i;
         if (global_index >= start && global_index < end)
-        {
+        {   
+            
             ierr = VecSetValue(tdse_state,global_index,tise_state_array[i],INSERT_VALUES); CHKERRQ(ierr);
         }
     }
@@ -261,7 +263,7 @@ namespace tdse
             std::vector<int> indices;
             for (int i = 0; i < n_blocks; ++i)
             {   
-                auto lm_pair = sim.qn_map.block_to_lm.at(i);  // Retrieve (l, m) pair
+                auto lm_pair = sim.block_to_lm.at(i);  // Retrieve (l, m) pair
                 if (lm_pair.first == l) // Compare only 'l' component
                 {
                     indices.push_back(i);
@@ -317,8 +319,12 @@ namespace tdse
 {
     PetscErrorCode ierr;
 
+    
+
     Vec state;
     ierr = load_starting_state(sim, state); CHKERRQ(ierr);
+
+
 
     Mat H_atomic, S_atomic, atomic_left, atomic_right;
     ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
@@ -339,6 +345,8 @@ namespace tdse
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
 
+
+
     Vec state_temp;
     Mat atomic_left_temp, atomic_right_temp;
     ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
@@ -349,7 +357,7 @@ namespace tdse
     double start = MPI_Wtime();
     for (int idx = 0; idx < Nt; ++idx)
     {   
-        if (sim.misc_data.value("debug", 0))
+        if (sim.debug)
         {
             PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d\n", idx);
         }

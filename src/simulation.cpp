@@ -265,6 +265,13 @@ void simulation::_process_grid_data()
 void simulation::_process_angular_data()
 {
     _compute_lm_expansion();
+    _invert_lm_expansion();
+    _compute_n_blocks();
+}
+
+void simulation::_compute_n_blocks()
+{
+    angular_data["n_blocks"] = lm_to_block.size();
 }
 
 void simulation::_compute_lm_expansion()
@@ -284,6 +291,14 @@ void simulation::_compute_lm_expansion()
         _zxy_expansion();
     }
     
+}
+
+void simulation::_invert_lm_expansion()
+{
+    for (const auto& pair : lm_to_block) // ✅ Works in C++14
+    {
+        block_to_lm[pair.second] = pair.first; 
+    }
 }
 
 void simulation::_z_expansion()

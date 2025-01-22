@@ -73,10 +73,13 @@ class simulation
     void _process_grid_data();
 
     void _compute_lm_expansion();
+    void _invert_lm_expansion();
     void _z_expansion();
     void _xy_expansion();
     void _zxy_expansion();
+    void _compute_n_blocks();
     void _process_angular_data();
+
 
    
 

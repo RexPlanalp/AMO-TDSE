@@ -1,6 +1,6 @@
 {
     "grid": {
-        "grid_size": 1500.0,
+        "grid_size": 2000.0,
         "grid_spacing": 0.01,
         "N": 20.0,
         "time_spacing": 0.05

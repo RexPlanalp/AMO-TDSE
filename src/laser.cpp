@@ -24,7 +24,7 @@ double laser::A(double t, const simulation& sim, int idx)
 }
 
 void laser::save_debug_laser(int rank, const simulation& sim) {
-    if (!sim.misc_data.value("debug", 0)) return;
+    if (!sim.debug) return;
 
 
     std::string filename = "laser.txt";

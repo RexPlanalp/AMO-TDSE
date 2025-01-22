@@ -38,18 +38,12 @@ int main(int argc, char **argv) {
     end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",end-start);
 
+    laser::save_debug_laser(rank,sim);
 
-
-    
-
-
-    // laser::save_debug_laser(rank,sim);
-  
-
-    // //start = MPI_Wtime();
-    // ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
-    // //end = MPI_Wtime();
-    // //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
+    //start = MPI_Wtime();
+    ierr = tdse::solve_tdse(sim); CHKERRQ(ierr);
+    //end = MPI_Wtime();
+    //PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
 
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

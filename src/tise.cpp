@@ -42,7 +42,6 @@ namespace tise
         ierr = bsplines::construct_kinetic(sim,K,true,false); CHKERRQ(ierr);
         ierr = bsplines::construct_invr2(sim,Inv_r2,true,false); CHKERRQ(ierr);
         ierr = bsplines::construct_invr(sim,Inv_r,true,false); CHKERRQ(ierr);
-        ierr = bsplines::construct_der(sim,Der,true,false); CHKERRQ(ierr);
 
         ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TISE_files/tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
