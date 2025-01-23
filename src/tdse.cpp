@@ -421,94 +421,7 @@ namespace tdse
         return ierr;
     }
 
-    PetscErrorCode solve_tdse(const simulation& sim, int rank)
-{
-    PetscErrorCode ierr;
-    Vec state;
-    ierr = load_starting_state(sim, state); CHKERRQ(ierr);
-
-    Vec3 components = sim.laser_data.at("components").get<Vec3>();
-    std::complex<double> alpha = PETSC_i * (sim.grid_data.at("time_spacing").get<double>() / 2.0);
-
-    Mat H_atomic, S_atomic, atomic_left, atomic_right;
-    ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
-    ierr = _construct_H_atomic(sim, H_atomic); CHKERRQ(ierr);
-    ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
-
-    Mat H_z;
-    if (false)
-    {   
-        ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
-    }
-
-    std::complex<double> norm;
-    Vec y; 
-    ierr = VecDuplicate(state, &y); CHKERRQ(ierr);
-    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
-    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
-    PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n", norm.real(), norm.imag());
-
-    int Nt = sim.grid_data.value("Nt", 0);
-    double dt = sim.grid_data.value("time_spacing", 0.0);
-
-    KSP ksp;
-    ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
-    ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
-    ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
-
-
-    Vec state_temp;
-    Mat atomic_left_temp, atomic_right_temp;
-    ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
-    ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
-    ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
-
-
-    
-    double start = MPI_Wtime();
-    for (int idx = 0; idx < Nt; ++idx)
-    {   
-        if (true)
-        {
-            PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d\n", idx);
-        }
-
-        double t= idx*dt;
-        
-
-        // Faster copy, assumes nonzero structure does not change
-        ierr = MatCopy(atomic_left, atomic_left_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
-        ierr = MatCopy(atomic_right, atomic_right_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
-
-        if (false)
-        {   
-            double laser_val = laser::A(t,sim,2);
-            ierr = MatAXPY(atomic_left_temp,alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-            ierr = MatAXPY(atomic_right_temp,-alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-        }
-
-        ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr); 
-
-        ierr = MatMult(atomic_right_temp, state, state_temp); CHKERRQ(ierr);
-
-        // Reuse KSP operator
-        ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr);
-        ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); CHKERRQ(ierr);
-
-        ierr = KSPSolve(ksp, state_temp, state); CHKERRQ(ierr);
-    }
-    double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD, "Time to solve TDSE %.3f\n", end - start);
-
-    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
-    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
-    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
-
-    return ierr;
-}
-
-
-// PetscErrorCode solve_tdse(const simulation& sim, int rank)
+    // PetscErrorCode solve_tdse(const simulation& sim, int rank)
 // {
 //     PetscErrorCode ierr;
 //     Vec state;
@@ -523,7 +436,8 @@ namespace tdse
 //     ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
 
 //     Mat H_z;
-//     if (components[2]) {   
+//     if (false)
+//     {   
 //         ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
 //     }
 
@@ -539,11 +453,9 @@ namespace tdse
 
 //     KSP ksp;
 //     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
-//     PC pc;
-//     ierr = KSPGetPC(ksp, &pc); CHKERRQ(ierr);
-//     ierr = PCSetType(pc, PCBJACOBI); CHKERRQ(ierr);
 //     ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
 //     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
+
 
 //     Vec state_temp;
 //     Mat atomic_left_temp, atomic_right_temp;
@@ -551,28 +463,28 @@ namespace tdse
 //     ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
 //     ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
 
+
+    
 //     double start = MPI_Wtime();
-//     for (int idx = 0; idx < Nt; ++idx) 
+//     for (int idx = 0; idx < Nt; ++idx)
 //     {   
 //         if (true)
 //         {
-//             PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d/%d\n", idx,Nt);
+//             PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d\n", idx);
 //         }
+
+//         double t= idx*dt;
         
-//         double t = idx * dt;
 
-//         // Destroy and recreate temp matrices to avoid accumulation of structural changes
-//         ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
-//         ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
-//         ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
-//         ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
+//         // Faster copy, assumes nonzero structure does not change
+//         ierr = MatCopy(atomic_left, atomic_left_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
+//         ierr = MatCopy(atomic_right, atomic_right_temp, SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 
-//         if (false) 
-//         {
-
-//             double laser_val = laser::A(t, sim, 2);
-//             ierr = MatAXPY(atomic_left_temp, alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-//             ierr = MatAXPY(atomic_right_temp, -alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+//         if (false)
+//         {   
+//             double laser_val = laser::A(t,sim,2);
+//             ierr = MatAXPY(atomic_left_temp,alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+//             ierr = MatAXPY(atomic_right_temp,-alpha*laser_val,H_z,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
 //         }
 
 //         ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr); 
@@ -584,10 +496,7 @@ namespace tdse
 //         ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); CHKERRQ(ierr);
 
 //         ierr = KSPSolve(ksp, state_temp, state); CHKERRQ(ierr);
-
-        
 //     }
-
 //     double end = MPI_Wtime();
 //     PetscPrintf(PETSC_COMM_WORLD, "Time to solve TDSE %.3f\n", end - start);
 
@@ -595,21 +504,112 @@ namespace tdse
 //     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
 //     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
 
-//     // Clean up
-//     ierr = VecDestroy(&y); CHKERRQ(ierr);
-//     ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
-//     ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
-//     ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
-//     ierr = MatDestroy(&H_z); CHKERRQ(ierr);
-//     ierr = MatDestroy(&H_atomic); CHKERRQ(ierr);
-//     ierr = MatDestroy(&S_atomic); CHKERRQ(ierr);
-//     ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);
-//     ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
-//     ierr = VecDestroy(&state); CHKERRQ(ierr);
-//     ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
-
 //     return ierr;
 // }
+
+
+PetscErrorCode solve_tdse(const simulation& sim, int rank)
+{
+    PetscErrorCode ierr;
+    Vec state;
+    ierr = load_starting_state(sim, state); CHKERRQ(ierr);
+
+    Vec3 components = sim.laser_data.at("components").get<Vec3>();
+    std::complex<double> alpha = PETSC_i * (sim.grid_data.at("time_spacing").get<double>() / 2.0);
+
+    Mat H_atomic, S_atomic, atomic_left, atomic_right;
+    ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
+    ierr = _construct_H_atomic(sim, H_atomic); CHKERRQ(ierr);
+    ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
+
+    Mat H_z;
+    if (false) {   
+        ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
+    }
+
+    std::complex<double> norm;
+    Vec y; 
+    ierr = VecDuplicate(state, &y); CHKERRQ(ierr);
+    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
+    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
+    PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n", norm.real(), norm.imag());
+
+    int Nt = sim.grid_data.value("Nt", 0);
+    double dt = sim.grid_data.value("time_spacing", 0.0);
+
+    KSP ksp;
+    ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
+    PC pc;
+    ierr = KSPGetPC(ksp, &pc); CHKERRQ(ierr);
+    ierr = PCSetType(pc, PCBJACOBI); CHKERRQ(ierr);
+    ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
+    ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
+
+    Vec state_temp;
+    Mat atomic_left_temp, atomic_right_temp;
+    ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
+    ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
+    ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
+
+    double start = MPI_Wtime();
+    for (int idx = 0; idx < Nt; ++idx) 
+    {   
+        if (true)
+        {
+            PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d/%d\n", idx,Nt);
+        }
+        
+        double t = idx * dt;
+
+        // Destroy and recreate temp matrices to avoid accumulation of structural changes
+        ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
+        ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
+        ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
+        ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
+
+        if (false) 
+        {
+
+            double laser_val = laser::A(t, sim, 2);
+            ierr = MatAXPY(atomic_left_temp, alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+            ierr = MatAXPY(atomic_right_temp, -alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+        }
+
+        ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr); 
+
+        ierr = MatMult(atomic_right_temp, state, state_temp); CHKERRQ(ierr);
+
+        // Reuse KSP operator
+        ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr);
+        ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); CHKERRQ(ierr);
+
+        ierr = KSPSolve(ksp, state_temp, state); CHKERRQ(ierr);
+
+        
+    }
+
+    double end = MPI_Wtime();
+    PetscPrintf(PETSC_COMM_WORLD, "Time to solve TDSE %.3f\n", end - start);
+
+    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
+    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
+    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
+
+    // Clean up
+    ierr = VecDestroy(&y); CHKERRQ(ierr);
+    ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
+    ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
+    ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
+    ierr = MatDestroy(&H_z); CHKERRQ(ierr);
+    ierr = MatDestroy(&H_atomic); CHKERRQ(ierr);
+    ierr = MatDestroy(&S_atomic); CHKERRQ(ierr);
+    ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);
+    ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
+    ierr = VecDestroy(&state); CHKERRQ(ierr);
+    ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
+
+    return ierr;
+}
 
 
 
