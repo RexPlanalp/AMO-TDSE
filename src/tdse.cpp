@@ -523,7 +523,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
 
     Mat H_z;
-    if (false) {   
+    if (components[2]) {   
         ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
     }
 
@@ -567,7 +567,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
         ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
         ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
 
-        if (false) 
+        if (components[2]) 
         {
 
             double laser_val = laser::A(t, sim, 2);
