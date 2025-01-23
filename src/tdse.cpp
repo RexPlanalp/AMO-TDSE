@@ -464,12 +464,11 @@ namespace tdse
     ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
 
 
-
     
     double start = MPI_Wtime();
     for (int idx = 0; idx < Nt; ++idx)
     {   
-        if (sim.debug)
+        if (true)
         {
             PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d\n", idx);
         }
