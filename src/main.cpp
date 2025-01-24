@@ -27,23 +27,13 @@ int main(int argc, char **argv) {
 
     sim.save_debug_info(rank);
     bsplines::save_debug_bsplines(rank,sim);
-
-    double start = MPI_Wtime();
-    ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
-    double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n",end-start);
-
-    start = MPI_Wtime();
-    ierr = tise::prepare_matrices(sim,rank); CHKERRQ(ierr);
-    end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",end-start);
-
     laser::save_debug_laser(rank,sim);
 
-    start = MPI_Wtime();
+
+    ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
+    ierr = tise::prepare_matrices(sim,rank); CHKERRQ(ierr);
+
     ierr = tdse::solve_tdse(sim,rank); CHKERRQ(ierr);
-    end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",end-start);
 
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

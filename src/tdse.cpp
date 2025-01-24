@@ -423,48 +423,53 @@ namespace tdse
 
 
 PetscErrorCode solve_tdse(const simulation& sim, int rank)
-{
+{   
+    double time_start = MPI_Wtime();    
+
+    PetscPrintf(PETSC_COMM_WORLD, "Loading Information\n\n");
     PetscErrorCode ierr;
     Vec state;
     ierr = load_starting_state(sim, state); CHKERRQ(ierr);
-
     Vec3 components = sim.laser_data.at("components").get<Vec3>();
     std::complex<double> alpha = PETSC_i * (sim.grid_data.at("time_spacing").get<double>() / 2.0);
+    int Nt = sim.grid_data.value("Nt", 0);
+    double dt = sim.grid_data.value("time_spacing", 0.0);
 
+    PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
     Mat H_atomic, S_atomic, atomic_left, atomic_right;
     ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
     ierr = _construct_H_atomic(sim, H_atomic); CHKERRQ(ierr);
     ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
 
     Mat H_z;
-    if (components[2]) {   
+    if (components[2]) 
+    {   
+        PetscPrintf(PETSC_COMM_WORLD, "Constructing Z Interaction\n\n");
         ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
     }
 
+    PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
     std::complex<double> norm;
     Vec y; 
     ierr = VecDuplicate(state, &y); CHKERRQ(ierr);
     ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
-    PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n", norm.real(), norm.imag());
+    PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n\n", norm.real(), norm.imag());
 
-    int Nt = sim.grid_data.value("Nt", 0);
-    double dt = sim.grid_data.value("time_spacing", 0.0);
-
+    PetscPrintf(PETSC_COMM_WORLD, "Setting up Linear Solver\n\n");
     KSP ksp;
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
     ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
 
+    PetscPrintf(PETSC_COMM_WORLD, "Preallocating Temporary Petsc Objects\n\n");
     Vec state_temp;
     Mat atomic_left_temp, atomic_right_temp;
     ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
     ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
     ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
 
-    double time_start,time_end;
-
-    double start = MPI_Wtime();
+    PetscPrintf(PETSC_COMM_WORLD, "Solving TDSE\n\n");
     for (int idx = 0; idx < Nt; ++idx) 
     {   
         if (sim.debug)
@@ -499,14 +504,12 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
         
     }
 
-    double end = MPI_Wtime();
-    PetscPrintf(PETSC_COMM_WORLD, "Time to solve TDSE %.3f\n", end - start);
-
+    PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
     ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
-    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n", (double)norm.real(), (double)norm.imag());
+    PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
 
-    // Clean up
+    PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects\n\n");
     ierr = VecDestroy(&y); CHKERRQ(ierr);
     ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
@@ -518,6 +521,8 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
     ierr = VecDestroy(&state); CHKERRQ(ierr);
     ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
+    double time_end = MPI_Wtime();
+    PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",time_end-time_start);
 
     return ierr;
 }
