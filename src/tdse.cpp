@@ -7,7 +7,8 @@
 #include <petscviewerhdf5.h>
 #include <petscksp.h>
 #include "laser.h"
-
+#include <sys/stat.h>
+#include <sys/types.h>
 using Vec3 = std::array<double, 3>;
 
 namespace tdse 
@@ -514,6 +515,22 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     int Nt = sim.grid_data.value("Nt", 0);
     double dt = sim.grid_data.value("time_spacing", 0.0);
 
+    if (rank == 0) 
+        {
+            if (mkdir("TDSE_files", 0777) == 0) 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n\n", "TDSE_files");
+            } 
+            else 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n\n", "DISE_files");
+            }
+        }
+
+    PetscViewer viewTDSE;
+    ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TDSE_files/tdse_output.h5", FILE_MODE_WRITE, &viewTDSE); CHKERRQ(ierr);
+
+
     PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
     Mat H_atomic, S_atomic, atomic_left, atomic_right;
     ierr = _construct_S_atomic(sim, S_atomic); CHKERRQ(ierr);
@@ -588,6 +605,9 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
 
+    ierr = PetscObjectSetName((PetscObject)state,"final_state"); CHKERRQ(ierr);
+    ierr = VecView(state, viewTDSE); CHKERRQ(ierr);
+
     PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects\n\n");
     ierr = VecDestroy(&y); CHKERRQ(ierr);
     ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
@@ -600,6 +620,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
     ierr = VecDestroy(&state); CHKERRQ(ierr);
     ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
+    ierr = PetscViewerDestroy(&viewTDSE); CHKERRQ(ierr);
     double time_end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",time_end-time_start);
 
