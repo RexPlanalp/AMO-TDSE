@@ -6,8 +6,8 @@ import numpy as np
 import sys
 import json
 
-# with open("build/debug/debug.json") as f:
-#     data = json.load(f)
+with open("build/debug/debug.json") as f:
+    data = json.load(f)
 
 if "BSPLINE" in sys.argv:
     bspline_data = np.loadtxt("build/debug/bsplines.txt")
@@ -58,50 +58,16 @@ if "LM" in sys.argv:
     ax.set_title('Reachable (white) and Unreachable (black) Points in l-m Space')
     fig.savefig("build/debug/lm_space.png")
 
+if "LASER" in sys.argv:
+    laser_data = np.loadtxt("build/debug/laser.txt")
+    t = laser_data[:,0]
+    Ax = laser_data[:,1]
+    Ay = laser_data[:,2]
+    Az = laser_data[:,3]
 
+    plt.plot(t,Ax,color = "k",label = "Ax")
+    plt.plot(t,Ay,color = "brown",label = "Ay")
+    plt.plot(t,Az,color = "blue",label = "Az")
+    plt.legend()
+    plt.savefig("build/debug/laser.png")
 
-# laser_data = np.loadtxt("build/laser.txt")
-# t = laser_data[:,0]
-# Ax = laser_data[:,1]
-# Ay = laser_data[:,2]
-# Az = laser_data[:,3]
-
-# plt.plot(t,Ax,color = "k",label = "Ax")
-# plt.plot(t,Ay,color = "brown",label = "Ay")
-# plt.plot(t,Az,color = "blue",label = "Az")
-# plt.legend()
-# plt.savefig("build/laser.png")
-
-starting_val =  -0.017737546244461-0.445338526671213j
-total_time = (2*np.pi/0.0850000132513)*20
-phase = np.exp(-1j*(-0.5*total_time))
-ending_val = starting_val*phase
-print(ending_val)
-
-# w = 0.085
-# N = 20
-
-# time_size = (2*np.pi/w)*N
-# t = np.linspace(0,time_size,100000)
-
-# envelope = np.sin(w*t/(2*N))
-
-# t2_int = np.trapz(envelope*t**2,t)
-# int = np.trapz(envelope,t)
-
-# alpha = (0.085/w) * np.sqrt(t2_int/int)
-# factor = (1+np.sqrt(1+4/(np.pi**2 * alpha**2)))/2
-# w_test = w*factor
-
-# print(w_test)
-
-
-#  ///
-#     if (rank == 0)
-#     {
-#         PetscScalar value;
-#         PetscInt temp_idx = 0;  // First element index
-#         ierr = VecGetValues(state, 1, &temp_idx, &value); CHKERRQ(ierr);
-#         PetscPrintf(PETSC_COMM_WORLD, "First value of state: (%.15f,%.15f)\n", (double)value.real(), (double)value.imag());
-#     }
-#     ///

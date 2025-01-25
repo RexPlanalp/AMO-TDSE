@@ -8,6 +8,7 @@
 #include "laser.h"  
 #include "tise.h"
 #include "tdse.h"
+#include "block.h"
 #include <petscviewerhdf5.h>
 
 
@@ -30,10 +31,12 @@ int main(int argc, char **argv) {
     laser::save_debug_laser(rank,sim);
 
 
-    ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
-    ierr = tise::prepare_matrices(sim,rank); CHKERRQ(ierr);
+    // ierr = tise::solve_tise(sim,rank); CHKERRQ(ierr);
+    // ierr = tise::prepare_matrices(sim,rank); CHKERRQ(ierr);
 
-    ierr = tdse::solve_tdse(sim,rank); CHKERRQ(ierr);
+    // ierr = tdse::solve_tdse(sim,rank); CHKERRQ(ierr);
+
+    ierr = block::compute_block_distribution(rank,sim); CHKERRQ(ierr);
 
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

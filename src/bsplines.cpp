@@ -11,7 +11,7 @@ namespace bsplines
 {
 void save_debug_bsplines(int rank, const simulation& sim)
 {
-    if (!sim.debug) return; // Only save if debugging is enabled
+    if (!sim.debug or !sim.bspline_data.at("debug").get<int>()) return; // Only save if debugging is enabled
 
     if (rank == 0)
     {
