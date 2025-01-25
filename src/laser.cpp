@@ -16,10 +16,11 @@ double laser::A(double t, const simulation& sim, int idx)
     double ell = sim.laser_data.value("ell",0.0);
     double w = sim.laser_data.value("w",0.0);
     double CEP = sim.laser_data.value("CEP",0.0);
+    double N = sim.grid_data.value("N",0.0);
 
     double prefactor = laser::sin2_envelope(t,sim)/std::sqrt(1+ell*ell);
-    double term1 = polarization[idx]*std::sin(w *t + CEP);
-    double term2 = ell*ellipticity[idx]*std::cos(w*t + CEP);
+    double term1 = polarization[idx]*std::sin(w *t + CEP - N*M_PI);
+    double term2 = ell*ellipticity[idx]*std::cos(w*t + CEP - N*M_PI);
     return prefactor*(term1 + term2);
 }
 
@@ -27,7 +28,7 @@ void laser::save_debug_laser(int rank, const simulation& sim) {
     if (!sim.debug) return;
 
 
-    std::string filename = "laser.txt";
+    std::string filename = "debug/laser.txt";
     int Nt = sim.grid_data.value("Nt", 0);
     double dt = sim.grid_data.value("time_spacing", 0.0);
 

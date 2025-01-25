@@ -36,7 +36,7 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode compute_probabilities(Vec& state, Mat& S,int n_blocks,int n_basis, std::complex<double>& norm, std::map<int,std::pair<int,int>>& block_to_lm)
+    PetscErrorCode compute_probabilities(Vec& state, Mat& S,int n_blocks,int n_basis, std::map<int,std::pair<int,int>>& block_to_lm)
     {
         PetscErrorCode ierr;
         Vec state_block,temp;
@@ -58,7 +58,6 @@ namespace block
             ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
             ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
             ierr = VecDot(state_block,temp,&block_norm); CHKERRQ(ierr);
-            norm += block_norm;
             file << block_norm.real() << " " << block_norm.imag() << "\n";
             ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);
 
@@ -92,10 +91,9 @@ namespace block
         std::cout << "Loading Final State" << std::endl;
         ierr = load_final_state("TDSE_files/tdse_output.h5", &state, total_size); CHKERRQ(ierr);
 
-        std::cout << "Computing norm" << std::endl;
-        std::complex<double> norm = {0};
-        ierr = compute_probabilities(state, S, n_blocks, n_basis, norm, block_to_lm); CHKERRQ(ierr);
-        std::cout << "Norm: (" << norm.real() <<","<< norm.imag() << ")"<< std::endl;
+        std::cout << "Computing Distribution" << std::endl;
+
+        ierr = compute_probabilities(state, S, n_blocks, n_basis, block_to_lm); CHKERRQ(ierr);
         return ierr;
     }
 

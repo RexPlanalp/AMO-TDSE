@@ -13,6 +13,6 @@
 namespace block 
 {
     PetscErrorCode load_final_state(const char* filename, Vec* state, int total_size);
-    PetscErrorCode comptue_norm(Vec& state, Mat& S,int n_blocks,int n_basis, std::complex<double>& norm, std::map<int,std::pair<int,int>>& block_to_lm);
+    PetscErrorCode comptue_norm(Vec& state, Mat& S,int n_blocks,int n_basis, std::map<int,std::pair<int,int>>& block_to_lm);
     PetscErrorCode compute_block_distribution(int rank,const simulation& sim);
 }
