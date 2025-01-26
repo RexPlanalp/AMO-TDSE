@@ -91,7 +91,6 @@ namespace tdse
     return ierr; 
 }
 
-
     PetscErrorCode load_matrix(const char* filename, Mat *matrix)
     {
         PetscErrorCode ierr;
@@ -330,6 +329,212 @@ namespace tdse
         return ierr;
     }
 
+    double _a(int l, int m)
+    {
+        int numerator = (l+m);
+        int denominator = (2*l +1) * (2*l-1);
+        double f1 = sqrt(numerator/(double)denominator);
+        double f2 = - m * std::sqrt(l+m-1) - std::sqrt((l-m)*(l*(l-1)-m*(m-1)));
+        return f1*f2;
+        
+    }
+
+    double _atilde(int l, int m)
+    {
+        int numerator = (l-m);
+        int denominator = (2*l+1)*(2*l-1);
+        double f1 = sqrt(numerator/(double)denominator);
+        double f2 = - m * std::sqrt(l-m-1) + std::sqrt((l+m)*(l*(l-1)-m*(m+1)));
+        return f1*f2;
+    }
+
+    double _b(int l, int m)
+    {
+        return -_atilde(l+1,m-1);
+    }
+
+    double _btilde(int l, int m)
+    {
+        return -_a(l+1,m+1);
+    }
+
+    double _d(int l, int m)
+    {
+        double numerator = (l-m+1)*(l-m+2);
+        double denominator = (2*l+1)*(2*l+3);
+        return std::sqrt(numerator/(double)denominator);
+    }
+
+    double _dtilde(int l, int m)
+    {
+        return _d(l,-m);
+    }
+
+    double _c(int l, int m)
+    {
+        return _dtilde(l-1,m-1);
+    }
+
+    double _ctilde(int l, int m)
+    {
+        return _d(l-1,m+1);
+    }
+
+    PetscErrorCode _construct_xy_interaction(const simulation& sim, Mat& H_xy, Mat& H_xy_tilde)
+    {
+        PetscErrorCode ierr;
+
+        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
+        int degree = sim.bspline_data.at("degree").get<int>();
+
+        Mat Der,Inv_r;
+        ierr = load_matrix("TISE_files/Der.bin",&Der); CHKERRQ(ierr);
+        ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
+
+        Mat H_lm_1;
+        ierr = MatCreate(PETSC_COMM_SELF,&H_lm_1); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_1,PETSC_DECIDE,PETSC_DECIDE,n_blocks,n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_1); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_1,2,NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_1); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime+1))
+                {
+                    ierr = MatSetValue(H_lm_1, i, j, PETSC_i*_a(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime+1))
+                {
+                    ierr = MatSetValue(H_lm_1, i, j, PETSC_i*_b(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+
+        Mat H_lm_2;
+        ierr = MatCreate(PETSC_COMM_SELF,&H_lm_2); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_2,PETSC_DECIDE,PETSC_DECIDE,n_blocks,n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_2); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_2,2,NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_2); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime+1))
+                {
+                    ierr = MatSetValue(H_lm_2, i, j, PETSC_i*_c(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime+1))
+                {
+                    ierr = MatSetValue(H_lm_2, i, j, -PETSC_i*_d(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+        Mat H_xy_temp_1;
+        ierr = KroneckerProductParallel(H_lm_1,2,Inv_r,2*degree+1,&H_xy); CHKERRQ(ierr);      
+        ierr = KroneckerProductParallel(H_lm_2,2,Der,2*degree+1,&H_xy_temp_1); CHKERRQ(ierr);
+        ierr = MatAXPY(H_xy,1.0,H_xy_temp_1,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_lm_1); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_lm_2); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_xy_temp_1); CHKERRQ(ierr);
+
+
+        Mat H_lm_3;
+        ierr = MatCreate(PETSC_COMM_SELF,&H_lm_3); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_3,PETSC_DECIDE,PETSC_DECIDE,n_blocks,n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_3); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_3,2,NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_3); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime-1))
+                {
+                    ierr = MatSetValue(H_lm_3, i, j, PETSC_i*_atilde(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime-1))
+                {
+                    ierr = MatSetValue(H_lm_3, i, j, PETSC_i*_btilde(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_3, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_3, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+        Mat H_lm_4;
+        ierr = MatCreate(PETSC_COMM_SELF,&H_lm_4); CHKERRQ(ierr);
+        ierr = MatSetSizes(H_lm_4,PETSC_DECIDE,PETSC_DECIDE,n_blocks,n_blocks); CHKERRQ(ierr);
+        ierr = MatSetFromOptions(H_lm_4); CHKERRQ(ierr);
+        ierr = MatSeqAIJSetPreallocation(H_lm_4,2,NULL); CHKERRQ(ierr);
+        ierr = MatSetUp(H_lm_4); CHKERRQ(ierr);
+        for (int i = 0; i < n_blocks; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                if ((l == lprime+1) && (m == mprime-1))
+                {
+                    ierr = MatSetValue(H_lm_4, i, j, -PETSC_i*_ctilde(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+                else if ((l == lprime-1)&&(m == mprime-1))
+                {
+                    ierr = MatSetValue(H_lm_4, i, j, PETSC_i*_dtilde(l,m)/2, INSERT_VALUES); CHKERRQ(ierr);
+                }
+            }
+        }
+        ierr = MatAssemblyBegin(H_lm_4, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+        ierr = MatAssemblyEnd(H_lm_4, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+
+        Mat H_xy_temp_2;
+        ierr = KroneckerProductParallel(H_lm_3,2,Inv_r,2*degree+1,&H_xy_tilde); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_4,2,Der,2*degree+1,&H_xy_temp_2); CHKERRQ(ierr);
+        ierr = MatAXPY(H_xy_tilde,1.0,H_xy_temp_2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_lm_3); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_lm_4); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_xy_temp_2); CHKERRQ(ierr);
+
+        ierr = MatDestroy(&Der); CHKERRQ(ierr);
+        ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
+        return ierr;
+
+    }
+
     double _f(int l, int m)
     {   
         int numerator = (l+1)*(l+1) - m*m;
@@ -475,6 +680,12 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Z Interaction\n\n");
         ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
     }
+    Mat H_xy, H_xy_tilde;
+    if (components[0] || components[1]) 
+    {
+        PetscPrintf(PETSC_COMM_WORLD, "Constructing XY Interaction\n\n");
+        ierr = _construct_xy_interaction(sim, H_xy, H_xy_tilde); CHKERRQ(ierr);
+    }
 
     PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
     std::complex<double> norm;
@@ -516,9 +727,21 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
         if (components[2]) 
         {
 
-            double laser_val = laser::A(t, sim, 2);
+            double laser_val = laser::A(t+dt/2.0, sim, 2);
             ierr = MatAXPY(atomic_left_temp, alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
             ierr = MatAXPY(atomic_right_temp, -alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+        }
+        else if (components[0] || components[1])
+        {
+            std::complex<double> A_tilde = laser::A(t+dt/2.0, sim, 0) + PETSC_i*laser::A(t+dt/2.0, sim, 1);
+            std::complex<double> A_tilde_star = laser::A(t+dt/2.0, sim, 0) - PETSC_i*laser::A(t+dt/2.0, sim, 1);
+
+            ierr = MatAXPY(atomic_left_temp,alpha*A_tilde_star,H_xy,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+            ierr = MatAXPY(atomic_right_temp,-alpha*A_tilde_star,H_xy,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+
+            ierr = MatAXPY(atomic_left_temp,alpha*A_tilde,H_xy_tilde,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+            ierr = MatAXPY(atomic_right_temp,-alpha*A_tilde,H_xy_tilde,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+
         }
 
         ierr = MatMult(atomic_right_temp, state, state_temp); CHKERRQ(ierr);
@@ -545,7 +768,15 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
-    ierr = MatDestroy(&H_z); CHKERRQ(ierr);
+    if (components[0] || components[1]) 
+    {
+        ierr = MatDestroy(&H_xy); CHKERRQ(ierr);
+        ierr = MatDestroy(&H_xy_tilde); CHKERRQ(ierr);
+    }
+    if (components[2]) 
+    {
+        ierr = MatDestroy(&H_z); CHKERRQ(ierr);
+    }
     ierr = MatDestroy(&H_atomic); CHKERRQ(ierr);
     ierr = MatDestroy(&S_atomic); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);

@@ -6,7 +6,7 @@ import numpy as np
 import sys
 import json
 
-with open("build/debug/debug.json") as f:
+with open("debug/debug.json") as f:
     data = json.load(f)
 
 if "BSPLINE" in sys.argv:
@@ -38,8 +38,8 @@ if "BSPLINE" in sys.argv:
     fig.savefig("build/debug/bsplines.png")
 
 if "LM" in sys.argv:
-    lmax = data["angular"]["lmax"]
-    lm_to_block_txt = np.loadtxt("build/debug/lm_to_block.txt")
+    lmax = data["angular_data"]["lmax"]
+    lm_to_block_txt = np.loadtxt("debug/lm_to_block.txt")
     fig,ax = plt.subplots()
     space_size =lmax + 1
     space = np.zeros((space_size, 2 * lmax + 1))
@@ -48,7 +48,7 @@ if "LM" in sys.argv:
     column2 = lm_to_block_txt[:,1]
     column3 = lm_to_block_txt[:,2]
     for i in range(len(column1)):
-        space[lmax - column1[i], column2[i] + lmax] = 1
+        space[lmax - int(column1[i]), int(column2[i]) + lmax] = 1
 
     ax.imshow(np.flipud(space), cmap='gray', interpolation='none', origin='lower')
     ax.set_xlabel('m')
@@ -56,10 +56,10 @@ if "LM" in sys.argv:
     ax.set_xticks([i for i in range(0, 2 * lmax + 1, 10)])  # Positions for ticks
     ax.set_xticklabels([str(i - lmax) for i in range(0, 2 * lmax + 1, 10)])  # Labels from -lmax to lmax
     ax.set_title('Reachable (white) and Unreachable (black) Points in l-m Space')
-    fig.savefig("build/debug/lm_space.png")
+    fig.savefig("debug/lm_space.png")
 
 if "LASER" in sys.argv:
-    laser_data = np.loadtxt("build/debug/laser.txt")
+    laser_data = np.loadtxt("debug/laser.txt")
     t = laser_data[:,0]
     Ax = laser_data[:,1]
     Ay = laser_data[:,2]
@@ -69,5 +69,5 @@ if "LASER" in sys.argv:
     plt.plot(t,Ay,color = "brown",label = "Ay")
     plt.plot(t,Az,color = "blue",label = "Az")
     plt.legend()
-    plt.savefig("build/debug/laser.png")
+    plt.savefig("debug/laser.png")
 

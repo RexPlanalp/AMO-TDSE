@@ -319,7 +319,7 @@ void simulation::_xy_expansion()
         int temp_idx = 0;
         for (int m = -l; m<=l; ++m)
         {
-            if (temp_idx/2 == 0)
+            if (temp_idx%2 == 0)
             {
                 lm_to_block[int_tuple(l,m)] = block_idx;
                 block_idx++;
