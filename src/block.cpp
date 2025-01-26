@@ -85,7 +85,7 @@ namespace block
         int total_size = n_basis*n_blocks;  
         std::map<int,std::pair<int,int>> block_to_lm =  sim.block_to_lm;
         
-        std::cout << "Loading Overlap Matrix" << std::endl;
+        std::cout << "Constructing Overlap Matrix" << std::endl;
         ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
 
         std::cout << "Loading Final State" << std::endl;
