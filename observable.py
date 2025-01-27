@@ -31,7 +31,7 @@ if "BLOCK" in sys.argv:
         space[lmax - int(column1[i]), int(column2[i]) + lmax] = column4[i]
 
     space[space==0] = np.min(space[space!=0])
-    cax = ax.imshow(space, cmap='inferno', interpolation='nearest', norm=LogNorm())  
+    cax = ax.imshow(space, cmap='inferno', interpolation='nearest', norm=Normalize())  
     ax.set_xlabel('m')
     ax.set_ylabel('l')
     ax.set_xticks([0, lmax, 2 * lmax])  

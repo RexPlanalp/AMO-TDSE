@@ -15,5 +15,5 @@ REPO_DIR="/users/becker/dopl4670/Research/TDSE_PETSC/build"
 hostname
 pwd
 
-mpirun -np $SLURM_NTASKS $REPO_DIR/example >> results.log
+mpirun -np $SLURM_NTASKS $REPO_DIR/example $@ >> results.log
 
