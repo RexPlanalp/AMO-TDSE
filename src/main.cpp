@@ -54,6 +54,7 @@
 #include "tise.h"
 #include "tdse.h"
 #include "block.h"
+#include "pes.h"
 #include <petscviewerhdf5.h>
 
 #include <string>
@@ -62,6 +63,7 @@
 int main(int argc, char **argv) {
     PetscErrorCode ierr;
     ierr = SlepcInitialize(&argc, &argv, NULL, NULL); CHKERRQ(ierr);
+    int code {};
     
     int rank, size;
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
@@ -78,6 +80,7 @@ int main(int argc, char **argv) {
     bool run_tise = false;
     bool run_tdse = false;
     bool run_block = false;
+    bool run_pes = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -87,18 +90,22 @@ int main(int argc, char **argv) {
             run_tdse = true;
         } else if (arg == "--block") {
             run_block = true;
+        } else if (arg == "--pes") {
+            run_pes = true;
         } else if (arg == "--all") {
             run_tise = true;
             run_tdse = true;
             run_block = true;
+            run_pes = true;
         }
     }
 
     // If no flags are provided, default to running everything
-    if (!run_tise && !run_tdse && !run_block) {
+    if (!run_tise && !run_tdse && !run_block && !run_pes) {
         run_tise = true;
         run_tdse = true;
         run_block = true;
+        run_pes = true;
     }
 
     // Execute selected computations
@@ -113,6 +120,10 @@ int main(int argc, char **argv) {
 
     if (run_block) {
         ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
+    }
+
+    if (run_pes) {
+        code = pes::compute_pes(rank,sim);
     }
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);
