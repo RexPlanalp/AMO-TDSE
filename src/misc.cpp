@@ -48,6 +48,8 @@ void save_lm_expansion(const std::map<std::pair<int, int>, int>& lm_to_block, co
 void normalize_array(std::array<double,3>& vec)
 {      
     double norm = std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+
+    if (norm == 0) return;
     
     for (int idx = 0; idx< vec.size(); ++idx)
     {

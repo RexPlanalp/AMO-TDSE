@@ -78,8 +78,8 @@ namespace block
                     ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
 
                     ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
-                    ierr = VecDot(tise_state,temp,&inner_product); CHKERRQ(ierr);
-                    ierr = VecAXPY(state_block,-std::conj(inner_product),tise_state); CHKERRQ(ierr); // Subtract projection 
+                    ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
+                    ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); // Subtract projection 
                 }
             }
             
