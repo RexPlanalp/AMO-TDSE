@@ -8,6 +8,7 @@
 #include <map>
 #include <iomanip>
 #include <algorithm>
+#include <complex>
 
 
 
@@ -174,7 +175,45 @@ namespace pes
         return CoulombResult{phase, wave};
 
     }
- 
+    
+    PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
+    {   
+        PetscErrorCode ierr;
+        const std::complex<double>* array;
+        ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&array)); CHKERRQ(ierr);
+
+        for (int idx = 0; idx < n_basis; ++idx)
+        {
+            std::complex<double> start = knots[idx];
+            std::complex<double> end = knots[idx+degree+1];
+
+            std::vector<std::complex<double>> basis_eval;
+            std::vector<int> basis_indices;
+
+            for (int i = 0; i < Nr; ++i)
+            {   
+                
+                std::complex<double> r = i*dr;
+                if (r.real() >= start.real() && r.real() < end.real())
+                {
+                    std::complex<double> val = bsplines::B(idx,degree,r,knots);
+                    basis_eval.push_back(val);
+                    basis_indices.push_back(i);
+                }
+            }
+
+            for (int block = 0; block < n_blocks; ++block)
+            {   
+                int global_idx = block*n_basis + idx;
+                std::complex<double> coeff = array[global_idx];
+                for (int index = 0; index < basis_eval.size(); ++index)
+                {
+                    expanded_state[block*Nr + basis_indices[index]] += coeff*basis_eval[index];
+                }
+            }
+        }
+    }
+
     int compute_pes(int rank,const simulation& sim)
     {   
         if (rank!=0)
@@ -182,32 +221,47 @@ namespace pes
             return 0;
         }
 
-        double E = 0.5;
-        int l = 0;
-        int Nr = 1000;
-        double dr = 0.01;
+        // double E = 0.5;
+        // int l = 0;
+        // int Nr = 1000;
+        // double dr = 0.01;
+        // int n_blocks = 1;
 
-        CoulombResult result = compute_coulomb_wave(E, l, Nr, dr);
-        std::cout << "Phase: " << result.phase << std::endl;
+        // CoulombResult result = compute_coulomb_wave(E, l, Nr, dr);
+        // std::cout << "Phase: " << result.phase << std::endl;
 
-        std::ofstream outFile("wave.txt");
-        if (!outFile.is_open())
-        {
-            std::cerr << "couldnt open wave.txt";
-            return 1;
-        }
+        // std::ofstream outFile("wave.txt");
+        // if (!outFile.is_open())
+        // {
+        //     std::cerr << "couldnt open wave.txt";
+        //     return 1;
+        // }
 
-        for (int idx = 0; idx < Nr; ++idx)
-        {
-            double rVal = idx*dr;
-            outFile << rVal << " " << result.wave[idx] << "\n";
-        }
+        // for (int idx = 0; idx < Nr; ++idx)
+        // {
+        //     double rVal = idx*dr;
+        //     outFile << rVal << " " << result.wave[idx] << "\n";
+        // }
 
-        outFile.close();
-        std::cout << "wrote wave to txt" << std::endl;
+        // outFile.close();
+        // std::cout << "wrote wave to txt" << std::endl;
+
+        int Nr = sim.grid_data.at("Nr").get<int>();
+        double dr = sim.grid_data.at("grid_spacing").get<double>();
+        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
+        int n_basis = sim.bspline_data.at("n_basis").get<int>();
+        int degree = sim.bspline_data.at("degree").get<int>();
+        std::map<int, std::pair<int, int>> block_to_lm = sim.block_to_lm;
+
+        Vec final_state;
+        load_final_state("TDSE_files/tdse_output.h5", &final_state, n_blocks*n_basis);
+
+
+        std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
+        expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
         return 0;
-        
     }
+
 
 }
