@@ -176,44 +176,6 @@ namespace pes
 
     }
     
-    // PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
-    // {   
-    //     PetscErrorCode ierr;
-    //     const std::complex<double>* array;
-    //     ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&array)); CHKERRQ(ierr);
-
-    //     for (int idx = 0; idx < n_basis; ++idx)
-    //     {
-    //         std::complex<double> start = knots[idx];
-    //         std::complex<double> end = knots[idx+degree+1];
-
-    //         std::vector<std::complex<double>> basis_eval;
-    //         std::vector<int> basis_indices;
-
-    //         for (int i = 0; i < Nr; ++i)
-    //         {   
-                
-    //             std::complex<double> r = i*dr;
-    //             if (r.real() >= start.real() && r.real() < end.real())
-    //             {
-    //                 std::complex<double> val = bsplines::B(idx,degree,r,knots);
-    //                 basis_eval.push_back(val);
-    //                 basis_indices.push_back(i);
-    //             }
-    //         }
-
-    //         for (int block = 0; block < n_blocks; ++block)
-    //         {   
-    //             int global_idx = block*n_basis + idx;
-    //             std::complex<double> coeff = array[global_idx];
-    //             for (int index = 0; index < basis_eval.size(); ++index)
-    //             {
-    //                 expanded_state[block*Nr + basis_indices[index]] += coeff*basis_eval[index];
-    //             }
-    //         }
-    //     }
-    // }
-
     PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
     {   
         // Load the state into easily accessible array (avoid VecGetValue calls)
@@ -294,11 +256,17 @@ namespace pes
         int n_blocks = sim.angular_data.at("n_blocks").get<int>();
         int n_basis = sim.bspline_data.at("n_basis").get<int>();
         int degree = sim.bspline_data.at("degree").get<int>();
+        int nmax = sim.angular_data.at("nmax").get<int>();
+        PetscErrorCode ierr;
         std::map<int, std::pair<int, int>> block_to_lm = sim.block_to_lm;
 
         Vec final_state;
         load_final_state("TDSE_files/tdse_output.h5", &final_state, n_blocks*n_basis);
 
+        Mat S;
+        ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
+
+        ierr = project_out_bound("TISE_files/tise_output.h5", S, final_state, n_basis, n_blocks, nmax, block_to_lm); CHKERRQ(ierr);
 
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
