@@ -271,12 +271,14 @@ namespace pes
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
-        std::complex<double> total {};
-        for (int i = 0; i < Nr*n_blocks; ++i)
-        {
-            total += expanded_state[i];
+        std::fstream outFile("expanded_state.txt", std::ios::out);
+        for (int i = 0; i < Nr; ++i)
+        {   
+            int block = 13;
+            int global_idx = block*Nr + i;
+            outFile << expanded_state[global_idx].real() << " " << expanded_state[global_idx].imag() <<  "\n";
         }
-        std::cout << "Sum of all elements in the expanded state" << total << std::endl;
+        outFile.close();
 
         return 0;
     }

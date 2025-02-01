@@ -71,3 +71,9 @@ if "LASER" in sys.argv:
     plt.legend()
     plt.savefig("debug/laser.png")
 
+data = np.loadtxt("expanded_state.txt")
+x = data[:,0]
+y = data[:,1]
+z = x + 1j * y
+plt.plot(np.abs(z)**2)
+plt.savefig("expanded_state.png")
