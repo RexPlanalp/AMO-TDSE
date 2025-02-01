@@ -176,39 +176,82 @@ namespace pes
 
     }
     
+    // PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
+    // {   
+    //     PetscErrorCode ierr;
+    //     const std::complex<double>* array;
+    //     ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&array)); CHKERRQ(ierr);
+
+    //     for (int idx = 0; idx < n_basis; ++idx)
+    //     {
+    //         std::complex<double> start = knots[idx];
+    //         std::complex<double> end = knots[idx+degree+1];
+
+    //         std::vector<std::complex<double>> basis_eval;
+    //         std::vector<int> basis_indices;
+
+    //         for (int i = 0; i < Nr; ++i)
+    //         {   
+                
+    //             std::complex<double> r = i*dr;
+    //             if (r.real() >= start.real() && r.real() < end.real())
+    //             {
+    //                 std::complex<double> val = bsplines::B(idx,degree,r,knots);
+    //                 basis_eval.push_back(val);
+    //                 basis_indices.push_back(i);
+    //             }
+    //         }
+
+    //         for (int block = 0; block < n_blocks; ++block)
+    //         {   
+    //             int global_idx = block*n_basis + idx;
+    //             std::complex<double> coeff = array[global_idx];
+    //             for (int index = 0; index < basis_eval.size(); ++index)
+    //             {
+    //                 expanded_state[block*Nr + basis_indices[index]] += coeff*basis_eval[index];
+    //             }
+    //         }
+    //     }
+    // }
+
     PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
     {   
+        // Load the state into easily accessible array (avoid VecGetValue calls)
         PetscErrorCode ierr;
-        const std::complex<double>* array;
-        ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&array)); CHKERRQ(ierr);
+        const std::complex<double>* state_array;
+        ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&state_array)); CHKERRQ(ierr);
 
-        for (int idx = 0; idx < n_basis; ++idx)
-        {
-            std::complex<double> start = knots[idx];
-            std::complex<double> end = knots[idx+degree+1];
+        // Loop over all bspline basis function
+        for (int bspline_idx = 0; bspline_idx < n_basis; ++bspline_idx)
+        {   
+            // Get the start and end of the bspline basis function
+            std::complex<double> start = knots[bspline_idx];
+            std::complex<double> end = knots[bspline_idx+degree+1];
 
-            std::vector<std::complex<double>> basis_eval;
-            std::vector<int> basis_indices;
+            // Initialize vectors to store the evaluation of the bspline basis function and the corresponding indices
+            std::vector<std::complex<double>> bspline_eval;
+            std::vector<int> bspline_eval_indices;
 
-            for (int i = 0; i < Nr; ++i)
+            // Loop over all grid points
+            for (int r_idx = 0; r_idx < Nr; ++r_idx)
             {   
-                
-                std::complex<double> r = i*dr;
+                std::complex<double> r = r_idx*dr;
                 if (r.real() >= start.real() && r.real() < end.real())
                 {
-                    std::complex<double> val = bsplines::B(idx,degree,r,knots);
-                    basis_eval.push_back(val);
-                    basis_indices.push_back(i);
+                    std::complex<double> val = bsplines::B(bspline_idx,degree,r,knots);
+                    bspline_eval.push_back(val);
+                    bspline_eval_indices.push_back(r_idx);
                 }
             }
 
+            // Loop over each block 
             for (int block = 0; block < n_blocks; ++block)
             {   
-                int global_idx = block*n_basis + idx;
-                std::complex<double> coeff = array[global_idx];
-                for (int index = 0; index < basis_eval.size(); ++index)
+                std::complex<double> coeff = state_array[block*n_basis + bspline_idx];
+                // Loop over all grid points and add contribution to the expanded state for this block
+                for (int r_sub_idx = 0; r_sub_idx < bspline_eval.size(); ++r_sub_idx)
                 {
-                    expanded_state[block*Nr + basis_indices[index]] += coeff*basis_eval[index];
+                    expanded_state[block*Nr + bspline_eval_indices[r_sub_idx]] += coeff*bspline_eval[r_sub_idx];
                 }
             }
         }
@@ -259,6 +302,13 @@ namespace pes
 
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
+
+        std::complex<double> total {};
+        for (int i = 0; i < Nr*n_blocks; ++i)
+        {
+            total += expanded_state[i];
+        }
+        std::cout << "Sum of all elements in the expanded state" << total << std::endl;
 
         return 0;
     }

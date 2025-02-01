@@ -11,9 +11,9 @@ spack load petsc
 spack load slepc
 
 
-REPO_DIR="/users/becker/dopl4670/Research/TDSE_PETSC/build"
+REPO_DIR="/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/bin"
 hostname
 pwd
 
-mpirun -np $SLURM_NTASKS $REPO_DIR/example $@ >> results.log
+mpirun -np $SLURM_NTASKS $REPO_DIR/simulation.exe $@ >> results.log
 
