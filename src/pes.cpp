@@ -352,23 +352,25 @@ namespace pes
 
         std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Emax,dE,n_blocks,block_to_lm,Nr,dr);
 
-        std::vector<std::complex<double>> partial_0_0 = partial_spectra.at(std::make_pair(0,0));
 
-       std::ofstream partial00("partial00.txt");
-        if (!partial00.is_open()) {
-            std::cerr << "Failed to open partial00.txt" << std::endl;
+        compute_photoelectron(partial_spectra,n_blocks,Emax,dE,block_to_lm);
+        std::vector<std::complex<double>> partial_test = partial_spectra.at(std::make_pair(15,0));
+
+       std::ofstream partial("partial.txt");
+        if (!partial.is_open()) {
+            std::cerr << "Failed to open partial.txt" << std::endl;
             return 1;  // Or handle the error appropriately
         }
 
-        for (int idx = 0; idx < partial_0_0.size(); ++idx)
+        for (int idx = 0; idx < partial_test.size(); ++idx)
         {
-            partial00 << idx*dE << " " << partial_0_0[idx].real() << " " << partial_0_0[idx].imag() << "\n";
+            partial << idx*dE << " " << partial_test[idx].real() << " " << partial_test[idx].imag() << "\n";
         }
-        partial00.flush();  // Ensure all data is written
-        partial00.close();
+        partial.flush();  // Ensure all data is written
+        partial.close();
 
         // Add a confirmation message
-        std::cout << "Wrote partial spectrum to partial00.txt" << std::endl;
+        std::cout << "Wrote partial spectrum to partial.txt" << std::endl;
 
         
 

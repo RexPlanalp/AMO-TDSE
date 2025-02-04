@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
+import pickle
 
 import numpy as np
 import sys
@@ -71,7 +72,24 @@ if "LASER" in sys.argv:
     plt.legend()
     plt.savefig("debug/laser.png")
 
-data = np.loadtxt("partial00.txt")
-plt.plot(data[:,0],data[:,1]**2 + data[:,2]**2)
+data = np.loadtxt("partial.txt")
+with open("partial_spectra.pkl","rb") as f:
+    python_data = pickle.load(f)
 
-plt.savefig("partial00.png")
+y = data[:,1]**2 + data[:,2]**2
+
+plt.semilogy(data[:,0],y,label = "C++")
+plt.semilogy(data[:,0],np.abs(python_data[(15,0)])**2,label = "Python")
+plt.legend()
+
+# plt.semilogy(data[:,0],np.abs(np.abs(python_data[(0,0)])**2 - y))
+
+plt.savefig("partial_comparison.png")
+
+
+# data = np.loadtxt("pes.txt")
+# plt.semilogy(data[:,0],data[:,1]/(2*np.pi)**3,color = "k")
+# plt.xlim([np.min(data[:,0]),np.max(data[:,0])])
+
+
+# plt.savefig("pes.png")
