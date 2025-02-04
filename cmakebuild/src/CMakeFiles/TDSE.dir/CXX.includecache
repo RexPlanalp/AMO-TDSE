@@ -29,6 +29,8 @@ fstream
 -
 iostream
 -
+complex
+-
 
 ../headers/simulation.h
 vector
@@ -64,6 +66,12 @@ iomanip
 algorithm
 -
 complex
+-
+misc.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/misc.h
+complex
+-
+map
 -
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-oegl3edo26iqhmlaja2ggspquno7g3ll/include/mpi.h
