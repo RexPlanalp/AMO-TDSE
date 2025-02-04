@@ -31,8 +31,8 @@ namespace pes
         ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
 
         // TESTING
-        //ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        ierr = PetscObjectSetName((PetscObject)*state, "psi_final"); CHKERRQ(ierr);
+        ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
+        //ierr = PetscObjectSetName((PetscObject)*state, "psi_final"); CHKERRQ(ierr);
         // TESTING
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
         ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
@@ -73,8 +73,8 @@ namespace pes
             {
                 std::ostringstream dataset_name;
                 // TESTING
-                // dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
-                dataset_name << "/Psi_" << n << "_" << l;
+                 dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
+                //dataset_name << "/Psi_" << n << "_" << l;
                 // TESTING
                 ierr = PetscViewerHDF5HasDataset(viewer, dataset_name.str().c_str(), &has_dataset); CHKERRQ(ierr);
                 if (has_dataset)
@@ -131,14 +131,9 @@ namespace pes
         double k    = std::sqrt(2.0 * E);
         int   lterm = l * (l + 1);
 
-        wave[0] = 1.0;
+        wave[0] = 0.0;
+        wave[1] = 1.0;
 
-        
-        double r1    = dr;  
-        double term1 = dr2 * (lterm/(r1*r1) + 2.0*H(r1) - 2.0*E);
-        wave[1]      = (term1 + 2.0) * wave[0];
-
-    
         for (int idx = 2; idx < Nr; ++idx)
         {
             double r_val = idx*dr; 
