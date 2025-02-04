@@ -224,6 +224,7 @@ namespace pes
     std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> compute_coulomb_map(double Emax, double dE, int lmax, int Nr, double dr)
     {   
         int Ne = static_cast<int>(Emax/dE) + 1;
+        std::cout << "Ne" << " " << Ne << std::endl;
         std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map;
         for (int l = 0; l <= lmax; ++l)
         {
@@ -243,12 +244,13 @@ namespace pes
     {
         std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra;
         int Ne = static_cast<int>(Emax/dE) + 1;
+        std:: cout << "Ne" << " " << Ne << std::endl;
         for (int block = 0; block < n_blocks; ++block)
         {
+            
             std::pair<int,int> lm_pair = block_to_lm.at(block);
             int l = lm_pair.first;
             int m = lm_pair.second;
-
             partial_spectra[std::make_pair(l, m)].reserve(Ne); 
         }
 
@@ -256,20 +258,20 @@ namespace pes
         {
             for (int block = 0; block < n_blocks; ++block)
             {
+                
                 std::pair<int,int> lm_pair = block_to_lm.at(block);
                 int l = lm_pair.first;
                 int m = lm_pair.second;
 
                 std::vector<double> coulomb_wave = coulomb_map.at(std::make_pair(E_idx*dE,l)).first;
                 auto start = expanded_state.begin() + Nr*block;  // Starting at index 2
-                auto end = expanded_state.begin() + Nr*(block+1) - 1;    // Ending before index 5
+                auto end = expanded_state.begin() + Nr*(block+1);    // Ending before index 5
 
                 std::vector<std::complex<double>> block_vector(start, end);  // Subvector containing elements 3, 4, 5
 
                 std::vector<std::complex<double>> result;
-                complex_pointwise_mult(coulomb_wave,block_vector,result);
-                std::complex<double> I = complex_simpsons_method(result,dr);
-
+                pes_pointwise_mult(coulomb_wave,block_vector,result);
+                std::complex<double> I = pes_simpsons_method(result,dr);   
                 partial_spectra[std::make_pair(l,m)].push_back(I);
 
             }
@@ -282,6 +284,39 @@ namespace pes
         return partial_spectra;
     }
 
+    void compute_photoelectron(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,double Emax, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
+    {   
+
+        std::ofstream pesFiles("pes.txt", std::ios::app);
+        int Ne = static_cast<int>(Emax/dE) + 1;
+
+        std::vector<std::complex<double>> pes(Ne,0.0);
+       
+        for (int block = 0; block < n_blocks; ++block)
+        {   
+            std::pair<int,int> lm_pair = block_to_lm.at(block);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+
+            std::vector<std::complex<double>> magsq(Ne,0.0);
+            
+            pes_pointwise_magsq(partial_spectra.at(std::make_pair(l,m)),magsq);
+            std::cout << "TEST" << std::endl;
+            pes_pointwise_add(pes,magsq,pes);
+        }
+        
+
+        for (int idx = 0; idx < pes.size(); ++idx)
+        {   
+            std::cout << idx * dE << std::endl;
+            pesFiles << idx*dE << " " << pes[idx].real() << " " << pes[idx].imag() << "\n";
+        }
+
+        pesFiles.close();
+
+    }
+
+   
     int compute_pes(int rank,const simulation& sim)
     {   
         if (rank!=0)
@@ -295,8 +330,8 @@ namespace pes
         int n_basis = sim.bspline_data.at("n_basis").get<int>();
         int degree = sim.bspline_data.at("degree").get<int>();
         int nmax = sim.angular_data.at("nmax").get<int>();
-        double Emax = sim.observable_data.at("E").get<std::array<double,2>>()[0];
-        double dE = sim.observable_data.at("E").get<std::array<double,2>>()[1];
+        double Emax = sim.observable_data.at("E").get<std::array<double,2>>()[1];
+        double dE = sim.observable_data.at("E").get<std::array<double,2>>()[0];
         int lmax = sim.angular_data.at("lmax").get<int>();
         std::map<int, std::pair<int, int>> block_to_lm = sim.block_to_lm;
 
@@ -313,6 +348,32 @@ namespace pes
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
         std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Emax,dE,lmax,Nr,dr);
+
+
+        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Emax,dE,n_blocks,block_to_lm,Nr,dr);
+
+        std::vector<std::complex<double>> partial_0_0 = partial_spectra.at(std::make_pair(0,0));
+
+       std::ofstream partial00("partial00.txt");
+        if (!partial00.is_open()) {
+            std::cerr << "Failed to open partial00.txt" << std::endl;
+            return 1;  // Or handle the error appropriately
+        }
+
+        for (int idx = 0; idx < partial_0_0.size(); ++idx)
+        {
+            partial00 << idx*dE << " " << partial_0_0[idx].real() << " " << partial_0_0[idx].imag() << "\n";
+        }
+        partial00.flush();  // Ensure all data is written
+        partial00.close();
+
+        // Add a confirmation message
+        std::cout << "Wrote partial spectrum to partial00.txt" << std::endl;
+
+        
+
+
+
 
 
 

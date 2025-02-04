@@ -66,16 +66,31 @@ void cross_product(const std::array<double,3>& vec1, const std::array<double,3>&
     result[2] = vec1[0]*vec2[1] - vec1[1]*vec2[0];
 }
 
-void complex_pointwise_mult(const std::vector<double>& vec1, const std::vector<std::complex<double>>& vec2,std::vector<std::complex<double>>& result)
-{   
-    result.resize(vec1.size());
-    for (int idx = 0; idx < vec1.size(); ++idx)
-    {
-        result.push_back(vec1[idx]*vec2[idx]);
+void pes_pointwise_mult(const std::vector<double>& vec1, const std::vector<std::complex<double>>& vec2, std::vector<std::complex<double>>& result) {
+    result.resize(vec1.size());  // Correct: Set the size
+
+    for (int idx = 0; idx < vec1.size(); ++idx) {
+        result[idx] = vec1[idx] * vec2[idx]; // Direct assignment: No push_back!
     }
 }
 
-std::complex<double> complex_simpsons_method(const std::vector<std::complex<double>>& vec,double dr)
+void pes_pointwise_add(const std::vector<std::complex<double>>& vec1, const std::vector<std::complex<double>>& vec2, std::vector<std::complex<double>>& result) {
+    result.resize(vec1.size());
+
+    for (int idx = 0; idx < vec1.size(); ++idx) {
+        result[idx] = vec1[idx] + vec2[idx]; // Direct assignment
+    }
+}
+
+void pes_pointwise_magsq(const std::vector<std::complex<double>>& vec, std::vector<std::complex<double>>& result) {
+    result.resize(vec.size());
+
+    for (int idx = 0; idx < vec.size(); ++idx) {
+        result[idx] = vec[idx] * std::conj(vec[idx]); // Direct assignment
+    }
+}
+
+std::complex<double> pes_simpsons_method(const std::vector<std::complex<double>>& vec,double dr)
 {
     int n = vec.size() - 1;
     std::complex<double> I {};
