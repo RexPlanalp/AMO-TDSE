@@ -362,43 +362,36 @@ namespace pes
 
 
         compute_photoelectron(partial_spectra,n_blocks,Emax,dE,block_to_lm);
-    //     std::vector<std::complex<double>> partial_test = partial_spectra.at(std::make_pair(0,0));
 
-    //    std::ofstream partial("partial.txt");
-    //     if (!partial.is_open()) {
-    //         std::cerr << "Failed to open partial.txt" << std::endl;
-    //         return 1;  // Or handle the error appropriately
-    //     }
+        for (const auto& entry : partial_spectra) {
+            const auto& key = entry.first;     // This is the pair<int,int>
+            const auto& spectrum = entry.second;  // This is the vector<complex<double>>
+            
+            std::string filename = "partial_" + std::to_string(key.first) + "_" + std::to_string(key.second) + ".txt";
+            
+            std::ofstream outfile(filename);
+            if (!outfile.is_open()) {
+                std::cerr << "Failed to open " << filename << std::endl;
+                continue;  // Skip to next spectrum if file can't be opened
+            }
 
-    //     for (int idx = 0; idx < partial_test.size(); ++idx)
-    //     {
-    //         partial << idx*dE << " " << partial_test[idx].real() << " " << partial_test[idx].imag() << "\n";
-    //     }
-    //     partial.flush();  // Ensure all data is written
-    //     partial.close();
+            for (int idx = 0; idx < spectrum.size(); ++idx) {
+                outfile << idx*dE << " " << spectrum[idx].real() << " " << spectrum[idx].imag() << "\n";
+            }
+            outfile.flush();
+            outfile.close();
+            
+            std::cout << "Wrote " << filename << std::endl;
+        }
 
-    //     // Add a confirmation message
-    //     std::cout << "Wrote partial spectrum to partial.txt" << std::endl;
-for (const auto& entry : partial_spectra) {
-    const auto& key = entry.first;     // This is the pair<int,int>
-    const auto& spectrum = entry.second;  // This is the vector<complex<double>>
-    
-    std::string filename = "partial_" + std::to_string(key.first) + "_" + std::to_string(key.second) + ".txt";
-    
-    std::ofstream outfile(filename);
-    if (!outfile.is_open()) {
-        std::cerr << "Failed to open " << filename << std::endl;
-        continue;  // Skip to next spectrum if file can't be opened
-    }
-
-    for (int idx = 0; idx < spectrum.size(); ++idx) {
-        outfile << idx*dE << " " << spectrum[idx].real() << " " << spectrum[idx].imag() << "\n";
-    }
-    outfile.flush();
-    outfile.close();
-    
-    std::cout << "Wrote " << filename << std::endl;
-}
+        CoulombResult test = compute_coulomb_wave(0.9,0,Nr,dr);
+        std::ofstream outfile("coulomb.txt");
+        for (int idx = 0; idx < test.wave.size(); ++idx)
+        {
+            outfile << idx*dr << " " << test.wave[idx] << "\n";
+        }
+        outfile.flush();
+        outfile.close();
 
 
 
