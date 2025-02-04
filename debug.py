@@ -72,24 +72,25 @@ if "LASER" in sys.argv:
     plt.legend()
     plt.savefig("debug/laser.png")
 
-data = np.loadtxt("partial.txt")
 with open("partial_spectra.pkl","rb") as f:
-    python_data = pickle.load(f)
+    python_spectra = pickle.load(f)
 
-y = data[:,1]**2 + data[:,2]**2
+l,m = 0,0
+cpp_spectra = np.loadtxt(f"partial_{l}_{m}.txt")
 
-plt.semilogy(data[:,0],y,label = "C++")
-plt.semilogy(data[:,0],np.abs(python_data[(15,0)])**2,label = "Python")
+python_spectrum = np.abs(python_spectra[(l,m)])**2
+cpp_spectrum = cpp_spectra[:,1]**2 + cpp_spectra[:,2]**2
+plt.semilogy(python_spectrum,label = "Python")
+plt.semilogy(cpp_spectrum,label = "C++")
 plt.legend()
+plt.title(f"Partial Spectrum for l = {l} m = {m}")
+plt.savefig("partial.png")
+plt.clf()
 
-# plt.semilogy(data[:,0],np.abs(np.abs(python_data[(0,0)])**2 - y))
-
-plt.savefig("partial_comparison.png")
-
-
-# data = np.loadtxt("pes.txt")
-# plt.semilogy(data[:,0],data[:,1]/(2*np.pi)**3,color = "k")
-# plt.xlim([np.min(data[:,0]),np.max(data[:,0])])
-
-
-# plt.savefig("pes.png")
+data = np.loadtxt("pes.txt")
+pes_cpp = data[:,1]/(2*np.pi)**3
+pes_python = np.load("PES.npy")
+plt.semilogy(pes_python,label = "Python")
+plt.semilogy(pes_cpp,label = "C++")
+plt.legend()
+plt.savefig("pes.png")

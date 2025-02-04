@@ -30,9 +30,11 @@ namespace pes
         ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
         ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
 
-
-        ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, "TDSE_files/tdse_output.h5", FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+        // TESTING
+        //ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
+        ierr = PetscObjectSetName((PetscObject)*state, "psi_final"); CHKERRQ(ierr);
+        // TESTING
+        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
         ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
@@ -70,7 +72,10 @@ namespace pes
             for (int n = 0; n <= nmax; ++n)
             {
                 std::ostringstream dataset_name;
-                dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
+                // TESTING
+                // dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
+                dataset_name << "/Psi_" << n << "_" << l;
+                // TESTING
                 ierr = PetscViewerHDF5HasDataset(viewer, dataset_name.str().c_str(), &has_dataset); CHKERRQ(ierr);
                 if (has_dataset)
                 {   
@@ -143,7 +148,11 @@ namespace pes
 
             if (std::abs(wave[idx]) > 1e10)
             {
-                scale_vector(wave, 1e-10);  
+                double max_val = *std::max_element(wave.begin(), wave.end(), 
+                    [](double a, double b) { return std::abs(a) < std::abs(b); });
+                if (max_val != 0.0) {  // Just to be safe
+                    scale_vector(wave, 1.0/max_val);
+                }
             }
         }
 
@@ -301,7 +310,6 @@ namespace pes
             std::vector<std::complex<double>> magsq(Ne,0.0);
             
             pes_pointwise_magsq(partial_spectra.at(std::make_pair(l,m)),magsq);
-            std::cout << "TEST" << std::endl;
             pes_pointwise_add(pes,magsq,pes);
         }
         
@@ -354,25 +362,43 @@ namespace pes
 
 
         compute_photoelectron(partial_spectra,n_blocks,Emax,dE,block_to_lm);
-        std::vector<std::complex<double>> partial_test = partial_spectra.at(std::make_pair(15,0));
+    //     std::vector<std::complex<double>> partial_test = partial_spectra.at(std::make_pair(0,0));
 
-       std::ofstream partial("partial.txt");
-        if (!partial.is_open()) {
-            std::cerr << "Failed to open partial.txt" << std::endl;
-            return 1;  // Or handle the error appropriately
-        }
+    //    std::ofstream partial("partial.txt");
+    //     if (!partial.is_open()) {
+    //         std::cerr << "Failed to open partial.txt" << std::endl;
+    //         return 1;  // Or handle the error appropriately
+    //     }
 
-        for (int idx = 0; idx < partial_test.size(); ++idx)
-        {
-            partial << idx*dE << " " << partial_test[idx].real() << " " << partial_test[idx].imag() << "\n";
-        }
-        partial.flush();  // Ensure all data is written
-        partial.close();
+    //     for (int idx = 0; idx < partial_test.size(); ++idx)
+    //     {
+    //         partial << idx*dE << " " << partial_test[idx].real() << " " << partial_test[idx].imag() << "\n";
+    //     }
+    //     partial.flush();  // Ensure all data is written
+    //     partial.close();
 
-        // Add a confirmation message
-        std::cout << "Wrote partial spectrum to partial.txt" << std::endl;
+    //     // Add a confirmation message
+    //     std::cout << "Wrote partial spectrum to partial.txt" << std::endl;
+for (const auto& entry : partial_spectra) {
+    const auto& key = entry.first;     // This is the pair<int,int>
+    const auto& spectrum = entry.second;  // This is the vector<complex<double>>
+    
+    std::string filename = "partial_" + std::to_string(key.first) + "_" + std::to_string(key.second) + ".txt";
+    
+    std::ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        std::cerr << "Failed to open " << filename << std::endl;
+        continue;  // Skip to next spectrum if file can't be opened
+    }
 
-        
+    for (int idx = 0; idx < spectrum.size(); ++idx) {
+        outfile << idx*dE << " " << spectrum[idx].real() << " " << spectrum[idx].imag() << "\n";
+    }
+    outfile.flush();
+    outfile.close();
+    
+    std::cout << "Wrote " << filename << std::endl;
+}
 
 
 
