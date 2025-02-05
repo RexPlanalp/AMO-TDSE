@@ -123,64 +123,52 @@ namespace pes
         std::vector<double> wave;
     };
 
-    CoulombResult compute_coulomb_wave(double E, int l, int Nr, double dr)
-    {
-        std::vector<double> wave(Nr, 0.0);
+    CoulombResult compute_coulomb_wave(double E, int l, int Nr, double dr) {
+    std::vector<double> wave(Nr, 0.0);
+    const double dr2 = dr * dr;
+    const double k = std::sqrt(2.0 * E);
+    const int lterm = l * (l + 1);
 
-        double dr2  = dr * dr;
-        double k    = std::sqrt(2.0 * E);
-        int   lterm = l * (l + 1);
+    wave[0] = 0.0;
+    wave[1] = 1.0;
 
-        wave[0] = 0.0;
-        wave[1] = 1.0;
+    for (int idx = 2; idx < Nr; ++idx) {
+        const double r_val = idx * dr;
+        const double term = dr2 * (lterm/(r_val*r_val) + 2.0*H(r_val) - 2.0*E);
+        wave[idx] = wave[idx - 1] * (term + 2.0) - wave[idx - 2];
 
-        for (int idx = 2; idx < Nr; ++idx)
-        {
-            double r_val = idx*dr; 
-            double term   = dr2 * (lterm/(r_val*r_val) + 2.0*H(r_val) - 2.0*E);
-
-            wave[idx] = wave[idx - 1] * (term + 2.0) - wave[idx - 2];
-
-            if (std::abs(wave[idx]) > 1e10)
-            {
-                double max_val = *std::max_element(wave.begin(), wave.end(), 
-                    [](double a, double b) { return std::abs(a) < std::abs(b); });
-                if (max_val != 0.0) {  // Just to be safe
-                    scale_vector(wave, 1.0/max_val);
-                }
-            }
+        // Match Python's overflow handling
+        if (std::abs(wave[idx]) > 1E10) {
+            double max_val = *std::max_element(wave.begin(), wave.end(), 
+                [](double a, double b) { return std::abs(a) < std::abs(b); });
+            scale_vector(wave, 1.0/max_val);
         }
-
-        double r_end     = (Nr - 2)*dr;
-        double wave_end  = wave[Nr - 2];
-        double dwave_end = (wave[Nr - 1] - wave[Nr - 3]) / (2.0 * dr);
-
-
-        double denom   = (k + 1.0 / (k * r_end));
-        double termPsi = wave_end * wave_end;          
-        double termDer = (dwave_end / denom)*(dwave_end / denom); 
-        double normVal = std::sqrt(termPsi + termDer);
-
-        if (normVal != 0.0)
-        {
-            for (auto& val : wave) {
-                val /= normVal;
-            }
-        }
-
-        std::complex<double> numerator(0.0, wave_end); 
-        numerator += dwave_end / denom;  
-
-        double scale = 2.0*k*r_end;
-        double ln_s  = std::log(scale);
-        std::complex<double> denomC  = std::exp(std::complex<double>(0.0, 1.0/k) * ln_s ); 
-
-        std::complex<double> fraction = numerator / denomC;
-        double phase  = std::arg(fraction) - k*r_end + l*M_PI/2.0;
-
-        return CoulombResult{phase, wave};
-
     }
+
+    const double r_end = (Nr - 2) * dr;
+    const double wave_end = wave[Nr - 2];
+    const double dwave_end = (wave[Nr - 1] - wave[Nr - 3]) / (2.0 * dr);
+    
+    // Match Python's normalization approach
+    const double denom = k + 1.0/(k * r_end);
+    const double termPsi = std::abs(wave_end) * std::abs(wave_end);
+    const double termDer = std::abs(dwave_end/denom) * std::abs(dwave_end/denom);
+    const double normVal = std::sqrt(termPsi + termDer);
+
+    if (normVal > 0.0) {
+        scale_vector(wave, 1.0/normVal);
+    }
+
+    std::complex<double> numerator(0.0, wave_end);
+    numerator += dwave_end / denom;
+
+    const double scale = 2.0 * k * r_end;
+    const std::complex<double> denomC = std::exp(std::complex<double>(0.0, 1.0/k) * std::log(scale));
+    const std::complex<double> fraction = numerator / denomC;
+    const double phase = std::arg(fraction) - k * r_end + l * M_PI/2.0;
+
+    return CoulombResult{phase, wave};
+}
     
     PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
     {   
@@ -350,6 +338,14 @@ namespace pes
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
+        // int block_idx = 1;
+        // std::ofstream outFile("expanded_state.txt");
+        // for (int idx = 0; idx < Nr; ++idx)
+        // {
+        //     outFile << idx*dr << " " << expanded_state[block_idx*Nr + idx].real() << " " << expanded_state[block_idx*Nr + idx].imag() << "\n";
+        // }
+        // outFile.close();
+
         std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Emax,dE,lmax,Nr,dr);
 
 
@@ -358,47 +354,26 @@ namespace pes
 
         compute_photoelectron(partial_spectra,n_blocks,Emax,dE,block_to_lm);
 
-        for (const auto& entry : partial_spectra) {
-            const auto& key = entry.first;     // This is the pair<int,int>
-            const auto& spectrum = entry.second;  // This is the vector<complex<double>>
+        // for (const auto& entry : partial_spectra) {
+        //     const auto& key = entry.first;     // This is the pair<int,int>
+        //     const auto& spectrum = entry.second;  // This is the vector<complex<double>>
             
-            std::string filename = "partial_" + std::to_string(key.first) + "_" + std::to_string(key.second) + ".txt";
+        //     std::string filename = "partial_" + std::to_string(key.first) + "_" + std::to_string(key.second) + ".txt";
             
-            std::ofstream outfile(filename);
-            if (!outfile.is_open()) {
-                std::cerr << "Failed to open " << filename << std::endl;
-                continue;  // Skip to next spectrum if file can't be opened
-            }
+        //     std::ofstream outfile(filename);
+        //     if (!outfile.is_open()) {
+        //         std::cerr << "Failed to open " << filename << std::endl;
+        //         continue;  // Skip to next spectrum if file can't be opened
+        //     }
 
-            for (int idx = 0; idx < spectrum.size(); ++idx) {
-                outfile << idx*dE << " " << spectrum[idx].real() << " " << spectrum[idx].imag() << "\n";
-            }
-            outfile.flush();
-            outfile.close();
+        //     for (int idx = 0; idx < spectrum.size(); ++idx) {
+        //         outfile << idx*dE << " " << spectrum[idx].real() << " " << spectrum[idx].imag() << "\n";
+        //     }
+        //     outfile.flush();
+        //     outfile.close();
             
-            std::cout << "Wrote " << filename << std::endl;
-        }
-
-        CoulombResult test = compute_coulomb_wave(0.9,0,Nr,dr);
-        std::ofstream outfile("coulomb.txt");
-        for (int idx = 0; idx < test.wave.size(); ++idx)
-        {
-            outfile << idx*dr << " " << test.wave[idx] << "\n";
-        }
-        outfile.flush();
-        outfile.close();
-
-
-
-
-
-
-
-     
-
- 
-
-     
+        //     std::cout << "Wrote " << filename << std::endl;
+        // }
 
         return 0;
     }
