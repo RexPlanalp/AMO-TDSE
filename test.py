@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import os
 
 
 # coul_wave = np.loadtxt("coulomb.txt")
@@ -38,6 +39,7 @@ e_cpp  = data[:,0]
 plt.semilogy(e_cpp,pes_cpp,label = "C++")
 plt.legend()
 plt.savefig("pes.png")
+os.system("mv pes.png ~/Research/TDSE_PETSC/")
 
 
 # r_range,pdf = np.load("expanded.npy")

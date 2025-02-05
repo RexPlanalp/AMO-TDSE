@@ -24,6 +24,7 @@ simulation::simulation(const std::string& filename)
     _process_grid_data();
     _process_laser_data();
     _process_angular_data();
+    _process_observable_data();
 
 }
 void simulation::_read_input_par(const nlohmann::json& input_par)
@@ -66,6 +67,7 @@ void simulation::save_debug_info(int rank)
         debug_info["tise_data"] = tise_data;
         debug_info["tdse_data"] = tdse_data;
         debug_info["laser_data"] = laser_data;
+        debug_info["observable_data"] = observable_data;
 
         std::string filename = "debug/debug.json";
 
@@ -343,7 +345,19 @@ void simulation::_zxy_expansion()
     }
 }
 
+void simulation::_process_observable_data()
+{
+    _compute_energy();
+}
 
+void simulation::_compute_energy()
+{
+    std::array<double,2> energy = observable_data.at("E").get<std::array<double,2>>();
+    double dE = energy[0];
+    double Emax = energy[1];
+
+    observable_data["Ne"] = static_cast<int>(std::nearbyint(Emax/dE));
+}
 
 
 

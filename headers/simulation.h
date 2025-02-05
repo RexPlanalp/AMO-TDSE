@@ -80,6 +80,9 @@ class simulation
     void _compute_n_blocks();
     void _process_angular_data();
 
+    void _compute_energy();
+    void _process_observable_data();
+
 
    
 
