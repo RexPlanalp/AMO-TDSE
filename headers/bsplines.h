@@ -26,4 +26,5 @@ namespace bsplines
     PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi,bool use_ecs);
 
     PetscErrorCode save_matrix(Mat A, const char *filename);
+    PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename);
 };

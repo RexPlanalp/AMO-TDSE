@@ -11,8 +11,8 @@ with open("debug/debug.json") as f:
     data = json.load(f)
 
 if "BSPLINE" in sys.argv:
-    bspline_data = np.loadtxt("build/debug/bsplines.txt")
-    dbspline_data = np.loadtxt("build/debug/dbsplines.txt")
+    bspline_data = np.loadtxt("debug/bsplines.txt")
+    dbspline_data = np.loadtxt("debug/dbsplines.txt")
 
     real = bspline_data[:,0]
     imag = bspline_data[:,1]
@@ -36,7 +36,7 @@ if "BSPLINE" in sys.argv:
         ax2.plot(dreal[i*Nr:(i+1)*Nr],color = "k")
         ax2.plot(dimag[i*Nr:(i+1)*Nr],color = "brown")
 
-    fig.savefig("build/debug/bsplines.png")
+    fig.savefig("debug/bsplines.png")
 
 if "LM" in sys.argv:
     lmax = data["angular_data"]["lmax"]

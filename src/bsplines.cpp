@@ -285,35 +285,34 @@ PetscErrorCode save_matrix(Mat A, const char *filename)
         return ierr;
     }
 
+PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
+    PetscErrorCode ierr;
+    PetscInt m, n;
 
-// PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
-//     PetscErrorCode ierr;
-//     PetscInt m, n;
+    // Get matrix dimensions
+    ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
 
-//     // Get matrix dimensions
-//     ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return PETSC_ERR_FILE_OPEN;
+    }
 
-//     std::ofstream file(filename);
-//     if (!file.is_open()) {
-//         std::cerr << "Error opening file: " << filename << std::endl;
-//         return PETSC_ERR_FILE_OPEN;
-//     }
+    // Write matrix values row by row
+    for (PetscInt i = 0; i < m; ++i) {
+        for (PetscInt j = 0; j < n; ++j) {
+            PetscScalar value;
+            ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
+            file << value;
+            if (j < n - 1) {
+                file << ", ";  // Add CSV separator
+            }
+        }
+        file << "\n"; // Newline for next row
+    }
 
-//     // Write matrix values row by row
-//     for (PetscInt i = 0; i < m; ++i) {
-//         for (PetscInt j = 0; j < n; ++j) {
-//             PetscScalar value;
-//             ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
-//             file << value;
-//             if (j < n - 1) {
-//                 file << ", ";  // Add CSV separator
-//             }
-//         }
-//         file << "\n"; // Newline for next row
-//     }
-
-//     file.close();
-//     return ierr;
-// }
+    file.close();
+    return ierr;
+}
 
 }
