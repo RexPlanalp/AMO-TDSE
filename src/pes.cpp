@@ -213,14 +213,12 @@ namespace pes
         }
     }
 
-    std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> compute_coulomb_map(double Emax, double dE, int lmax, int Nr, double dr)
+    std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> compute_coulomb_map(int Ne, double dE,int lmax, int Nr, double dr)
     {   
-        int Ne = static_cast<int>(Emax/dE) + 1;
-        std::cout << "Ne" << " " << Ne << std::endl;
         std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map;
         for (int l = 0; l <= lmax; ++l)
         {
-            for (int E_idx = 1;  E_idx < Ne; ++E_idx)
+            for (int E_idx = 1;  E_idx <= Ne; ++E_idx)
             {
                 double E = E_idx*dE;
                 CoulombResult result = compute_coulomb_wave(E, l, Nr, dr);
@@ -232,11 +230,9 @@ namespace pes
         return coulomb_map;
     }
 
-    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, std::map<std::pair<double,int>,std::pair<std::vector<double>,double>>& coulomb_map, double Emax, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr)
+    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, std::map<std::pair<double,int>,std::pair<std::vector<double>,double>>& coulomb_map, int Ne, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr)
     {
         std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra;
-        int Ne = static_cast<int>(Emax/dE) + 1;
-        std:: cout << "Ne" << " " << Ne << std::endl;
         for (int block = 0; block < n_blocks; ++block)
         {
             
@@ -246,7 +242,7 @@ namespace pes
             partial_spectra[std::make_pair(l, m)].reserve(Ne); 
         }
 
-        for (int E_idx = 1; E_idx < Ne; ++E_idx)
+        for (int E_idx = 1; E_idx <= Ne; ++E_idx)
         {
             for (int block = 0; block < n_blocks; ++block)
             {
@@ -276,11 +272,11 @@ namespace pes
         return partial_spectra;
     }
 
-    void compute_photoelectron(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,double Emax, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
+    void compute_photoelectron(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
     {   
 
         std::ofstream pesFiles("pes.txt", std::ios::app);
-        int Ne = static_cast<int>(Emax/dE) + 1;
+
 
         std::vector<std::complex<double>> pes(Ne,0.0);
        
@@ -307,7 +303,6 @@ namespace pes
 
     }
 
-   
     int compute_pes(int rank,const simulation& sim)
     {   
         if (rank!=0)
@@ -316,6 +311,7 @@ namespace pes
         }
 
         int Nr = sim.grid_data.at("Nr").get<int>();
+        int Ne = sim.observable_data.at("Ne").get<int>();
         double dr = sim.grid_data.at("grid_spacing").get<double>();
         int n_blocks = sim.angular_data.at("n_blocks").get<int>();
         int n_basis = sim.bspline_data.at("n_basis").get<int>();
@@ -338,13 +334,13 @@ namespace pes
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
-        std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Emax,dE,lmax,Nr,dr);
+        std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Ne,dE,lmax,Nr,dr);
 
 
-        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Emax,dE,n_blocks,block_to_lm,Nr,dr);
+        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Ne,dE,n_blocks,block_to_lm,Nr,dr);
 
 
-        compute_photoelectron(partial_spectra,n_blocks,Emax,dE,block_to_lm);
+        compute_photoelectron(partial_spectra,n_blocks,Ne,dE,block_to_lm);
 
         // for (const auto& entry : partial_spectra) {
         //     const auto& key = entry.first;     // This is the pair<int,int>
