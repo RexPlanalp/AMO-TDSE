@@ -181,11 +181,6 @@ namespace tise
         ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
         ierr = bsplines::save_matrix(Der,"TISE_files/Der.bin"); CHKERRQ(ierr);
 
-        // //TESTING
-        ierr = bsplines::SaveMatrixToCSV(S,"TISE_files/S.csv"); CHKERRQ(ierr);
-        // std::complex<double> bsplines::integrate_matrix_element()
-        // //TESTING
-
         PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects  \n\n");
         ierr = MatDestroy(&K); CHKERRQ(ierr);
         ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);

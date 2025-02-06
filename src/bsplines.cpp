@@ -234,7 +234,7 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
         for (int j = col_start; j < col_end; j++) 
         {
             std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim,use_ecs);
-            ierr = MatSetValue(M, i, j, result.real(), INSERT_VALUES); CHKERRQ(ierr);
+            ierr = MatSetValue(M, i, j, result, INSERT_VALUES); CHKERRQ(ierr);
         }
     }
 
