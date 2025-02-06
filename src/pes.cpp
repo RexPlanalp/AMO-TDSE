@@ -334,13 +334,13 @@ namespace pes
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
-        std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Ne,dE,lmax,Nr,dr);
+        // std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Ne,dE,lmax,Nr,dr);
 
 
-        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Ne,dE,n_blocks,block_to_lm,Nr,dr);
+        // std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Ne,dE,n_blocks,block_to_lm,Nr,dr);
 
 
-        compute_photoelectron(partial_spectra,n_blocks,Ne,dE,block_to_lm);
+        // compute_photoelectron(partial_spectra,n_blocks,Ne,dE,block_to_lm);
 
         // for (const auto& entry : partial_spectra) {
         //     const auto& key = entry.first;     // This is the pair<int,int>
@@ -363,13 +363,13 @@ namespace pes
         //     std::cout << "Wrote " << filename << std::endl;
         // }
 
-        // int block_idx = 1;
-        // std::ofstream outFile("expanded_state.txt");
-        // for (int idx = 0; idx < Nr; ++idx)
-        // {
-        //     outFile << idx*dr << " " << expanded_state[block_idx*Nr + idx].real() << " " << expanded_state[block_idx*Nr + idx].imag() << "\n";
-        // }
-        // outFile.close();
+        int block_idx = 0;
+        std::ofstream outFile("expanded_state.txt");
+        for (int idx = 0; idx < Nr; ++idx)
+        {
+            outFile << idx*dr << " " << expanded_state[block_idx*Nr + idx].real() << " " << expanded_state[block_idx*Nr + idx].imag() << "\n";
+        }
+        outFile.close();
 
         return 0;
     }
