@@ -42,7 +42,7 @@ plt.savefig("pes.png")
 os.system("mv pes.png ~/Research/TDSE_PETSC/")
 
 
-# r_range,pdf = np.load("expanded.npy")
+#r_range,pdf = np.load("expanded.npy")
 
 # data = np.loadtxt("expanded_state.txt")
 # r = data[:,0]
@@ -52,7 +52,7 @@ os.system("mv pes.png ~/Research/TDSE_PETSC/")
 
 
 # plt.semilogy(r,state_pdf,label = "C++")
-# plt.semilogy(r_range,pdf,label = "Python")
+# #plt.semilogy(r_range,pdf,label = "Python")
 # plt.legend()
 # plt.savefig("expanded.png")
 # os.system("mv expanded.png ~/Research/TDSE_PETSC/")
