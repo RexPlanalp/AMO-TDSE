@@ -31,27 +31,28 @@ import os
 # plt.savefig("partial.png")
 # plt.clf()
 
-# data = np.loadtxt("pes.txt")
-# pes_cpp = data[:,1]/(2*np.pi)**3
-# e_cpp  = data[:,0]
+data = np.loadtxt("pes.txt")
+pes_cpp = data[:,1]/(2*np.pi)**3
+e_cpp  = data[:,0]
 # # pes_python = np.load("PES.npy")
 # # plt.semilogy(pes_python,label = "Python")
-# plt.semilogy(e_cpp,pes_cpp,label = "C++")
-# plt.legend()
-# plt.savefig("pes.png")
-# os.system("mv pes.png ~/Research/TDSE_PETSC/")
-
-
-r_range,pdf = np.load("expanded.npy")
-
-data = np.loadtxt("expanded_state.txt")
-r = data[:,0]
-state_real = data[:,1]
-state_imag = data[:,2]
-state_pdf = state_real**2 + state_imag**2
-
-
-plt.semilogy(r,state_pdf,label = "C++")
-plt.semilogy(r_range,pdf,label = "Python")
+plt.semilogy(e_cpp,pes_cpp,label = "C++")
 plt.legend()
-plt.savefig("expanded.png")
+plt.savefig("pes.png")
+os.system("mv pes.png ~/Research/TDSE_PETSC/")
+
+
+# r_range,pdf = np.load("expanded.npy")
+
+# data = np.loadtxt("expanded_state.txt")
+# r = data[:,0]
+# state_real = data[:,1]
+# state_imag = data[:,2]
+# state_pdf = state_real**2 + state_imag**2
+
+
+# plt.semilogy(r,state_pdf,label = "C++")
+# plt.semilogy(r_range,pdf,label = "Python")
+# plt.legend()
+# plt.savefig("expanded.png")
+# os.system("mv expanded.png ~/Research/TDSE_PETSC/")
