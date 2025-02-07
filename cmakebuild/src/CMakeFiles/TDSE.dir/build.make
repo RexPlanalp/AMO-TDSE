@@ -199,6 +199,8 @@ bin/simulation.exe: src/CMakeFiles/TDSE.dir/simulation.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/tdse.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/tise.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/build.make
+bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libgsl.so
+bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libgslcblas.so
 bin/simulation.exe: /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-3icmgg322wwy6grehsmgi3f7ocerv522/lib/libslepc.so
 bin/simulation.exe: /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.2-n5ewve7h22cweklyemvguyhsxznw56vh/lib/libpetsc.so
 bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libmpi.so

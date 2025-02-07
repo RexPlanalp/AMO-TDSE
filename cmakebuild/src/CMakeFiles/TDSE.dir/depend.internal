@@ -582,6 +582,9 @@ src/CMakeFiles/TDSE.dir/pes.cpp.o
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5pubconf.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5public.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5version.h
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_inline.h
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_legendre.h
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_result.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/hdf5.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/adl_serializer.hpp
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/byte_container_with_subtype.hpp

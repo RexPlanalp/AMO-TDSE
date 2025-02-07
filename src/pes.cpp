@@ -12,6 +12,7 @@
 #include "misc.h"
 #include <complex>
 #include <map>
+#include <gsl/gsl_sf_legendre.h>
 
 
 
@@ -116,6 +117,24 @@ namespace pes
             val *= scale;
         }
     }
+
+    std::complex<double> compute_Ylm(int l, int m, double theta, double phi) {
+
+    
+    // Handle negative m using Y_l(-m) = (-1)^m Y_lm*
+    if (m < 0) {
+        int abs_m = -m;
+        std::complex<double> Ylm = 
+                                  gsl_sf_legendre_sphPlm(l, abs_m, std::cos(theta)) * 
+                                  std::exp(std::complex<double>(0, -abs_m * phi));
+        return std::pow(-1.0, abs_m) * std::conj(Ylm);
+    }
+    
+    // For positive or zero m
+    return  
+           gsl_sf_legendre_sphPlm(l, m, std::cos(theta)) * 
+           std::exp(std::complex<double>(0, m * phi));
+}
 
     struct CoulombResult 
     {
@@ -272,7 +291,7 @@ namespace pes
         return partial_spectra;
     }
 
-    void compute_photoelectron(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
+    void compute_angle_integrated(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
     {   
 
         std::ofstream pesFiles("pes.txt", std::ios::app);
@@ -303,6 +322,73 @@ namespace pes
 
     }
 
+    void compute_angle_resolved(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<std::pair<int, int>,int>& lm_to_block, std::map<std::pair<double,int>,std::pair<std::vector<double>,double>>& coulomb_map,const std::string& SLICE)
+    {
+        std::ofstream padFiles("pad.txt", std::ios::app);
+        std::vector<double> theta_range;
+        std::vector<double> phi_range;
+
+        if (SLICE == "XZ")
+        {
+            for (double theta = 0; theta < M_PI; theta += 0.01) 
+            {
+                theta_range.push_back(theta);
+            }
+
+            phi_range  = {0.0,M_PI};
+        }
+        
+
+        if (SLICE == "XY")
+        {
+            theta_range = {M_PI/ 2.0};
+
+            for (double phi = 0; phi < 2.0*M_PI; phi += 0.01) 
+            {
+                phi_range.push_back(phi);
+            }
+
+        }
+
+        for (int E_idx = 1; E_idx <= Ne; ++E_idx)
+        {
+            double E = E_idx*dE;
+            double k = std::sqrt(2.0*E);
+
+            for (auto& theta : theta_range)
+            {
+                for (auto& phi : phi_range)
+                {   
+                    std::complex<double> pad_amplitude {};
+                    for (const auto& pair: partial_spectra)
+                    {
+                        int l = pair.first.first;
+                        int m = pair.first.second;
+
+                        std::complex<double> sph_term = compute_Ylm(l,m,theta,phi);
+
+                        double partial_phase = coulomb_map.at(std::make_pair(E,l)).second;
+                        std::complex<double> partial_amplitude = pair.second[E_idx - 1];
+
+                        std::complex<double> phase_factor = std::exp(std::complex<double>(0.0,3*l*M_PI/2.0 + partial_phase));
+
+                        pad_amplitude += sph_term*phase_factor*partial_amplitude;
+
+                    }
+
+                    double pad_prob = std::norm(pad_amplitude);
+                    pad_prob/=((2*M_PI)*(2*M_PI)*(2*M_PI));
+                    pad_prob/=k;
+
+                    padFiles << E << " " << theta << " " << phi << " " << pad_prob << "\n";
+                }
+            }
+        }
+    }
+
+
+
+
     int compute_pes(int rank,const simulation& sim)
     {   
         if (rank!=0)
@@ -320,7 +406,9 @@ namespace pes
         double Emax = sim.observable_data.at("E").get<std::array<double,2>>()[1];
         double dE = sim.observable_data.at("E").get<std::array<double,2>>()[0];
         int lmax = sim.angular_data.at("lmax").get<int>();
+        std::string SLICE = sim.observable_data.at("SLICE").get<std::string>();
         std::map<int, std::pair<int, int>> block_to_lm = sim.block_to_lm;
+        std::map<std::pair<int, int>, int> lm_to_block = sim.lm_to_block;
 
         Vec final_state;
         load_final_state("TDSE_files/tdse_output.h5", &final_state, n_blocks*n_basis);
@@ -339,7 +427,11 @@ namespace pes
 
         std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Ne,dE,n_blocks,block_to_lm,Nr,dr);
 
-        compute_photoelectron(partial_spectra,n_blocks,Ne,dE,block_to_lm);
+        compute_angle_integrated(partial_spectra,n_blocks,Ne,dE,block_to_lm);
+
+        compute_angle_resolved(partial_spectra,n_blocks,Ne,dE,lm_to_block,coulomb_map,SLICE);
+
+      
 
         
 
