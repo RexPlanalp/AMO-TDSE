@@ -315,7 +315,9 @@ namespace pes
         for (int idx = 0; idx < pes.size(); ++idx)
         {   
             std::cout << idx * dE << std::endl;
-            pesFiles << idx*dE << " " << pes[idx].real() << " " << pes[idx].imag() << "\n";
+            std::complex<double> val = pes[idx];
+            val /= ((2*M_PI)*(2*M_PI)*(2*M_PI));
+            pesFiles << idx*dE << " " << pes[idx].real() << " " << "\n";
         }
 
         pesFiles.close();
