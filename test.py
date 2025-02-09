@@ -32,15 +32,13 @@ import os
 # plt.savefig("partial.png")
 # plt.clf()
 
-# data = np.loadtxt("pes.txt")
-# pes_cpp = data[:,1]/(2*np.pi)**3
-# e_cpp  = data[:,0]
-# # pes_python = np.load("PES.npy")
-# # plt.semilogy(pes_python,label = "Python")
-# plt.semilogy(e_cpp,pes_cpp,label = "C++")
-# plt.legend()
-# plt.savefig("pes.png")
-# os.system("mv pes.png ~/Research/TDSE_PETSC/")
+data = np.loadtxt("pes.txt")
+pes_cpp = data[:,1]/(2*np.pi)**6
+e_cpp  = data[:,0]
+plt.semilogy(e_cpp,pes_cpp,label = "C++")
+plt.legend()
+plt.savefig("pes.png")
+os.system("mv pes.png ~/Research/TDSE_PETSC/")
 
 
 #r_range,pdf = np.load("expanded.npy")
@@ -57,6 +55,9 @@ import os
 # plt.legend()
 # plt.savefig("expanded.png")
 # os.system("mv expanded.png ~/Research/TDSE_PETSC/")
+
+
+
 
 
 pad_data = np.loadtxt("pad.txt")
@@ -77,11 +78,11 @@ cmap = "hot_r"
 
 fig,ax = plt.subplots()
 
-#norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
-norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
+norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
+#norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
 
-#sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
-sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
+sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
+#sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
 ax.set_aspect("equal",adjustable = "box")
 fig.colorbar(sc,ax=ax)
 fig.savefig("pad.png")

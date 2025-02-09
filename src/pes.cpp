@@ -232,24 +232,9 @@ namespace pes
         }
     }
 
-    std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> compute_coulomb_map(int Ne, double dE,int lmax, int Nr, double dr)
-    {   
-        std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map;
-        for (int l = 0; l <= lmax; ++l)
-        {
-            for (int E_idx = 1;  E_idx <= Ne; ++E_idx)
-            {
-                double E = E_idx*dE;
-                CoulombResult result = compute_coulomb_wave(E, l, Nr, dr);
-                coulomb_map[std::make_pair(E,l)] = std::make_pair(result.wave,result.phase);
-            }
 
-        }
 
-        return coulomb_map;
-    }
-
-    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, std::map<std::pair<double,int>,std::pair<std::vector<double>,double>>& coulomb_map, int Ne, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr)
+    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, int Ne, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr,std::map<std::pair<double,int>,double> phases)
     {
         std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra;
         for (int block = 0; block < n_blocks; ++block)
@@ -261,6 +246,8 @@ namespace pes
             partial_spectra[std::make_pair(l, m)].reserve(Ne); 
         }
 
+
+
         for (int E_idx = 1; E_idx <= Ne; ++E_idx)
         {
             for (int block = 0; block < n_blocks; ++block)
@@ -270,14 +257,18 @@ namespace pes
                 int l = lm_pair.first;
                 int m = lm_pair.second;
 
-                std::vector<double> coulomb_wave = coulomb_map.at(std::make_pair(E_idx*dE,l)).first;
+                CoulombResult coulomb_result = compute_coulomb_wave(E_idx*dE, l, Nr, dr);
+                
+                phases[std::make_pair(E_idx*dE,l)] = coulomb_result.phase;
+
+
                 auto start = expanded_state.begin() + Nr*block;  // Starting at index 2
                 auto end = expanded_state.begin() + Nr*(block+1);    // Ending before index 5
 
                 std::vector<std::complex<double>> block_vector(start, end);  // Subvector containing elements 3, 4, 5
 
                 std::vector<std::complex<double>> result;
-                pes_pointwise_mult(coulomb_wave,block_vector,result);
+                pes_pointwise_mult(coulomb_result.wave,block_vector,result);
                 std::complex<double> I = pes_simpsons_method(result,dr);   
                 partial_spectra[std::make_pair(l,m)].push_back(I);
 
@@ -324,7 +315,7 @@ namespace pes
 
     }
 
-    void compute_angle_resolved(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<std::pair<int, int>,int>& lm_to_block, std::map<std::pair<double,int>,std::pair<std::vector<double>,double>>& coulomb_map,const std::string& SLICE)
+    void compute_angle_resolved(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<std::pair<int, int>,int>& lm_to_block,const std::string& SLICE,std::map<std::pair<double,int>,double> phases)
     {
         std::ofstream padFiles("pad.txt", std::ios::app);
         std::vector<double> theta_range;
@@ -369,7 +360,7 @@ namespace pes
 
                         std::complex<double> sph_term = compute_Ylm(l,m,theta,phi);
 
-                        double partial_phase = coulomb_map.at(std::make_pair(E,l)).second;
+                        double partial_phase = phases[std::make_pair(E,l)];
                         std::complex<double> partial_amplitude = pair.second[E_idx - 1];
 
                         std::complex<double> phase_factor = std::exp(std::complex<double>(0.0,3*l*M_PI/2.0 + partial_phase));
@@ -424,14 +415,14 @@ namespace pes
         std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
         expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
 
-        std::map<std::pair<double,int>,std::pair<std::vector<double>,double>> coulomb_map = compute_coulomb_map(Ne,dE,lmax,Nr,dr);
+        
+        std::map<std::pair<double,int>,double> phases;
 
-
-        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,coulomb_map,Ne,dE,n_blocks,block_to_lm,Nr,dr);
+        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,Ne,dE,n_blocks,block_to_lm,Nr,dr,phases);
 
         compute_angle_integrated(partial_spectra,n_blocks,Ne,dE,block_to_lm);
 
-        compute_angle_resolved(partial_spectra,n_blocks,Ne,dE,lm_to_block,coulomb_map,SLICE);
+        compute_angle_resolved(partial_spectra,n_blocks,Ne,dE,lm_to_block,SLICE,phases);
 
       
 
