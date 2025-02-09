@@ -308,7 +308,7 @@ namespace pes
             std::cout << idx * dE << std::endl;
             std::complex<double> val = pes[idx];
             val /= ((2*M_PI)*(2*M_PI)*(2*M_PI));
-            pesFiles << idx*dE << " " << pes[idx].real() << " " << "\n";
+            pesFiles << idx*dE << " " << val.real() << " " << "\n";
         }
 
         pesFiles.close();

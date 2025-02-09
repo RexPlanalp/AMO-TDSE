@@ -33,7 +33,7 @@ import os
 # plt.clf()
 
 data = np.loadtxt("pes.txt")
-pes_cpp = data[:,1]/(2*np.pi)**6
+pes_cpp = data[:,1]
 e_cpp  = data[:,0]
 plt.semilogy(e_cpp,pes_cpp,label = "C++")
 plt.legend()
