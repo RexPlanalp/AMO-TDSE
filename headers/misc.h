@@ -16,3 +16,6 @@ void pes_pointwise_mult(const std::vector<double>& vec1, const std::vector<std::
 void pes_pointwise_add(const std::vector<std::complex<double>>& vec1, const std::vector<std::complex<double>>& vec2, std::vector<std::complex<double>>& result);
 void pes_pointwise_magsq(const std::vector<std::complex<double>>& vec, std::vector<std::complex<double>>& result);
 std::complex<double> pes_simpsons_method(const std::vector<std::complex<double>>& vec,double dr);
+
+double H(double r);
+void scale_vector(std::vector<double>& vec, double scale);

@@ -116,4 +116,16 @@ std::complex<double> pes_simpsons_method(const std::vector<std::complex<double>>
     return I;
 
 }
- 
+
+double H(double r)
+{
+    return -1.0/(r+1E-25);
+}
+
+void scale_vector(std::vector<double>& vec, double scale)
+{
+    for (double& val : vec)
+    {
+        val *= scale;
+    }
+}

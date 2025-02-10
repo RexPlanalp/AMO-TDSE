@@ -3,7 +3,7 @@
 #SBATCH --output run.log
 #SBATCH --nodes 1
 #SBATCH --ntasks 32
-#SBATCH --mem=8G
+#SBATCH --mem=64G
 
 source ~/spack/share/spack/setup-env.sh
 

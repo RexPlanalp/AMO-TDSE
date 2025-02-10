@@ -105,19 +105,6 @@ namespace pes
         return ierr;
     }
 
-    double H(double r)
-    {
-        return -1.0/(r+1E-25);
-    }
-
-    void scale_vector(std::vector<double>& vec, double scale)
-    {
-        for (double& val : vec)
-        {
-            val *= scale;
-        }
-    }
-
     std::complex<double> compute_Ylm(int l, int m, double theta, double phi) {
 
     
@@ -231,8 +218,6 @@ namespace pes
             }
         }
     }
-
-
 
     std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, int Ne, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr,std::map<std::pair<double,int>,double> phases)
     {
@@ -379,9 +364,6 @@ namespace pes
         }
     }
 
-
-
-
     int compute_pes(int rank,const simulation& sim)
     {   
         if (rank!=0)
@@ -430,6 +412,4 @@ namespace pes
 
         return 0;
     }
-
-
 }
