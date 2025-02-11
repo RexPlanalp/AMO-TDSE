@@ -422,16 +422,16 @@ namespace pes
 
 
         pes_context config = pes_context::set_config(sim);
-        pes_filepaths sim_output = pes_filepaths();
+        pes_filepaths filepaths = pes_filepaths();
 
         PetscErrorCode ierr;
         Vec final_state;
-        ierr = load_final_state(sim_output.tdse_output, &final_state, config);
+        ierr = load_final_state(filepaths.tdse_output, &final_state, config);
 
         Mat S;
         ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
 
-        ierr = project_out_bound(sim_output.tise_output, S, final_state, config); CHKERRQ(ierr);
+        ierr = project_out_bound(filepaths.tise_output, S, final_state, config); CHKERRQ(ierr);
 
         std::vector<std::complex<double>> expanded_state (config.Nr * config.n_blocks,0.0);
         expand_state(final_state,expanded_state,config);

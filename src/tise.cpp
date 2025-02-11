@@ -1,34 +1,39 @@
-#include "tise.h"
+#include <sys/stat.h>
+#include <iostream>
+
 
 #include <petscmat.h>
 #include <petscviewerhdf5.h>
 #include <slepceps.h>
+
+
+#include "tise.h"
 #include "simulation.h"
 #include "bsplines.h"
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <iostream>
 
 
 namespace tise
 {
+    struct tise_filepaths
+    {
+        static constexpr const char* tise_output = "TISE_files/tise_output.h5";
+        static constexpr const char* K = "TISE_files/K.bin";
+        static constexpr const char* Inv_r2 = "TISE_files/Inv_r2.bin";
+        static constexpr const char* Inv_r = "TISE_files/Inv_r.bin";
+        static constexpr const char* S = "TISE_files/S.bin";
+        static constexpr const char* Der = "TISE_files/Der.bin";
+    };
+
+    
+
     PetscErrorCode solve_tise(const simulation& sim,int rank)
     {   
         
         double start_time = MPI_Wtime();
 
-        PetscPrintf(PETSC_COMM_WORLD, "Declaring Petsc Objects  \n\n");
+        tise_filepaths filepaths = tise_filepaths();
         PetscErrorCode ierr;
-        PetscViewer viewTISE;
-        Mat K;
-        Mat Inv_r2;
-        Mat Inv_r;
-        Mat S;
-        Mat Der;
-        Mat temp;
-        EPS eps;
-        int nconv;
 
         if (rank == 0) 
         {
@@ -44,22 +49,34 @@ namespace tise
 
 
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
+        Mat S;
         ierr = bsplines::construct_overlap(sim,S,true,false); CHKERRQ(ierr);
+
+        Mat K;
         ierr = bsplines::construct_kinetic(sim,K,true,false); CHKERRQ(ierr);
+
+        Mat Inv_r2;
         ierr = bsplines::construct_invr2(sim,Inv_r2,true,false); CHKERRQ(ierr);
+
+        Mat Inv_r;
         ierr = bsplines::construct_invr(sim,Inv_r,true,false); CHKERRQ(ierr);
 
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
-        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TISE_files/tise_output.h5", FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
+        PetscViewer viewTISE;
+        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,filepaths.tise_output, FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
+        EPS eps;
         ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
         ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
         ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
         ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-15),sim.tise_data.value("max_iter",3000)); CHKERRQ(ierr);
 
+
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
+        int nconv;
+        Mat temp;
         for (int l = 0; l<= sim.angular_data.at("lmax").get<int>(); ++l)
         {
             ierr = MatDuplicate(K,MAT_COPY_VALUES,&temp); CHKERRQ(ierr);
