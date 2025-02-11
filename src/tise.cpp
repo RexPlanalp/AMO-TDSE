@@ -39,7 +39,7 @@ namespace tise
                 tise_context config;
                 config.lmax = sim.angular_data.at("lmax").get<int>();
                 config.nmax = sim.angular_data.at("nmax").get<int>();
-                config.tise_tolerance = sim.tise_data.at("tolereance").get<double>();
+                config.tise_tolerance = sim.tise_data.at("tolerance").get<double>();
                 config.tise_mat_iter = sim.tise_data.at("max_iter").get<int>();
             }
             catch(const std::exception& e)
@@ -50,6 +50,16 @@ namespace tise
         }
     };
 
+    PetscErrorCode setup_eigenvalue_problem(const tise_context& config, EPS& eps)
+    {   
+        PetscErrorCode ierr;
+        ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
+        ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
+        ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
+        ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
+        ierr = EPSSetTolerances(eps,config.tise_tolerance,config.tise_mat_iter); CHKERRQ(ierr);
+        return ierr;
+    }
 
 
     PetscErrorCode solve_tise(const simulation& sim,int rank)
@@ -93,11 +103,12 @@ namespace tise
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
         EPS eps;
-        ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
-        ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
-        ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
-        ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
-        ierr = EPSSetTolerances(eps,config.tise_tolerance,config.tise_mat_iter); CHKERRQ(ierr);
+        // ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
+        // ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
+        // ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
+        // ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
+        // ierr = EPSSetTolerances(eps,config.tise_tolerance,config.tise_mat_iter); CHKERRQ(ierr);
+        ierr = setup_eigenvalue_problem(config,eps); CHKERRQ(ierr);
 
 
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");

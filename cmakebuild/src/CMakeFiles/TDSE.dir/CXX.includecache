@@ -52,36 +52,6 @@ simulation.h
 bsplines.h
 ../headers/bsplines.h
 
-/users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp
-iostream
--
-fstream
--
-map
--
-algorithm
--
-complex
--
-gsl/gsl_sf_legendre.h
--
-sys/stat.h
--
-sys/types.h
--
-petscmat.h
--
-petscvec.h
--
-petscviewerhdf5.h
--
-simulation.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
-bsplines.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.h
-misc.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/misc.h
-
 /users/becker/dopl4670/Research/TDSE_PETSC/src/tise.cpp
 sys/stat.h
 -
@@ -1101,18 +1071,6 @@ H5api_adpt.h
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5api_adpt.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5version.h
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_inline.h
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_legendre.h
-stdlib.h
--
-gsl/gsl_inline.h
--
-gsl/gsl_sf_result.h
--
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_result.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/hdf5.h
 H5public.h
