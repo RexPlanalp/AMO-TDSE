@@ -41,6 +41,7 @@ namespace tise
                 config.nmax = sim.angular_data.at("nmax").get<int>();
                 config.tise_tolerance = sim.tise_data.at("tolerance").get<double>();
                 config.tise_mat_iter = sim.tise_data.at("max_iter").get<int>();
+                return config;
             }
             catch(const std::exception& e)
             {
@@ -71,6 +72,19 @@ namespace tise
         return ierr;
     }
 
+    PetscErrorCode compute_eigenvector_norm(const Vec& eigenvector, const Mat& S, std::complex<double>& norm)
+    {
+        PetscErrorCode ierr;
+        Vec temp_vec;
+        ierr = VecDuplicate(eigenvector,&temp_vec); CHKERRQ(ierr);
+        ierr = MatMult(S,eigenvector,temp_vec); CHKERRQ(ierr);
+        ierr = VecDot(eigenvector,temp_vec,&norm); CHKERRQ(ierr);
+        norm = std::sqrt(norm);
+
+        ierr = VecDestroy(&temp_vec); CHKERRQ(ierr);
+        return ierr;
+    }
+    
     PetscErrorCode extract_normalized_eigenvector(Vec& eigenvector,const EPS& eps, const Mat& S, int i)
     {   
         PetscErrorCode ierr;
@@ -78,11 +92,8 @@ namespace tise
         ierr = EPSGetEigenvector(eps,i,eigenvector,NULL); CHKERRQ(ierr);
 
         std::complex<double> norm;
-        Vec y;
-        ierr = VecDuplicate(eigenvector,&y); CHKERRQ(ierr);
-        ierr = MatMult(S,eigenvector,y); CHKERRQ(ierr);
-        ierr = VecDot(eigenvector,y,&norm); CHKERRQ(ierr);
-        ierr = VecScale(eigenvector,1.0/std::sqrt(norm.real())); CHKERRQ(ierr);
+        ierr = compute_eigenvector_norm(eigenvector,S,norm); CHKERRQ(ierr);
+        ierr = VecScale(eigenvector,1.0/norm.real()); CHKERRQ(ierr);
         return ierr;
     }
 
@@ -166,13 +177,13 @@ namespace tise
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
         int nconv;
         Mat temp;
-        for (int l = 0; l<= sim.angular_data.at("lmax").get<int>(); ++l)
+        for (int l = 0; l<= config.lmax; ++l)
         {
             ierr = MatDuplicate(K,MAT_COPY_VALUES,&temp); CHKERRQ(ierr);
             ierr = MatAXPY(temp, l*(l+1)*0.5,Inv_r2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
             ierr = MatAXPY(temp,-1.0,Inv_r,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 
-            int num_of_energies = sim.angular_data.at("nmax").get<int>() - l;
+            int num_of_energies = config.nmax - l;
             if (num_of_energies <= 0)
             {
                 continue;
@@ -199,17 +210,18 @@ namespace tise
                 Vec eigenvector;
                 ierr = extract_normalized_eigenvector(eigenvector,eps,S,i); CHKERRQ(ierr);
                 
-                std::complex<double> norm;
-                Vec temp_vec;
-                ierr = VecDuplicate(eigenvector,&temp_vec); CHKERRQ(ierr);
-                ierr = MatMult(S,eigenvector,temp_vec); CHKERRQ(ierr);
-                ierr = VecDot(eigenvector,temp_vec,&norm); CHKERRQ(ierr);
-                norm = std::sqrt(norm);
+                
+                
                 if (sim.debug)
-                {
+                {   
+                    std::complex<double> norm;
+                    ierr = compute_eigenvector_norm(eigenvector,S,norm); CHKERRQ(ierr);
                     PetscPrintf(PETSC_COMM_WORLD,"Eigenvector %d -> Norm(%.4f , %.4f) -> Eigenvalue(%.4f , %.4f)  \n",i+1,norm.real(),norm.imag(),eigenvalue.real(),eigenvalue.imag()); CHKERRQ(ierr);
                 }
                 ierr = save_eigenvector(eigenvector,viewTISE,l,i); CHKERRQ(ierr);
+
+
+                ierr = VecDestroy(&eigenvector); CHKERRQ(ierr);
             }
             ierr = MatDestroy(&temp); CHKERRQ(ierr);
 
@@ -222,7 +234,7 @@ namespace tise
         ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);
         ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
         ierr = MatDestroy(&S); CHKERRQ(ierr);
-        ierr = MatDestroy(&temp); CHKERRQ(ierr);
+
 
         double end_time = MPI_Wtime();
         PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n\n",end_time-start_time);
