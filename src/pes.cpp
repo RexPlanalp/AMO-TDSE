@@ -17,6 +17,7 @@
 #include "misc.h"
 
 using lm_pair = std::pair<int, int>;
+using energy_l_pair = std::pair<double, int>;
 
 namespace pes
 {
@@ -265,7 +266,7 @@ namespace pes
         }
     }
 
-    std::map<lm_pair,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<std::pair<double,int>,double> phases)
+    std::map<lm_pair,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<energy_l_pair,double> phases)
     {
         std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
         for (int block = 0; block < config.n_blocks; ++block)
@@ -336,7 +337,7 @@ namespace pes
         pesFiles.close();
     }
 
-    void compute_angle_resolved(const std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config,std::map<std::pair<double,int>,double> phases)
+    void compute_angle_resolved(const std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config,std::map<energy_l_pair,double> phases)
     {
         std::ofstream padFiles("PES_files/pad.txt", std::ios::app);
         std::vector<double> theta_range;
@@ -436,7 +437,7 @@ namespace pes
         expand_state(final_state,expanded_state,config);
 
         
-        std::map<std::pair<double,int>,double> phases;
+        std::map<energy_l_pair,double> phases;
         std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,config,phases);
 
         compute_angle_integrated(partial_spectra,config);
