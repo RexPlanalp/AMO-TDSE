@@ -345,7 +345,7 @@ namespace pes
 
         if (config.SLICE == "XZ")
         {
-            for (double theta = 0; theta < M_PI; theta += 0.01) 
+            for (double theta = 0; theta <= M_PI; theta += 0.01) 
             {
                 theta_range.push_back(theta);
             }
