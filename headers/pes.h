@@ -11,12 +11,18 @@
 
 namespace pes
 {
-    PetscErrorCode load_final_state(const char* filename, Vec* state, int total_size);
-    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, int n_basis, int n_blocks, int nmax, std::map<int, std::pair<int, int>>& block_to_lm);
-    double H(double r);
-    void scale_vector(std::vector<double>& vec, double scale);
-    struct CoulombResult;
-    CoulombResult compute_coulomb_wave(double E, int l, int Nr, double dr);
+    struct pes_context;
+    struct pes_filepaths;
+    struct coulomb_wave;
+
+    PetscErrorCode load_final_state(const char* filename, Vec* state, const pes_context& config);
+    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, const pes_context& config);
+    std::complex<double> compute_Ylm(int l, int m, double theta, double phi);
+    coulomb_wave compute_coulomb_wave(double E, int l, int Nr, double dr);
+    PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,const pes_context& config);
+    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<std::pair<double,int>,double> phases);
+    void compute_angle_integrated(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config);
+    void compute_angle_resolved(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config,std::map<std::pair<double,int>,double> phases);
     int compute_pes(int rank,const simulation& sim);
 }
 

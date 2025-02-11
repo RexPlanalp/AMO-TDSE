@@ -75,6 +75,10 @@ map
 -
 gsl/gsl_sf_legendre.h
 -
+sys/stat.h
+-
+sys/types.h
+-
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-oegl3edo26iqhmlaja2ggspquno7g3ll/include/mpi.h
 stddef.h

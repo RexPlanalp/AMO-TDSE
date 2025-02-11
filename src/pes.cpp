@@ -1,49 +1,102 @@
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <algorithm>
+#include <complex>
+
+#include <gsl/gsl_sf_legendre.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <petscmat.h>
 #include <petscvec.h>
 #include <petscviewerhdf5.h>
+
 #include "simulation.h"
 #include "bsplines.h"
-#include <map>
-#include <iomanip>
-#include <algorithm>
-#include <complex>
 #include "misc.h"
-#include <complex>
-#include <map>
-#include <gsl/gsl_sf_legendre.h>
 
-
-
+using lm_pair = std::pair<int, int>;
 
 namespace pes
 {
 
-    PetscErrorCode load_final_state(const char* filename, Vec* state, int total_size) 
+    struct pes_context 
+    {
+        int Nr;
+        int Ne;
+        double dr;
+        int n_blocks;
+        int n_basis;
+        int degree;
+        int nmax;
+        double Emax;
+        double dE;
+        int lmax;
+        std::string SLICE;
+        std::map<int, std::pair<int, int>> block_to_lm;
+        std::map<std::pair<int, int>, int> lm_to_block;
+        std::vector<std::complex<double>> knots;
+
+        static pes_context set_config(const simulation& sim) 
+        {   
+            try {
+                pes_context config;
+                config.Nr = sim.grid_data.at("Nr").get<int>();
+                config.Ne = sim.observable_data.at("Ne").get<int>();
+                config.dr = sim.grid_data.at("grid_spacing").get<double>();
+                config.n_blocks = sim.angular_data.at("n_blocks").get<int>();
+                config.n_basis = sim.bspline_data.at("n_basis").get<int>();
+                config.degree = sim.bspline_data.at("degree").get<int>();
+                config.nmax = sim.angular_data.at("nmax").get<int>();
+                config.Emax = sim.observable_data.at("E").get<std::array<double,2>>()[1];
+                config.dE = sim.observable_data.at("E").get<std::array<double,2>>()[0];
+                config.lmax = sim.angular_data.at("lmax").get<int>();
+                config.SLICE = sim.observable_data.at("SLICE").get<std::string>();
+                config.block_to_lm = sim.block_to_lm;
+                config.lm_to_block = sim.lm_to_block;
+                config.knots = sim.knots;
+                return config;
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "Error in setting up Photoelectron Spectra context: " << e.what() << std::endl;
+            }
+        }
+    };
+
+    struct pes_filepaths
+    {
+        static constexpr const char* tdse_output = "TDSE_files/tdse_output.h5";
+        static constexpr const char* tise_output = "TISE_files/tise_output.h5";
+    };
+
+    struct coulomb_wave 
+    {
+        double phase;
+        std::vector<double> wave;
+    };
+
+    PetscErrorCode load_final_state(const char* filename, Vec* state, const pes_context& config) 
     {   
         PetscErrorCode ierr;
         PetscViewer viewer;
 
         ierr = VecCreate(PETSC_COMM_SELF, state); CHKERRQ(ierr);
-        ierr = VecSetSizes(*state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
+        ierr = VecSetSizes(*state, PETSC_DECIDE, config.n_basis*config.n_blocks); CHKERRQ(ierr);
         ierr = VecSetFromOptions(*state); CHKERRQ(ierr);
         ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
         ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
 
-        // TESTING
         ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        //ierr = PetscObjectSetName((PetscObject)*state, "psi_final"); CHKERRQ(ierr);
-        // TESTING
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
         ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
-
         return ierr;
     }
 
-    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, int n_basis, int n_blocks, int nmax, std::map<int, std::pair<int, int>>& block_to_lm)
+    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, const pes_context& config)
     {
         PetscErrorCode ierr;
         Vec state_block, tise_state,temp;
@@ -57,26 +110,23 @@ namespace pes
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
-        for (int idx = 0; idx < n_blocks; ++idx)
+        for (int idx = 0; idx < config.n_blocks; ++idx)
         {
-            std::pair<int, int> lm_pair = block_to_lm.at(idx);
+            std::pair<int, int> lm_pair = config.block_to_lm.at(idx);
             int l = lm_pair.first;
             int m = lm_pair.second;
 
-            int start = idx * n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, n_basis, start, 1, &is); CHKERRQ(ierr);
+            int start = idx * config.n_basis;
+            ierr = ISCreateStride(PETSC_COMM_SELF, config.n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is, &state_block); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block, &temp); CHKERRQ(ierr);
 
           
 
-            for (int n = 0; n <= nmax; ++n)
+            for (int n = 0; n <= config.nmax; ++n)
             {
                 std::ostringstream dataset_name;
-                // TESTING
                  dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
-                //dataset_name << "/Psi_" << n << "_" << l;
-                // TESTING
                 ierr = PetscViewerHDF5HasDataset(viewer, dataset_name.str().c_str(), &has_dataset); CHKERRQ(ierr);
                 if (has_dataset)
                 {   
@@ -88,7 +138,7 @@ namespace pes
 
                     ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
                     ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
-                    ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); // Subtract projection 
+                    ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); 
                 }
             }
             
@@ -108,28 +158,24 @@ namespace pes
     std::complex<double> compute_Ylm(int l, int m, double theta, double phi) {
 
     
-    // Handle negative m using Y_l(-m) = (-1)^m Y_lm*
-    if (m < 0) {
+    // Using m parity identity to evaluate for negative m
+    if (m < 0) 
+    {
         int abs_m = -m;
         std::complex<double> Ylm = 
                                   gsl_sf_legendre_sphPlm(l, abs_m, std::cos(theta)) * 
                                   std::exp(std::complex<double>(0, -abs_m * phi));
+
         return std::pow(-1.0, abs_m) * std::conj(Ylm);
     }
     
-    // For positive or zero m
+    // For positive m evaluate as normal
     return  
            gsl_sf_legendre_sphPlm(l, m, std::cos(theta)) * 
            std::exp(std::complex<double>(0, m * phi));
 }
 
-    struct CoulombResult 
-    {
-        double phase;
-        std::vector<double> wave;
-    };
-
-    CoulombResult compute_coulomb_wave(double E, int l, int Nr, double dr) {
+    coulomb_wave compute_coulomb_wave(double E, int l, int Nr, double dr) {
     std::vector<double> wave(Nr, 0.0);
     const double dr2 = dr * dr;
     const double k = std::sqrt(2.0 * E);
@@ -173,10 +219,10 @@ namespace pes
     const std::complex<double> fraction = numerator / denomC;
     const double phase = std::arg(fraction) - k * r_end + l * M_PI/2.0;
 
-    return CoulombResult{phase, wave};
+    return coulomb_wave{phase, wave};
 }
     
-    PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,int Nr, int n_blocks,int n_basis, int degree, double dr, const std::vector<std::complex<double>>& knots, std::map<int, std::pair<int, int>>& block_to_lm)
+    PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state,const pes_context& config)
     {   
         // Load the state into easily accessible array (avoid VecGetValue calls)
         PetscErrorCode ierr;
@@ -184,104 +230,95 @@ namespace pes
         ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&state_array)); CHKERRQ(ierr);
 
         // Loop over all bspline basis function
-        for (int bspline_idx = 0; bspline_idx < n_basis; ++bspline_idx)
+        for (int bspline_idx = 0; bspline_idx < config.n_basis; ++bspline_idx)
         {   
             // Get the start and end of the bspline basis function
-            std::complex<double> start = knots[bspline_idx];
-            std::complex<double> end = knots[bspline_idx+degree+1];
+            std::complex<double> start = config.knots[bspline_idx];
+            std::complex<double> end = config.knots[bspline_idx+config.degree+1];
 
             // Initialize vectors to store the evaluation of the bspline basis function and the corresponding indices
             std::vector<std::complex<double>> bspline_eval;
             std::vector<int> bspline_eval_indices;
 
             // Loop over all grid points
-            for (int r_idx = 0; r_idx < Nr; ++r_idx)
+            for (int r_idx = 0; r_idx < config.Nr; ++r_idx)
             {   
-                std::complex<double> r = r_idx*dr;
+                std::complex<double> r = r_idx*config.dr;
                 if (r.real() >= start.real() && r.real() < end.real())
                 {
-                    std::complex<double> val = bsplines::B(bspline_idx,degree,r,knots);
+                    std::complex<double> val = bsplines::B(bspline_idx,config.degree,r,config.knots);
                     bspline_eval.push_back(val);
                     bspline_eval_indices.push_back(r_idx);
                 }
             }
 
             // Loop over each block 
-            for (int block = 0; block < n_blocks; ++block)
+            for (int block = 0; block < config.n_blocks; ++block)
             {   
-                std::complex<double> coeff = state_array[block*n_basis + bspline_idx];
+                std::complex<double> coeff = state_array[block*config.n_basis + bspline_idx];
                 // Loop over all grid points and add contribution to the expanded state for this block
                 for (int r_sub_idx = 0; r_sub_idx < bspline_eval.size(); ++r_sub_idx)
                 {
-                    expanded_state[block*Nr + bspline_eval_indices[r_sub_idx]] += coeff*bspline_eval[r_sub_idx];
+                    expanded_state[block*config.Nr + bspline_eval_indices[r_sub_idx]] += coeff*bspline_eval[r_sub_idx];
                 }
             }
         }
     }
 
-    std::map<std::pair<int,int>,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state, int Ne, double dE,int n_blocks,std::map<int, std::pair<int, int>>& block_to_lm, int Nr,double dr,std::map<std::pair<double,int>,double> phases)
+    std::map<lm_pair,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<std::pair<double,int>,double> phases)
     {
-        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra;
-        for (int block = 0; block < n_blocks; ++block)
+        std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
+        for (int block = 0; block < config.n_blocks; ++block)
         {
             
-            std::pair<int,int> lm_pair = block_to_lm.at(block);
+            lm_pair lm_pair = config.block_to_lm.at(block);
             int l = lm_pair.first;
             int m = lm_pair.second;
-            partial_spectra[std::make_pair(l, m)].reserve(Ne); 
+            partial_spectra[std::make_pair(l, m)].reserve(config.Ne); 
         }
 
-
-
-        for (int E_idx = 1; E_idx <= Ne; ++E_idx)
+        for (int E_idx = 1; E_idx <= config.Ne; ++E_idx)
         {
-            for (int block = 0; block < n_blocks; ++block)
+            for (int block = 0; block < config.n_blocks; ++block)
             {
                 
-                std::pair<int,int> lm_pair = block_to_lm.at(block);
+                lm_pair lm_pair = config.block_to_lm.at(block);
                 int l = lm_pair.first;
                 int m = lm_pair.second;
 
-                CoulombResult coulomb_result = compute_coulomb_wave(E_idx*dE, l, Nr, dr);
+                coulomb_wave coulomb_result = compute_coulomb_wave(E_idx*config.dE, l, config.Nr, config.dr);
                 
-                phases[std::make_pair(E_idx*dE,l)] = coulomb_result.phase;
+                phases[std::make_pair(E_idx*config.dE,l)] = coulomb_result.phase;
 
 
-                auto start = expanded_state.begin() + Nr*block;  // Starting at index 2
-                auto end = expanded_state.begin() + Nr*(block+1);    // Ending before index 5
+                auto start = expanded_state.begin() + config.Nr*block;  // Starting at index 2
+                auto end = expanded_state.begin() + config.Nr*(block+1);    // Ending before index 5
 
                 std::vector<std::complex<double>> block_vector(start, end);  // Subvector containing elements 3, 4, 5
 
                 std::vector<std::complex<double>> result;
                 pes_pointwise_mult(coulomb_result.wave,block_vector,result);
-                std::complex<double> I = pes_simpsons_method(result,dr);   
+                std::complex<double> I = pes_simpsons_method(result,config.dr);   
                 partial_spectra[std::make_pair(l,m)].push_back(I);
 
             }
         }
-
-
-        
-       
-
         return partial_spectra;
     }
 
-    void compute_angle_integrated(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<int, std::pair<int, int>>& block_to_lm)
+    void compute_angle_integrated(const std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config)
     {   
 
-        std::ofstream pesFiles("pes.txt", std::ios::app);
-
-
-        std::vector<std::complex<double>> pes(Ne,0.0);
+        std::ofstream pesFiles("PES_files/pes.txt", std::ios::app);
+        std::vector<std::complex<double>> pes(config.Ne,0.0);
        
-        for (int block = 0; block < n_blocks; ++block)
+        for (int block = 0; block < config.n_blocks; ++block)
         {   
-            std::pair<int,int> lm_pair = block_to_lm.at(block);
+            lm_pair lm_pair = config.block_to_lm.at(block);
             int l = lm_pair.first;
             int m = lm_pair.second;
 
-            std::vector<std::complex<double>> magsq(Ne,0.0);
+            std::vector<std::complex<double>> magsq(config.Ne,0.0);
             
             pes_pointwise_magsq(partial_spectra.at(std::make_pair(l,m)),magsq);
             pes_pointwise_add(pes,magsq,pes);
@@ -290,23 +327,22 @@ namespace pes
 
         for (int idx = 0; idx < pes.size(); ++idx)
         {   
-            std::cout << idx * dE << std::endl;
+            std::cout << idx * config.dE << std::endl;
             std::complex<double> val = pes[idx];
             val /= ((2*M_PI)*(2*M_PI)*(2*M_PI));
-            pesFiles << idx*dE << " " << val.real() << " " << "\n";
+            pesFiles << idx*config.dE << " " << val.real() << " " << "\n";
         }
 
         pesFiles.close();
-
     }
 
-    void compute_angle_resolved(const std::map<std::pair<int,int>,std::vector<std::complex<double>>>& partial_spectra,int n_blocks,int Ne, double dE,std::map<std::pair<int, int>,int>& lm_to_block,const std::string& SLICE,std::map<std::pair<double,int>,double> phases)
+    void compute_angle_resolved(const std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config,std::map<std::pair<double,int>,double> phases)
     {
-        std::ofstream padFiles("pad.txt", std::ios::app);
+        std::ofstream padFiles("PES_files/pad.txt", std::ios::app);
         std::vector<double> theta_range;
         std::vector<double> phi_range;
 
-        if (SLICE == "XZ")
+        if (config.SLICE == "XZ")
         {
             for (double theta = 0; theta < M_PI; theta += 0.01) 
             {
@@ -315,9 +351,7 @@ namespace pes
 
             phi_range  = {0.0,M_PI};
         }
-        
-
-        if (SLICE == "XY")
+        if (config.SLICE == "XY")
         {
             theta_range = {M_PI/ 2.0};
 
@@ -327,10 +361,13 @@ namespace pes
             }
 
         }
+        if (config.SLICE != "XZ" && config.SLICE != "XY") {
+            throw std::invalid_argument("Invalid SLICE value: " + config.SLICE);
+        }
 
-        for (int E_idx = 1; E_idx <= Ne; ++E_idx)
+        for (int E_idx = 1; E_idx <= config.Ne; ++E_idx)
         {
-            double E = E_idx*dE;
+            double E = E_idx*config.dE;
             double k = std::sqrt(2.0*E);
 
             for (auto& theta : theta_range)
@@ -370,41 +407,41 @@ namespace pes
         {
             return 0;
         }
+        else
+        {
+            if (mkdir("PES_files", 0777) == 0) 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n\n", "PES_files");
+            } 
+            else 
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n\n", "PES_files");
+            }
+        }
 
-        int Nr = sim.grid_data.at("Nr").get<int>();
-        int Ne = sim.observable_data.at("Ne").get<int>();
-        double dr = sim.grid_data.at("grid_spacing").get<double>();
-        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
-        int n_basis = sim.bspline_data.at("n_basis").get<int>();
-        int degree = sim.bspline_data.at("degree").get<int>();
-        int nmax = sim.angular_data.at("nmax").get<int>();
-        double Emax = sim.observable_data.at("E").get<std::array<double,2>>()[1];
-        double dE = sim.observable_data.at("E").get<std::array<double,2>>()[0];
-        int lmax = sim.angular_data.at("lmax").get<int>();
-        std::string SLICE = sim.observable_data.at("SLICE").get<std::string>();
-        std::map<int, std::pair<int, int>> block_to_lm = sim.block_to_lm;
-        std::map<std::pair<int, int>, int> lm_to_block = sim.lm_to_block;
 
+        pes_context config = pes_context::set_config(sim);
+        pes_filepaths sim_output = pes_filepaths();
+
+        PetscErrorCode ierr;
         Vec final_state;
-        load_final_state("TDSE_files/tdse_output.h5", &final_state, n_blocks*n_basis);
+        ierr = load_final_state(sim_output.tdse_output, &final_state, config);
 
         Mat S;
-        PetscErrorCode ierr;
         ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
 
-        ierr = project_out_bound("TISE_files/tise_output.h5", S, final_state, n_basis, n_blocks, nmax, block_to_lm); CHKERRQ(ierr);
+        ierr = project_out_bound(sim_output.tise_output, S, final_state, config); CHKERRQ(ierr);
 
-        std::vector<std::complex<double>> expanded_state (Nr * n_blocks,0.0);
-        expand_state(final_state,expanded_state,Nr,n_blocks,n_basis,degree,dr,sim.knots,block_to_lm);
+        std::vector<std::complex<double>> expanded_state (config.Nr * config.n_blocks,0.0);
+        expand_state(final_state,expanded_state,config);
 
         
         std::map<std::pair<double,int>,double> phases;
+        std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,config,phases);
 
-        std::map<std::pair<int,int>,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,Ne,dE,n_blocks,block_to_lm,Nr,dr,phases);
+        compute_angle_integrated(partial_spectra,config);
 
-        compute_angle_integrated(partial_spectra,n_blocks,Ne,dE,block_to_lm);
-
-        compute_angle_resolved(partial_spectra,n_blocks,Ne,dE,lm_to_block,SLICE,phases);
+        compute_angle_resolved(partial_spectra,config,phases);
 
       
 
