@@ -37,17 +37,23 @@ int main(int argc, char **argv) {
     bool run_block = false;
     bool run_pes = false;
 
-    for (int i = 1; i < argc; ++i) {
+    for (int i = 1; i < argc; ++i) 
+    {
         std::string arg = argv[i];
-        if (arg == "--tise") {
+        if (arg == "--tise") 
+        {
             run_tise = true;
-        } else if (arg == "--tdse") {
+        } else if (arg == "--tdse") 
+        {
             run_tdse = true;
-        } else if (arg == "--block") {
+        } else if (arg == "--block") 
+        {
             run_block = true;
-        } else if (arg == "--pes") {
+        } else if (arg == "--pes") 
+        {
             run_pes = true;
-        } else if (arg == "--all") {
+        } else if (arg == "--all") 
+        {
             run_tise = true;
             run_tdse = true;
             run_block = true;
@@ -56,7 +62,8 @@ int main(int argc, char **argv) {
     }
 
     // If no flags are provided, default to running everything
-    if (!run_tise && !run_tdse && !run_block && !run_pes) {
+    if (!run_tise && !run_tdse && !run_block && !run_pes) 
+    {
         run_tise = true;
         run_tdse = true;
         run_block = true;
@@ -64,20 +71,23 @@ int main(int argc, char **argv) {
     }
 
     // Execute selected computations
-    if (run_tise) {
+    if (run_tise) 
+    {
         ierr = tise::solve_tise(sim, rank); CHKERRQ(ierr);
-        ierr = tise::prepare_matrices(sim, rank); CHKERRQ(ierr);
     }
 
-    if (run_tdse) {
+    if (run_tdse) 
+    {
         ierr = tdse::solve_tdse(sim, rank); CHKERRQ(ierr);
     }
 
-    if (run_block) {
+    if (run_block) 
+    {
         ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
     }
 
-    if (run_pes) {
+    if (run_pes) 
+    {
         code = pes::compute_pes(rank,sim);
     }
 

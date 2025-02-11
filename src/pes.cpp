@@ -408,17 +408,8 @@ namespace pes
         {
             return 0;
         }
-        else
-        {
-            if (mkdir("PES_files", 0777) == 0) 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n\n", "PES_files");
-            } 
-            else 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n\n", "PES_files");
-            }
-        }
+        
+        create_directory(rank,"PES_files");
 
 
         pes_context config = pes_context::set_config(sim);

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <complex>
 #include <vector>
+#include <sys/stat.h>
 
 using json = nlohmann::json;
 
@@ -46,6 +47,22 @@ void save_lm_expansion(const std::map<std::pair<int, int>, int>& lm_to_block, co
     
     outFile.close();
 }
+
+void create_directory(int rank, const std::string& directory)
+{
+    if (rank == 0) 
+    {
+        if (mkdir(directory.c_str(), 0777) == 0) 
+        {
+            std::cout << "Directory created: " << directory << "\n\n";
+        } 
+        else 
+        {
+            std::cout << "Directory already exists: " << directory << "\n\n";
+        }
+    }
+}
+
 
 void normalize_array(std::array<double,3>& vec)
 {      

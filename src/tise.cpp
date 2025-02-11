@@ -10,6 +10,7 @@
 #include "tise.h"
 #include "simulation.h"
 #include "bsplines.h"
+#include "misc.h"
 
 
 
@@ -130,28 +131,9 @@ namespace tise
         return ierr;
     }
 
-    PetscErrorCode solve_tise(const simulation& sim,int rank)
+    PetscErrorCode solve_eigensystem(const simulation& sim, const tise_context& config, const tise_filepaths& filepaths)
     {   
-        
-        double start_time = MPI_Wtime();
-
-        tise_filepaths filepaths = tise_filepaths();
-        tise_context config = tise_context::set_config(sim);
         PetscErrorCode ierr;
-
-        if (rank == 0) 
-        {
-            if (mkdir("TISE_files", 0777) == 0) 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n\n", "TISE_files");
-            } 
-            else 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n\n", "TISE_files");
-            }
-        }
-
-
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         Mat S;
         ierr = bsplines::construct_overlap(sim,S,true,false); CHKERRQ(ierr);
@@ -234,10 +216,6 @@ namespace tise
         ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);
         ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
         ierr = MatDestroy(&S); CHKERRQ(ierr);
-
-
-        double end_time = MPI_Wtime();
-        PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n\n",end_time-start_time);
     }
 
     PetscErrorCode prepare_matrices(const simulation& sim,int rank)
@@ -277,6 +255,27 @@ namespace tise
         PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",time_end-time_start);
         
     }
+
+    PetscErrorCode solve_tise(const simulation& sim,int rank)
+    {   
+        
+        double start_time = MPI_Wtime();
+
+        tise_filepaths filepaths = tise_filepaths();
+        tise_context config = tise_context::set_config(sim);
+        PetscErrorCode ierr;
+
+        create_directory(rank, "TISE_files");
+        ierr = solve_eigensystem(sim,config,filepaths); CHKERRQ(ierr);
+        ierr = prepare_matrices(sim,rank); CHKERRQ(ierr);
+
+
+
+        double end_time = MPI_Wtime();
+        PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n\n",end_time-start_time);
+    }
+
+    
 }
 
 
