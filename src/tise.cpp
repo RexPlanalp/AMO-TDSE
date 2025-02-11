@@ -25,7 +25,32 @@ namespace tise
         static constexpr const char* Der = "TISE_files/Der.bin";
     };
 
-    
+    struct tise_context 
+    {
+        int lmax;
+        int nmax;
+        int tise_mat_iter;
+        double tise_tolerance;
+
+        static tise_context set_config(const simulation& sim)
+        {
+            try
+            {
+                tise_context config;
+                config.lmax = sim.angular_data.at("lmax").get<int>();
+                config.nmax = sim.angular_data.at("nmax").get<int>();
+                config.tise_tolerance = sim.tise_data.at("tolereance").get<double>();
+                config.tise_mat_iter = sim.tise_data.at("max_iter").get<int>();
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << "Error in setting up Time Independent Schrodinger Equation Context: " << "\n\n " <<  e.what() << '\n\n';
+            }
+            
+        }
+    };
+
+
 
     PetscErrorCode solve_tise(const simulation& sim,int rank)
     {   
@@ -33,6 +58,7 @@ namespace tise
         double start_time = MPI_Wtime();
 
         tise_filepaths filepaths = tise_filepaths();
+        tise_context config = tise_context::set_config(sim);
         PetscErrorCode ierr;
 
         if (rank == 0) 
@@ -71,7 +97,7 @@ namespace tise
         ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
         ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
-        ierr = EPSSetTolerances(eps,sim.tise_data.value("tolerance",1E-15),sim.tise_data.value("max_iter",3000)); CHKERRQ(ierr);
+        ierr = EPSSetTolerances(eps,config.tise_tolerance,config.tise_mat_iter); CHKERRQ(ierr);
 
 
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");

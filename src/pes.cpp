@@ -61,7 +61,7 @@ namespace pes
             }
             catch (std::exception& e)
             {
-                std::cerr << "Error in setting up Photoelectron Spectra context: " << e.what() << std::endl;
+                std::cerr << "Error in setting up Photoelectron Spectra context: " << "\n\n" << e.what() << "\n\n";
             }
         }
     };
