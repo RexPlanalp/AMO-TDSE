@@ -34,6 +34,7 @@ namespace pes
         double Emax;
         double dE;
         int lmax;
+        int debug;
         std::string SLICE;
         std::map<int, std::pair<int, int>> block_to_lm;
         std::map<std::pair<int, int>, int> lm_to_block;
@@ -57,6 +58,7 @@ namespace pes
                 config.block_to_lm = sim.block_to_lm;
                 config.lm_to_block = sim.lm_to_block;
                 config.knots = sim.knots;
+                config.debug = sim.debug;
                 return config;
             }
             catch (std::exception& e)
@@ -332,10 +334,13 @@ namespace pes
 
         for (size_t idx = 0; idx < pes.size(); ++idx)
         {   
-            std::cout << idx * config.dE << std::endl;
+            if (config.debug)
+            {
+                std::cout << "Computing Angle Integrated Spectrum for E = " << (config.dE+1)*idx << "\n\n";
+            }
             std::complex<double> val = pes[idx];
             val /= ((2*M_PI)*(2*M_PI)*(2*M_PI));
-            pesFiles << idx*config.dE << " " << val.real() << " " << "\n";
+            pesFiles << (idx*config.dE+1) << " " << val.real() << " " << "\n";
         }
 
         pesFiles.close();
@@ -371,9 +376,15 @@ namespace pes
         }
 
         for (int E_idx = 1; E_idx <= config.Ne; ++E_idx)
-        {
+        {   
+
             double E = E_idx*config.dE;
             double k = std::sqrt(2.0*E);
+
+            if (config.debug)
+            {
+                std::cout << "Computing Angle Resolved Spectrum for E = " << E << "\n\n";
+            }
 
             for (auto& theta : theta_range)
             {

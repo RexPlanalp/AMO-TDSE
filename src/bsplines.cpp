@@ -67,9 +67,6 @@ void save_debug_bsplines(int rank, const simulation& sim)
     }
 }
 
-
-
-
 std::complex<double> B(int i, int degree, std::complex<double> x, const std::vector<std::complex<double>>& knot_vector)
 {
     if (degree == 0)
