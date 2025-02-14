@@ -97,7 +97,7 @@ namespace pes
         return ierr;
     }
 
-    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, const pes_context& config)
+    PetscErrorCode project_out_bound(const char* filename,Vec& state, const pes_context& config,const simulation& sim)
     {
         PetscErrorCode ierr;
         Vec state_block, tise_state,temp;
@@ -108,6 +108,9 @@ namespace pes
 
         // Open HDF5 file for reading
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+
+        Mat S;
+        ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
@@ -419,10 +422,9 @@ namespace pes
         Vec final_state;
         ierr = load_final_state(filepaths.tdse_output, &final_state, config);
 
-        Mat S;
-        ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
+        
 
-        ierr = project_out_bound(filepaths.tise_output, S, final_state, config); CHKERRQ(ierr);
+        ierr = project_out_bound(filepaths.tise_output,final_state, config,sim); CHKERRQ(ierr);
 
         std::vector<std::complex<double>> expanded_state (config.Nr * config.n_blocks,0.0);
         expand_state(final_state,expanded_state,config);

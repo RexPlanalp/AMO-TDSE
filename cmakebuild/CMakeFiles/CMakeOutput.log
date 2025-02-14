@@ -15,40 +15,40 @@ The CXX compiler identification is GNU, found in "/users/becker/dopl4670/Researc
 Determining if the CXX compiler works passed with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_cc6ec/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_cc6ec.dir/build.make CMakeFiles/cmTC_cc6ec.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_cc6ec.dir/testCXXCompiler.cxx.o
-/jilasoft/software/gcc/6.3.0/bin/g++     -o CMakeFiles/cmTC_cc6ec.dir/testCXXCompiler.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_cc6ec
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cc6ec.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_cc6ec.dir/testCXXCompiler.cxx.o  -o cmTC_cc6ec 
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Run Build Command(s):/usr/bin/gmake cmTC_862d4/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_862d4.dir/build.make CMakeFiles/cmTC_862d4.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_862d4.dir/testCXXCompiler.cxx.o
+/jilasoft/software/gcc/6.3.0/bin/g++     -o CMakeFiles/cmTC_862d4.dir/testCXXCompiler.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_862d4
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_862d4.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_862d4.dir/testCXXCompiler.cxx.o  -o cmTC_862d4 
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_b064b/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_b064b.dir/build.make CMakeFiles/cmTC_b064b.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o
-/jilasoft/software/gcc/6.3.0/bin/g++    -v -o CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -c /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp
+Run Build Command(s):/usr/bin/gmake cmTC_cd1df/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_cd1df.dir/build.make CMakeFiles/cmTC_cd1df.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o
+/jilasoft/software/gcc/6.3.0/bin/g++    -v -o CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -c /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp
 Using built-in specs.
 COLLECT_GCC=/jilasoft/software/gcc/6.3.0/bin/g++
 Target: x86_64-pc-linux-gnu
 Configured with: ./configure --prefix=/jilasoft/software/gcc/6.3.0 --disable-multilib
 Thread model: posix
 gcc version 6.3.0 (GCC) 
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/cc1plus -quiet -v -D_GNU_SOURCE /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -version -o /scratch/becker/dopl4670//cc4UC3Cg.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/cc1plus -quiet -v -D_GNU_SOURCE /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -version -o /scratch/becker/dopl4670//cc0UENTS.s
 GNU C++14 (GCC) version 6.3.0 (x86_64-pc-linux-gnu)
 	compiled by GNU C version 6.3.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 ignoring nonexistent directory "/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring nonexistent directory "/jilasoft/software/cmake/3.14.5/include"
 ignoring duplicate directory "/jilasoft/software/gcc/6.3.0/include"
   as it is a non-system directory that duplicates a system directory
-ignoring nonexistent directory "/jilasoft/software/cmake/3.14.5/include"
 #include "..." search starts here:
 #include <...> search starts here:
  /jilasoft/software/binutils/2.27/include
@@ -65,15 +65,15 @@ GNU C++14 (GCC) version 6.3.0 (x86_64-pc-linux-gnu)
 	compiled by GNU C version 6.3.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: ab8007fdc715788d92c19c5378a75656
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- as -v --64 -o CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o /scratch/becker/dopl4670//cc4UC3Cg.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o /scratch/becker/dopl4670//cc0UENTS.s
 GNU assembler version 2.27 (x86_64-pc-linux-gnu) using BFD version (GNU Binutils) 2.27
 COMPILER_PATH=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/
 LIBRARY_PATH=/jilasoft/software/gcc/6.3.0/lib64/../lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/jilasoft/software/binutils/2.27/lib/:/jilasoft/software/gcc/6.3.0/lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
-Linking CXX executable cmTC_b064b
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b064b.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++      -v CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b064b 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+Linking CXX executable cmTC_cd1df
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cd1df.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++      -v CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_cd1df 
 Using built-in specs.
 COLLECT_GCC=/jilasoft/software/gcc/6.3.0/bin/g++
 COLLECT_LTO_WRAPPER=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper
@@ -83,10 +83,10 @@ Thread model: posix
 gcc version 6.3.0 (GCC) 
 COMPILER_PATH=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/
 LIBRARY_PATH=/jilasoft/software/gcc/6.3.0/lib64/../lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/jilasoft/software/binutils/2.27/lib/:/jilasoft/software/gcc/6.3.0/lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b064b' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/collect2 -plugin /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/scratch/becker/dopl4670//cckRG7gl.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_b064b /lib/../lib64/crt1.o /lib/../lib64/crti.o /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtbegin.o -L/jilasoft/software/gcc/6.3.0/lib64/../lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/jilasoft/software/binutils/2.27/lib -L/jilasoft/software/gcc/6.3.0/lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtend.o /lib/../lib64/crtn.o
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b064b' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_cd1df' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/collect2 -plugin /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/scratch/becker/dopl4670//ccidFlUX.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_cd1df /lib/../lib64/crt1.o /lib/../lib64/crti.o /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtbegin.o -L/jilasoft/software/gcc/6.3.0/lib64/../lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/jilasoft/software/binutils/2.27/lib -L/jilasoft/software/gcc/6.3.0/lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_cd1df' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit include dir info from above output: rv=done
@@ -118,26 +118,26 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_b064b/fast ]
-  ignore line: [/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_b064b.dir/build.make CMakeFiles/cmTC_b064b.dir/build]
-  ignore line: [gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/jilasoft/software/gcc/6.3.0/bin/g++    -v -o CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -c /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Run Build Command(s):/usr/bin/gmake cmTC_cd1df/fast ]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTC_cd1df.dir/build.make CMakeFiles/cmTC_cd1df.dir/build]
+  ignore line: [gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/jilasoft/software/gcc/6.3.0/bin/g++    -v -o CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -c /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/jilasoft/software/gcc/6.3.0/bin/g++]
   ignore line: [Target: x86_64-pc-linux-gnu]
   ignore line: [Configured with: ./configure --prefix=/jilasoft/software/gcc/6.3.0 --disable-multilib]
   ignore line: [Thread model: posix]
   ignore line: [gcc version 6.3.0 (GCC) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/cc1plus -quiet -v -D_GNU_SOURCE /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -version -o /scratch/becker/dopl4670//cc4UC3Cg.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/cc1plus -quiet -v -D_GNU_SOURCE /jilasoft/software/cmake/3.14.5/share/cmake-3.14/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -version -o /scratch/becker/dopl4670//cc0UENTS.s]
   ignore line: [GNU C++14 (GCC) version 6.3.0 (x86_64-pc-linux-gnu)]
   ignore line: [	compiled by GNU C version 6.3.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [ignoring nonexistent directory "/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring nonexistent directory "/jilasoft/software/cmake/3.14.5/include"]
   ignore line: [ignoring duplicate directory "/jilasoft/software/gcc/6.3.0/include"]
   ignore line: [  as it is a non-system directory that duplicates a system directory]
-  ignore line: [ignoring nonexistent directory "/jilasoft/software/cmake/3.14.5/include"]
   ignore line: [#include "..." search starts here:]
   ignore line: [#include <...> search starts here:]
   ignore line: [ /jilasoft/software/binutils/2.27/include]
@@ -154,15 +154,15 @@ Parsed CXX implicit link information from above output:
   ignore line: [	compiled by GNU C version 6.3.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: ab8007fdc715788d92c19c5378a75656]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [ as -v --64 -o CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o /scratch/becker/dopl4670//cc4UC3Cg.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o /scratch/becker/dopl4670//cc0UENTS.s]
   ignore line: [GNU assembler version 2.27 (x86_64-pc-linux-gnu) using BFD version (GNU Binutils) 2.27]
   ignore line: [COMPILER_PATH=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/]
   ignore line: [LIBRARY_PATH=/jilasoft/software/gcc/6.3.0/lib64/../lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/jilasoft/software/binutils/2.27/lib/:/jilasoft/software/gcc/6.3.0/lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [Linking CXX executable cmTC_b064b]
-  ignore line: [/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b064b.dir/link.txt --verbose=1]
-  ignore line: [/jilasoft/software/gcc/6.3.0/bin/g++      -v CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b064b ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking CXX executable cmTC_cd1df]
+  ignore line: [/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cd1df.dir/link.txt --verbose=1]
+  ignore line: [/jilasoft/software/gcc/6.3.0/bin/g++      -v CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_cd1df ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/jilasoft/software/gcc/6.3.0/bin/g++]
   ignore line: [COLLECT_LTO_WRAPPER=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper]
@@ -172,13 +172,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 6.3.0 (GCC) ]
   ignore line: [COMPILER_PATH=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/]
   ignore line: [LIBRARY_PATH=/jilasoft/software/gcc/6.3.0/lib64/../lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/jilasoft/software/binutils/2.27/lib/:/jilasoft/software/gcc/6.3.0/lib64/:/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b064b' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/collect2 -plugin /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/scratch/becker/dopl4670//cckRG7gl.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_b064b /lib/../lib64/crt1.o /lib/../lib64/crti.o /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtbegin.o -L/jilasoft/software/gcc/6.3.0/lib64/../lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/jilasoft/software/binutils/2.27/lib -L/jilasoft/software/gcc/6.3.0/lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtend.o /lib/../lib64/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_cd1df' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/collect2 -plugin /jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/liblto_plugin.so -plugin-opt=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper -plugin-opt=-fresolution=/scratch/becker/dopl4670//ccidFlUX.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_cd1df /lib/../lib64/crt1.o /lib/../lib64/crti.o /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtbegin.o -L/jilasoft/software/gcc/6.3.0/lib64/../lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/jilasoft/software/binutils/2.27/lib -L/jilasoft/software/gcc/6.3.0/lib64 -L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../.. CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtend.o /lib/../lib64/crtn.o]
     arg [/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/jilasoft/software/gcc/6.3.0/libexec/gcc/x86_64-pc-linux-gnu/6.3.0/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/scratch/becker/dopl4670//cckRG7gl.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/scratch/becker/dopl4670//ccidFlUX.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -190,7 +190,7 @@ Parsed CXX implicit link information from above output:
     arg [-dynamic-linker] ==> ignore
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_b064b] ==> ignore
+    arg [cmTC_cd1df] ==> ignore
     arg [/lib/../lib64/crt1.o] ==> ignore
     arg [/lib/../lib64/crti.o] ==> ignore
     arg [/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/crtbegin.o] ==> ignore
@@ -202,7 +202,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/jilasoft/software/binutils/2.27/lib] ==> dir [/jilasoft/software/binutils/2.27/lib]
     arg [-L/jilasoft/software/gcc/6.3.0/lib64] ==> dir [/jilasoft/software/gcc/6.3.0/lib64]
     arg [-L/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../..] ==> dir [/jilasoft/software/gcc/6.3.0/lib/gcc/x86_64-pc-linux-gnu/6.3.0/../../..]
-    arg [CMakeFiles/cmTC_b064b.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_cd1df.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -230,15 +230,15 @@ Parsed CXX implicit link information from above output:
 Detecting CXX [-std=c++1z] compiler features compiled with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_2e684/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_2e684.dir/build.make CMakeFiles/cmTC_2e684.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_2e684.dir/feature_tests.cxx.o
-/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++1z -o CMakeFiles/cmTC_2e684.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_2e684
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2e684.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_2e684.dir/feature_tests.cxx.o  -o cmTC_2e684 
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Run Build Command(s):/usr/bin/gmake cmTC_08398/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_08398.dir/build.make CMakeFiles/cmTC_08398.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_08398.dir/feature_tests.cxx.o
+/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++1z -o CMakeFiles/cmTC_08398.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_08398
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_08398.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_08398.dir/feature_tests.cxx.o  -o cmTC_08398 
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -303,15 +303,15 @@ gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebui
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_9bbd9/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_9bbd9.dir/build.make CMakeFiles/cmTC_9bbd9.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_9bbd9.dir/feature_tests.cxx.o
-/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++14 -o CMakeFiles/cmTC_9bbd9.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_9bbd9
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9bbd9.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_9bbd9.dir/feature_tests.cxx.o  -o cmTC_9bbd9 
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Run Build Command(s):/usr/bin/gmake cmTC_30728/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_30728.dir/build.make CMakeFiles/cmTC_30728.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_30728.dir/feature_tests.cxx.o
+/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++14 -o CMakeFiles/cmTC_30728.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_30728
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_30728.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_30728.dir/feature_tests.cxx.o  -o cmTC_30728 
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -376,15 +376,15 @@ gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebui
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_38dc3/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_38dc3.dir/build.make CMakeFiles/cmTC_38dc3.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_38dc3.dir/feature_tests.cxx.o
-/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++11 -o CMakeFiles/cmTC_38dc3.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_38dc3
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_38dc3.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_38dc3.dir/feature_tests.cxx.o  -o cmTC_38dc3 
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Run Build Command(s):/usr/bin/gmake cmTC_45c9c/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_45c9c.dir/build.make CMakeFiles/cmTC_45c9c.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_45c9c.dir/feature_tests.cxx.o
+/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++11 -o CMakeFiles/cmTC_45c9c.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_45c9c
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_45c9c.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_45c9c.dir/feature_tests.cxx.o  -o cmTC_45c9c 
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -449,15 +449,15 @@ gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebui
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
 Change Dir: /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake cmTC_11846/fast 
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/bin/gmake -f CMakeFiles/cmTC_11846.dir/build.make CMakeFiles/cmTC_11846.dir/build
-gmake[1]: Entering directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_11846.dir/feature_tests.cxx.o
-/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++98 -o CMakeFiles/cmTC_11846.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_11846
-/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_11846.dir/link.txt --verbose=1
-/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_11846.dir/feature_tests.cxx.o  -o cmTC_11846 
-gmake[1]: Leaving directory '/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Run Build Command(s):/usr/bin/gmake cmTC_13762/fast 
+/usr/bin/gmake -f CMakeFiles/cmTC_13762.dir/build.make CMakeFiles/cmTC_13762.dir/build
+gmake[1]: Entering directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_13762.dir/feature_tests.cxx.o
+/jilasoft/software/gcc/6.3.0/bin/g++    -std=c++98 -o CMakeFiles/cmTC_13762.dir/feature_tests.cxx.o -c /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_13762
+/jilasoft/software/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13762.dir/link.txt --verbose=1
+/jilasoft/software/gcc/6.3.0/bin/g++       CMakeFiles/cmTC_13762.dir/feature_tests.cxx.o  -o cmTC_13762 
+gmake[1]: Leaving directory `/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
