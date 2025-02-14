@@ -29,7 +29,7 @@ namespace block
 
 
         ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, "TDSE_files/tdse_output.h5", FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
         ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
@@ -55,7 +55,7 @@ namespace block
         {
             std::pair<int, int> lm_pair = block_to_lm.at(idx);
             int l = lm_pair.first;
-            int m = lm_pair.second;
+            
 
             int start = idx * n_basis;
             ierr = ISCreateStride(PETSC_COMM_SELF, n_basis, start, 1, &is); CHKERRQ(ierr);
@@ -96,7 +96,7 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode compute_probabilities(Vec& state, Mat& S,int n_blocks,int n_basis, std::map<int,std::pair<int,int>>& block_to_lm)
+    PetscErrorCode compute_probabilities(Vec& state, Mat& S,int n_blocks,int n_basis)
     {
         PetscErrorCode ierr;
         Vec state_block,temp;
@@ -109,10 +109,8 @@ namespace block
         for (int idx = 0; idx<n_blocks; ++idx)
         {   
             std::cout << "Computing norm for block " << idx << std::endl;   
-            std::pair<int,int> lm_pair = block_to_lm.at(idx);
-            int l = lm_pair.first;
-            int m = lm_pair.second;
-
+            
+           
             int start = idx*n_basis;
             ierr = ISCreateStride(PETSC_COMM_SELF, n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
@@ -159,7 +157,7 @@ namespace block
         }
 
         std::cout << "Computing Distribution" << std::endl;
-        ierr = compute_probabilities(state, S, n_blocks, n_basis, block_to_lm); CHKERRQ(ierr);
+        ierr = compute_probabilities(state, S, n_blocks, n_basis); CHKERRQ(ierr);
         return ierr;
     }
 

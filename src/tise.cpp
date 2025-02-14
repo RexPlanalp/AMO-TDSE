@@ -46,7 +46,8 @@ namespace tise
             }
             catch(const std::exception& e)
             {
-                std::cerr << "Error in setting up Time Independent Schrodinger Equation Context: " << "\n\n " <<  e.what() << '\n\n';
+                std::cerr << "Error in setting up Time Independent Schrodinger Equation Context: " << "\n\n " <<  e.what() << "\n\n";
+                throw;
             }
             
         }
@@ -216,9 +217,10 @@ namespace tise
         ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);
         ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
         ierr = MatDestroy(&S); CHKERRQ(ierr);
+        return ierr;
     }
 
-    PetscErrorCode prepare_matrices(const simulation& sim,int rank)
+    PetscErrorCode prepare_matrices(const simulation& sim)
     {   
         double time_start = MPI_Wtime();
 
@@ -253,6 +255,7 @@ namespace tise
 
         double time_end = MPI_Wtime();
         PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",time_end-time_start);
+        return ierr;
         
     }
 
@@ -267,12 +270,13 @@ namespace tise
 
         create_directory(rank, "TISE_files");
         ierr = solve_eigensystem(sim,config,filepaths); CHKERRQ(ierr);
-        ierr = prepare_matrices(sim,rank); CHKERRQ(ierr);
+        ierr = prepare_matrices(sim); CHKERRQ(ierr);
 
 
 
         double end_time = MPI_Wtime();
         PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n\n",end_time-start_time);
+        return ierr;
     }
 
     

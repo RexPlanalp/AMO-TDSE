@@ -135,7 +135,7 @@ void simulation::_compute_R0()
     double min_val = std::abs(knots[0]-R0_input);
     double knot_val = knots[0].real();
 
-    for (int idx = 1; idx<knots.size(); ++idx)
+    for (size_t idx = 1; idx<knots.size(); ++idx)
     {
         double diff = std::abs(knots[idx]-R0_input);
         if (diff < min_val)
@@ -176,7 +176,7 @@ std::complex<double> simulation::ecs_w(double x, double w) const
 
 void simulation::_compute_complex_knots()
 {   
-    for (int i = 0; i < knots.size(); i++)  
+    for (size_t i = 0; i < knots.size(); i++)  
     {
         complex_knots.push_back(ecs_x(knots[i].real())); 
     }
@@ -210,7 +210,6 @@ void simulation::_compute_laser_vectors()
     Vec3 polarization = laser_data.at("polarization").get<Vec3>();
     Vec3 poynting = laser_data.at("poynting").get<Vec3>();
     Vec3 elliptiity = {};
-    Vec3 components = {};
 
     cross_product(polarization,poynting,elliptiity);
     normalize_array(elliptiity);

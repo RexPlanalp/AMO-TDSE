@@ -70,7 +70,7 @@ void normalize_array(std::array<double,3>& vec)
 
     if (norm == 0) return;
     
-    for (int idx = 0; idx< vec.size(); ++idx)
+    for (size_t idx = 0; idx< vec.size(); ++idx)
     {
         vec[idx] /= norm;
     }
@@ -86,7 +86,7 @@ void cross_product(const std::array<double,3>& vec1, const std::array<double,3>&
 void pes_pointwise_mult(const std::vector<double>& vec1, const std::vector<std::complex<double>>& vec2, std::vector<std::complex<double>>& result) {
     result.resize(vec1.size());  // Correct: Set the size
 
-    for (int idx = 0; idx < vec1.size(); ++idx) {
+    for (size_t idx = 0; idx < vec1.size(); ++idx) {
         result[idx] = vec1[idx] * vec2[idx]; // Direct assignment: No push_back!
     }
 }
@@ -94,7 +94,7 @@ void pes_pointwise_mult(const std::vector<double>& vec1, const std::vector<std::
 void pes_pointwise_add(const std::vector<std::complex<double>>& vec1, const std::vector<std::complex<double>>& vec2, std::vector<std::complex<double>>& result) {
     result.resize(vec1.size());
 
-    for (int idx = 0; idx < vec1.size(); ++idx) {
+    for (size_t idx = 0; idx < vec1.size(); ++idx) {
         result[idx] = vec1[idx] + vec2[idx]; // Direct assignment
     }
 }
@@ -102,7 +102,7 @@ void pes_pointwise_add(const std::vector<std::complex<double>>& vec1, const std:
 void pes_pointwise_magsq(const std::vector<std::complex<double>>& vec, std::vector<std::complex<double>>& result) {
     result.resize(vec.size());
 
-    for (int idx = 0; idx < vec.size(); ++idx) {
+    for (size_t idx = 0; idx < vec.size(); ++idx) {
         result[idx] = vec[idx] * std::conj(vec[idx]); // Direct assignment
     }
 }

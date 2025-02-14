@@ -62,6 +62,7 @@ namespace pes
             catch (std::exception& e)
             {
                 std::cerr << "Error in setting up Photoelectron Spectra context: " << "\n\n" << e.what() << "\n\n";
+                throw;
             }
         }
     };
@@ -118,7 +119,7 @@ namespace pes
         {
             std::pair<int, int> lm_pair = config.block_to_lm.at(idx);
             int l = lm_pair.first;
-            int m = lm_pair.second;
+            
 
             int start = idx * config.n_basis;
             ierr = ISCreateStride(PETSC_COMM_SELF, config.n_basis, start, 1, &is); CHKERRQ(ierr);
@@ -261,17 +262,17 @@ namespace pes
             {   
                 std::complex<double> coeff = state_array[block*config.n_basis + bspline_idx];
                 // Loop over all grid points and add contribution to the expanded state for this block
-                for (int r_sub_idx = 0; r_sub_idx < bspline_eval.size(); ++r_sub_idx)
+                for (size_t r_sub_idx = 0; r_sub_idx < bspline_eval.size(); ++r_sub_idx)
                 {
                     expanded_state[block*config.Nr + bspline_eval_indices[r_sub_idx]] += coeff*bspline_eval[r_sub_idx];
                 }
             }
         }
+        return ierr;
     }
 
-    std::map<lm_pair,std::vector<std::complex<double>>> compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<energy_l_pair,double> phases)
+    void compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,const pes_context& config,std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,std::map<energy_l_pair,double> phases)
     {
-        std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
         for (int block = 0; block < config.n_blocks; ++block)
         {
             
@@ -295,10 +296,10 @@ namespace pes
                 phases[std::make_pair(E_idx*config.dE,l)] = coulomb_result.phase;
 
 
-                auto start = expanded_state.begin() + config.Nr*block;  // Starting at index 2
-                auto end = expanded_state.begin() + config.Nr*(block+1);    // Ending before index 5
+                auto start = expanded_state.begin() + config.Nr*block;  
+                auto end = expanded_state.begin() + config.Nr*(block+1);    
 
-                std::vector<std::complex<double>> block_vector(start, end);  // Subvector containing elements 3, 4, 5
+                std::vector<std::complex<double>> block_vector(start, end);  
 
                 std::vector<std::complex<double>> result;
                 pes_pointwise_mult(coulomb_result.wave,block_vector,result);
@@ -307,7 +308,7 @@ namespace pes
 
             }
         }
-        return partial_spectra;
+        return;
     }
 
     void compute_angle_integrated(const std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,const pes_context& config)
@@ -329,7 +330,7 @@ namespace pes
         }
         
 
-        for (int idx = 0; idx < pes.size(); ++idx)
+        for (size_t idx = 0; idx < pes.size(); ++idx)
         {   
             std::cout << idx * config.dE << std::endl;
             std::complex<double> val = pes[idx];
@@ -431,7 +432,9 @@ namespace pes
 
         
         std::map<energy_l_pair,double> phases;
-        std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra = compute_partial_spectra(expanded_state,config,phases);
+        std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
+
+        compute_partial_spectra(expanded_state,config,partial_spectra,phases);
 
         compute_angle_integrated(partial_spectra,config);
 

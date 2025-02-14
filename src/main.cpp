@@ -18,8 +18,7 @@
 int main(int argc, char **argv) {
     PetscErrorCode ierr;
     ierr = SlepcInitialize(&argc, &argv, NULL, NULL); CHKERRQ(ierr);
-    int code {};
-    
+
     int rank, size;
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
     MPI_Comm_size(PETSC_COMM_WORLD, &size);
@@ -85,10 +84,14 @@ int main(int argc, char **argv) {
     {
         ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
     }
-
     if (run_pes) 
-    {
+    {   
+        int code {};
         code = pes::compute_pes(rank,sim);
+        if (code != 0)
+        {
+            std::cerr << "Error in computing PES" << std::endl;
+        }
     }
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

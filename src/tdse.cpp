@@ -107,7 +107,7 @@ namespace tdse
         return ierr;
     }
 
-    PetscErrorCode KroneckerProductParallel(Mat A, PetscInt nnz_A, Mat B, PetscInt nnz_B, Mat *C_out) {
+    PetscErrorCode KroneckerProductParallel(Mat A, Mat B, Mat *C_out) {
         PetscErrorCode ierr;
 
 
@@ -223,7 +223,6 @@ namespace tdse
         ierr = load_matrix("TISE_files/S.bin",&S); CHKERRQ(ierr);
 
         int n_blocks = sim.angular_data.value("n_blocks",0);
-        int degree = sim.bspline_data.value("degree",0);
         
         Mat I; 
         ierr = MatCreate(PETSC_COMM_SELF,&I); CHKERRQ(ierr);
@@ -237,7 +236,7 @@ namespace tdse
         ierr = MatAssemblyBegin(I,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
         ierr = MatAssemblyEnd(I,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
-        ierr = KroneckerProductParallel(I,1,S,2*degree+1,&S_atomic); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(I,S,&S_atomic); CHKERRQ(ierr);
 
         ierr = MatDestroy(&S); CHKERRQ(ierr);
         ierr = MatDestroy(&I); CHKERRQ(ierr);
@@ -300,7 +299,7 @@ namespace tdse
             ierr = MatAssemblyBegin(I_partial,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
             ierr = MatAssemblyEnd(I_partial,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
-            ierr = KroneckerProductParallel(I_partial,1,temp,2*degree+1,&H_partial); CHKERRQ(ierr);
+            ierr = KroneckerProductParallel(I_partial,temp,&H_partial); CHKERRQ(ierr);
             ierr = MatDestroy(&temp); CHKERRQ(ierr);
             ierr = MatDestroy(&I_partial); CHKERRQ(ierr);
 
@@ -385,7 +384,6 @@ namespace tdse
         PetscErrorCode ierr;
 
         int n_blocks = sim.angular_data.at("n_blocks").get<int>();
-        int degree = sim.bspline_data.at("degree").get<int>();
 
         Mat Der,Inv_r;
         ierr = load_matrix("TISE_files/Der.bin",&Der); CHKERRQ(ierr);
@@ -453,8 +451,8 @@ namespace tdse
         ierr = MatAssemblyEnd(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
         Mat H_xy_temp_1;
-        ierr = KroneckerProductParallel(H_lm_1,2,Inv_r,2*degree+1,&H_xy); CHKERRQ(ierr);      
-        ierr = KroneckerProductParallel(H_lm_2,2,Der,2*degree+1,&H_xy_temp_1); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_1,Inv_r,&H_xy); CHKERRQ(ierr);      
+        ierr = KroneckerProductParallel(H_lm_2,Der,&H_xy_temp_1); CHKERRQ(ierr);
         ierr = MatAXPY(H_xy,1.0,H_xy_temp_1,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
         ierr = MatDestroy(&H_lm_1); CHKERRQ(ierr);
         ierr = MatDestroy(&H_lm_2); CHKERRQ(ierr);
@@ -522,8 +520,8 @@ namespace tdse
         ierr = MatAssemblyEnd(H_lm_4, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
         Mat H_xy_temp_2;
-        ierr = KroneckerProductParallel(H_lm_3,2,Inv_r,2*degree+1,&H_xy_tilde); CHKERRQ(ierr);
-        ierr = KroneckerProductParallel(H_lm_4,2,Der,2*degree+1,&H_xy_temp_2); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_3,Inv_r,&H_xy_tilde); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_4,Der,&H_xy_temp_2); CHKERRQ(ierr);
         ierr = MatAXPY(H_xy_tilde,1.0,H_xy_temp_2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
         ierr = MatDestroy(&H_lm_3); CHKERRQ(ierr);
         ierr = MatDestroy(&H_lm_4); CHKERRQ(ierr);
@@ -554,7 +552,6 @@ namespace tdse
         PetscErrorCode ierr;
 
         int n_blocks = sim.angular_data.at("n_blocks").get<int>();
-        int degree = sim.bspline_data.at("degree").get<int>();
 
         Mat H_lm_1;
         ierr = MatCreate(PETSC_COMM_SELF, &H_lm_1); CHKERRQ(ierr);
@@ -625,8 +622,8 @@ namespace tdse
         ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
 
         Mat H_z_2;
-        ierr = KroneckerProductParallel(H_lm_1,2,Der,2*degree+1,&H_z); CHKERRQ(ierr);
-        ierr = KroneckerProductParallel(H_lm_2,2,Inv_r,2*degree+1,&H_z_2); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_1,Der,&H_z); CHKERRQ(ierr);
+        ierr = KroneckerProductParallel(H_lm_2,Inv_r,&H_z_2); CHKERRQ(ierr);
 
         ierr = MatAXPY(H_z,1.0,H_z_2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 

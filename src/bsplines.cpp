@@ -141,7 +141,7 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
         double half_b_plus_a = 0.5 * (b + a);
 
 
-        for (int r = 0; r < sim.roots.size(); ++r)
+        for (size_t r = 0; r < sim.roots.size(); ++r)
         {
             double x_val = half_b_minus_a * sim.roots[r] + half_b_plus_a;
             double weight_val = sim.weights[r];
