@@ -437,29 +437,30 @@ namespace pes
 
         PetscErrorCode ierr;
         Vec final_state;
+
+        std::cout << "Loading Final State" << "\n\n";
         ierr = load_final_state(filepaths.tdse_output, &final_state, config);
 
         
-
+        std::cout << "Projecting out Bound States" << "\n\n";
         ierr = project_out_bound(filepaths.tise_output,final_state, config,sim); CHKERRQ(ierr);
 
+
+        std::cout << "Expanding State in Position Space" << "\n\n";
         std::vector<std::complex<double>> expanded_state (config.Nr * config.n_blocks,0.0);
         expand_state(final_state,expanded_state,config);
 
-        
+
+        std::cout << "Computing Partial Spectra" << "\n\n";
         std::map<energy_l_pair,double> phases;
         std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
-
         compute_partial_spectra(expanded_state,config,partial_spectra,phases);
 
+        std::cout << "Computing Angle Integrated Spectrum" << "\n\n";
         compute_angle_integrated(partial_spectra,config);
 
+        std::cout << "Computing Angle Resolved Spectrum" << "\n\n";
         compute_angle_resolved(partial_spectra,config,phases);
-
-      
-
-        
-
         return 0;
     }
 }
