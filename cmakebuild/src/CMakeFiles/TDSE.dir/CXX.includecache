@@ -6,6 +6,24 @@
 
 #IncludeRegexTransform: 
 
+../headers/block.h
+block.h
+../headers/block.h
+iostream
+-
+fstream
+-
+petscmat.h
+-
+petscvec.h
+-
+petscviewerhdf5.h
+-
+simulation.h
+../headers/simulation.h
+map
+-
+
 ../headers/bsplines.h
 vector
 -
@@ -44,38 +62,12 @@ nlohmann/json.hpp
 misc.h
 ../headers/misc.h
 
-/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.cpp
-cmath
--
-fstream
--
-iostream
--
-functional
--
-algorithm
--
-bsplines.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.h
-simulation.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
-
-/users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp
+/users/becker/dopl4670/Research/TDSE_PETSC/src/block.cpp
+block.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/block.h
 iostream
 -
 fstream
--
-map
--
-algorithm
--
-complex
--
-gsl/gsl_sf_legendre.h
--
-sys/stat.h
--
-sys/types.h
 -
 petscmat.h
 -
@@ -87,8 +79,10 @@ simulation.h
 /users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
 bsplines.h
 /users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.h
-misc.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/misc.h
+map
+-
+iomanip
+-
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi.h
 stddef.h
@@ -963,18 +957,6 @@ H5api_adpt.h
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5api_adpt.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5version.h
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_inline.h
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_legendre.h
-stdlib.h
--
-gsl/gsl_inline.h
--
-gsl/gsl_sf_result.h
--
-
-/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_result.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/hdf5.h
 H5public.h

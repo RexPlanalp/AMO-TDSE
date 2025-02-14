@@ -20,7 +20,7 @@ if not os.path.exists("images"):
 if "BLOCK" in sys.argv:
     lmax = data["angular_data"]["lmax"]
     lm_to_block_txt = np.loadtxt("debug/lm_to_block.txt")
-    probabilities_txt = np.loadtxt("TDSE_files/block_norms.txt")
+    probabilities_txt = np.loadtxt("BLOCK_files/block_norms.txt")
     fig,ax = plt.subplots(figsize=(10, 8))
     space_size =lmax + 1
     space = np.zeros((space_size, 2 * lmax + 1))

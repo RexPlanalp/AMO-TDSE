@@ -14,7 +14,42 @@
 
 
 namespace block 
-{
+{   
+    struct block_context 
+    {
+        int n_basis;
+        int n_blocks;
+        int nmax; 
+        int CONT;
+        std::map<int, std::pair<int, int>> block_to_lm;
+
+        
+
+        static block_context set_config(const simulation& sim) 
+        {   
+            try {
+                block_context config;
+                config.n_blocks= sim.angular_data.at("n_blocks").get<int>();
+                config.n_basis = sim.bspline_data.at("n_basis").get<int>();
+                config.nmax= sim.angular_data.at("nmax").get<int>();
+                config.block_to_lm = sim.block_to_lm;
+                config.CONT = sim.observable_data.at("CONT").get<int>();
+
+                return config;
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "Error in setting up Photoelectron Spectra context: " << "\n\n" << e.what() << "\n\n";
+                throw;
+            }
+        }
+    };
+
+    struct block_filepaths
+    {
+        static constexpr const char* tdse_output = "TDSE_files/tdse_output.h5";
+        static constexpr const char* tise_output = "TISE_files/tise_output.h5";
+    };
 
     PetscErrorCode load_final_state(const char* filename, Vec* state, int total_size) 
     {   
@@ -37,7 +72,7 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state, int n_basis, int n_blocks, int nmax, std::map<int, std::pair<int, int>>& block_to_lm)
+    PetscErrorCode project_out_bound(const char* filename, Mat& S, Vec& state,const block_context& config)
     {
         PetscErrorCode ierr;
         Vec state_block, tise_state,temp;
@@ -51,20 +86,20 @@ namespace block
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
-        for (int idx = 0; idx < n_blocks; ++idx)
+        for (int idx = 0; idx < config.n_blocks; ++idx)
         {
-            std::pair<int, int> lm_pair = block_to_lm.at(idx);
+            std::pair<int, int> lm_pair = config.block_to_lm.at(idx);
             int l = lm_pair.first;
             
 
-            int start = idx * n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, n_basis, start, 1, &is); CHKERRQ(ierr);
+            int start = idx * config.n_basis;
+            ierr = ISCreateStride(PETSC_COMM_SELF, config.n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is, &state_block); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block, &temp); CHKERRQ(ierr);
 
           
 
-            for (int n = 0; n <= nmax; ++n)
+            for (int n = 0; n <= config.nmax; ++n)
             {
                 std::ostringstream dataset_name;
                 dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
@@ -96,23 +131,36 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode compute_probabilities(Vec& state, Mat& S,int n_blocks,int n_basis)
+    PetscErrorCode compute_probabilities(const block_context& config,const block_filepaths& filepaths, const simulation& sim)
     {
         PetscErrorCode ierr;
-        Vec state_block,temp;
-        IS is;
-        std::complex<double> block_norm;
 
-        std::ofstream file("TDSE_files/block_norms.txt");
+        std::ofstream file("BLOCK_files/block_norms.txt");
         file << std::fixed << std::setprecision(15);
 
-        for (int idx = 0; idx<n_blocks; ++idx)
+        std::cout << "Constructing Overlap Matrix" << std::endl;
+        Mat S;
+        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
+
+        std::cout << "Loading Final State" << std::endl;
+        Vec state;
+        ierr = load_final_state(filepaths.tdse_output, &state, config.n_blocks*config.n_basis); CHKERRQ(ierr);
+
+        if (config.CONT)
+        {
+            ierr = project_out_bound(filepaths.tise_output, S, state, config); CHKERRQ(ierr);
+        }
+        
+        Vec state_block,temp;
+        std::complex<double> block_norm;
+        IS is;
+        for (int idx = 0; idx<config.n_blocks; ++idx)
         {   
             std::cout << "Computing norm for block " << idx << std::endl;   
             
            
-            int start = idx*n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, n_basis, start, 1, &is); CHKERRQ(ierr);
+            int start = idx*config.n_basis;
+            ierr = ISCreateStride(PETSC_COMM_SELF, config.n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
             ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
@@ -135,29 +183,15 @@ namespace block
         {
             return 0;
         }
+
+        create_directory(rank,"BLOCK_files");
+
+        block_context config = block_context::set_config(sim);
+        block_filepaths filepaths = block_filepaths();
+
         PetscErrorCode ierr;
-        Mat S;
-        Vec state;
-
-        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
-        int n_basis = sim.bspline_data.at("n_basis").get<int>();  
-        int total_size = n_basis*n_blocks;  
-        int nmax = sim.angular_data.at("nmax").get<int>();
-        std::map<int,std::pair<int,int>> block_to_lm =  sim.block_to_lm;
-        
-        std::cout << "Constructing Overlap Matrix" << std::endl;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
-
-        std::cout << "Loading Final State" << std::endl;
-        ierr = load_final_state("TDSE_files/tdse_output.h5", &state, total_size); CHKERRQ(ierr);
-
-        if (sim.observable_data.at("CONT").get<int>())
-        {
-            ierr = project_out_bound("TISE_files/tise_output.h5", S, state, n_basis, n_blocks, nmax, block_to_lm); CHKERRQ(ierr);
-        }
-
         std::cout << "Computing Distribution" << std::endl;
-        ierr = compute_probabilities(state, S, n_blocks, n_basis); CHKERRQ(ierr);
+        ierr = compute_probabilities(config, filepaths,sim); CHKERRQ(ierr);
         return ierr;
     }
 
