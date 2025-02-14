@@ -44,6 +44,22 @@ nlohmann/json.hpp
 misc.h
 ../headers/misc.h
 
+/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.cpp
+cmath
+-
+fstream
+-
+iostream
+-
+functional
+-
+algorithm
+-
+bsplines.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.h
+simulation.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
+
 /users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp
 iostream
 -

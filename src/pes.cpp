@@ -337,15 +337,15 @@ namespace pes
         }
         
 
-        for (size_t idx = 0; idx < pes.size(); ++idx)
+        for (size_t idx = 1; idx <=pes.size(); ++idx)
         {   
             if (config.debug)
             {
-                std::cout << "Computing Angle Integrated Spectrum for E = " << (config.dE+1)*idx << "\n\n";
+                std::cout << "Computing Angle Integrated Spectrum for E = " << config.dE*idx << "\n\n";
             }
             std::complex<double> val = pes[idx];
             val /= ((2*M_PI)*(2*M_PI)*(2*M_PI));
-            pesFiles << (idx*config.dE+1) << " " << val.real() << " " << "\n";
+            pesFiles << idx*config.dE << " " << val.real() << " " << "\n";
         }
 
         pesFiles.close();
