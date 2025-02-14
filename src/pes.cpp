@@ -286,13 +286,18 @@ namespace pes
 
         for (int E_idx = 1; E_idx <= config.Ne; ++E_idx)
         {
+
+            if (config.debug)
+            {
+                std::cout << "Computing Partial Spectrum for E = " << (E_idx*config.dE) << "\n\n";
+            }
+
             for (int block = 0; block < config.n_blocks; ++block)
             {
                 
                 lm_pair lm_pair = config.block_to_lm.at(block);
                 int l = lm_pair.first;
                 int m = lm_pair.second;
-
                 coulomb_wave coulomb_result = compute_coulomb_wave(E_idx*config.dE, l, config.Nr, config.dr);
                 
                 phases[std::make_pair(E_idx*config.dE,l)] = coulomb_result.phase;
