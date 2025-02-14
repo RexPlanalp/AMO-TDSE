@@ -111,7 +111,7 @@ namespace pes
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename, FILE_MODE_READ, &viewer); CHKERRQ(ierr);
 
         Mat S;
-        ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 

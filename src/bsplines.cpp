@@ -243,30 +243,6 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
     return ierr;
 }
 
-PetscErrorCode construct_overlap(const simulation& sim, Mat& S,bool use_mpi,bool use_ecs)
-{
-    return construct_matrix(sim, S, bsplines::overlap_integrand, use_mpi,use_ecs);
-}
-
-PetscErrorCode construct_kinetic(const simulation& sim, Mat& K,bool use_mpi,bool use_ecs)
-{
-    return construct_matrix(sim, K, bsplines::kinetic_integrand, use_mpi,use_ecs);
-}
-
-PetscErrorCode construct_invr(const simulation& sim, Mat& Inv_r,bool use_mpi,bool use_ecs)
-{
-    return construct_matrix(sim, Inv_r, bsplines::invr_integrand, use_mpi,use_ecs);
-}
-
-PetscErrorCode construct_invr2(const simulation& sim, Mat& Inv_r2,bool use_mpi,bool use_ecs)
-{
-    return construct_matrix(sim, Inv_r2, bsplines::invr2_integrand, use_mpi,use_ecs);
-}
-
-PetscErrorCode construct_der(const simulation& sim, Mat& D,bool use_mpi,bool use_ecs)
-{
-    return construct_matrix(sim, D, bsplines::der_integrand, use_mpi,use_ecs);
-}
 
 PetscErrorCode save_matrix(Mat A, const char *filename)
     {

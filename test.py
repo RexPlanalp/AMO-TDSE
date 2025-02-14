@@ -1,10 +1,4 @@
-import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import pickle
-import os
+
 
 data = np.loadtxt("PES_files/pes.txt")
 pes_cpp = data[:,1]

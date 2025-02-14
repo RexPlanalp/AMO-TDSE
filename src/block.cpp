@@ -146,7 +146,7 @@ namespace block
         std::map<int,std::pair<int,int>> block_to_lm =  sim.block_to_lm;
         
         std::cout << "Constructing Overlap Matrix" << std::endl;
-        ierr = bsplines::construct_overlap(sim,S,false,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
 
         std::cout << "Loading Final State" << std::endl;
         ierr = load_final_state("TDSE_files/tdse_output.h5", &state, total_size); CHKERRQ(ierr);

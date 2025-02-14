@@ -6,9 +6,19 @@
 
 #IncludeRegexTransform: 
 
-../headers/laser.h
+../headers/bsplines.h
+vector
+-
+string
+-
+complex
+-
+functional
+-
 simulation.h
 ../headers/simulation.h
+petscmat.h
+-
 
 ../headers/misc.h
 map
@@ -34,20 +44,22 @@ nlohmann/json.hpp
 misc.h
 ../headers/misc.h
 
-../headers/tdse.h
-petscmat.h
--
-simulation.h
-../headers/simulation.h
-
-/users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp
-tdse.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.h
-simulation.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp
 iostream
 -
 fstream
+-
+map
+-
+algorithm
+-
+complex
+-
+gsl/gsl_sf_legendre.h
+-
+sys/stat.h
+-
+sys/types.h
 -
 petscmat.h
 -
@@ -55,14 +67,12 @@ petscvec.h
 -
 petscviewerhdf5.h
 -
-petscksp.h
--
-laser.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/laser.h
-sys/stat.h
--
-sys/types.h
--
+simulation.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
+bsplines.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/bsplines.h
+misc.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/misc.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi.h
 stddef.h
@@ -107,8 +117,6 @@ petscstring.h
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdevicetypes.h
 petscsys.h
 -
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmtypes.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdrawtypes.h
 
@@ -221,12 +229,6 @@ petscistypes.h
 -
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscistypes.h
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscksp.h
-petscpc.h
--
-petscdrawtypes.h
--
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsclog.h
 petscsys.h
@@ -425,16 +427,6 @@ petscoptions.h
 -
 petscoptions.h
 -
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpc.h
-petscmat.h
--
-petscdmtypes.h
--
-petscpctypes.h
--
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpctypes.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpkg_version.h
 
@@ -955,6 +947,18 @@ H5api_adpt.h
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5api_adpt.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5version.h
+
+/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_inline.h
+
+/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_legendre.h
+stdlib.h
+-
+gsl/gsl_inline.h
+-
+gsl/gsl_sf_result.h
+-
+
+/users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/gsl/gsl_sf_result.h
 
 /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/hdf5.h
 H5public.h

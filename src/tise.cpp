@@ -137,16 +137,16 @@ namespace tise
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         Mat S;
-        ierr = bsplines::construct_overlap(sim,S,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,true,false); CHKERRQ(ierr);
 
         Mat K;
-        ierr = bsplines::construct_kinetic(sim,K,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,K,bsplines::kinetic_integrand,true,false); CHKERRQ(ierr);
 
         Mat Inv_r2;
-        ierr = bsplines::construct_invr2(sim,Inv_r2,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,Inv_r2,bsplines::invr2_integrand,true,false); CHKERRQ(ierr);
 
         Mat Inv_r;
-        ierr = bsplines::construct_invr(sim,Inv_r,true,false); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,Inv_r,bsplines::invr_integrand,true,false); CHKERRQ(ierr);
 
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
         PetscViewer viewTISE;
@@ -233,11 +233,11 @@ namespace tise
         Mat Der;
         
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
-        ierr = bsplines::construct_overlap(sim,S,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_kinetic(sim,K,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr2(sim,Inv_r2,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_invr(sim,Inv_r,true,true); CHKERRQ(ierr);
-        ierr = bsplines::construct_der(sim,Der,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,K,bsplines::kinetic_integrand,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,Inv_r2,bsplines::invr2_integrand,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,Inv_r,bsplines::invr_integrand,true,true); CHKERRQ(ierr);
+        ierr = bsplines::construct_matrix(sim,Der,bsplines::der_integrand,true,true); CHKERRQ(ierr);
 
         PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
         ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
