@@ -12,27 +12,7 @@ using json = nlohmann::json;
 
 
 
-json read_json(const std::string& filename)
-{   
-    json input_par;
-    std::ifstream file(filename);
 
-
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Could not open input file:" + filename);
-    }
-    try 
-    {
-        file >> input_par;
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Error parsing JSON:" + std::string(e.what()));
-    }
-
-    return input_par;
-}
 
 void save_lm_expansion(const std::map<std::pair<int, int>, int>& lm_to_block, const std::string& filename) {
     std::ofstream outFile(filename);
@@ -52,13 +32,21 @@ void create_directory(int rank, const std::string& directory)
 {
     if (rank == 0) 
     {
-        if (mkdir(directory.c_str(), 0777) == 0) 
+        if (mkdir(directory.c_str(), 0777) == -1) 
         {
-            std::cout << "Directory created: " << directory << "\n\n";
-        } 
+            if (errno == EEXIST) 
+            {
+                std::cout << "Directory already exists: " << directory << "\n\n";
+            }
+            else 
+            {
+                throw std::runtime_error("Failed to create directory " + directory + 
+                                       ": " + std::strerror(errno));
+            }
+        }
         else 
         {
-            std::cout << "Directory already exists: " << directory << "\n\n";
+            std::cout << "Directory created: " << directory << "\n\n";
         }
     }
 }

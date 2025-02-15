@@ -4,6 +4,7 @@
 #include <vector>
 #include <complex>
 #include <map>
+#include <string>
 
 #include <nlohmann/json.hpp>
 #include "misc.h"
@@ -14,26 +15,104 @@ class simulation
 
     public:
 
-    simulation( const std::string& filename);
+    std::string input_path = "input.json";
+    std::string tise_output_path = "TISE_files";
+    std::string tdse_output_path = "TDSE_files";
+
+
+    nlohmann::json processed_input_par;
+    int debug;
+    simulation();
+    void process_input_data();
+
+
+    struct BSplineParams 
+    {
+        int n_basis;
+        int order;
+        int degree;
+        double R0_input;
+        double R0;
+        double eta;
+        std::vector<std::complex<double>> knots;
+        std::vector<std::complex<double>> complex_knots;
+        std::vector<double> roots;
+        std::vector<double> weights;
+        int debug;
+    };
+    
+    BSplineParams bspline_params;  
+
+    struct GridParams
+    {
+        double N;
+        double dt;
+        double dr;
+        double grid_size;
+        double Nt;
+        double Nr;
+        double time_size;
+    }; 
+    
+    GridParams grid_params;  
+
+    struct LaserParams
+    {
+        double w;
+        double I;
+        double ell; 
+        double cep; 
+        double A_0;
+        std::array<double,3> polarization;
+        std::array<double,3> poynting;
+        std::array<double,3> ellipticity;
+        std::array<double,3> components;
+
+    }; 
+    
+    LaserParams laser_params;  
+
+    struct AngularParams
+    {
+       int lmax;
+       int nmax;
+       int mmin;
+       int mmax;
+       int n_blocks;
+       std::map<std::pair<int,int>,int> lm_to_block;
+       std::map<int,std::pair<int,int>> block_to_lm;
+    }; 
+    
+    AngularParams angular_params;  
+
+    struct ObservableParams
+    {
+       double Emax;
+       double dE;
+       int Ne;
+       int hhg; 
+       int cont;
+       std::string SLICE;
+    }; 
+    
+    ObservableParams observable_params;  
+
+
+  
+    
+
+
+
     void save_debug_info(int rank);
     std::complex<double> ecs_x(double x) const;
     std::complex<double> ecs_w(double x, double w) const;
 
-    nlohmann::json bspline_data;
-    nlohmann::json grid_data;
-    nlohmann::json angular_data;
-    nlohmann::json tise_data;
-    nlohmann::json tdse_data;
-    nlohmann::json laser_data;
-    nlohmann::json observable_data;
-    int debug;
+  
+    
 
     double I_au = 3.51E16;
 
-    std::vector<std::complex<double>> knots;
-    std::vector<std::complex<double>> complex_knots;
-    std::map<std::pair<int,int>,int> lm_to_block;
-    std::map<int,std::pair<int,int>> block_to_lm;
+  
 
     std::unordered_map<int, std::pair<std::vector<double>, std::vector<double>>> gauss = {
         {2, {{-0.57735027, 0.57735027}, {1, 1}}},
@@ -45,8 +124,7 @@ class simulation
         {8, {{-0.96028986, -0.79666648, -0.52553241, -0.18343464, 0.18343464, 0.52553241, 0.79666648, 0.96028986}, {0.10122854, 0.22238103, 0.31370665, 0.36268378, 0.36268378, 0.31370665, 0.22238103, 0.10122854}}}
     };
 
-    std::vector<double> roots;
-    std::vector<double> weights;
+    
 
 
 
@@ -54,34 +132,25 @@ class simulation
     
 
     private:
-    void _read_input_par(const nlohmann::json& input_par);
 
-    void _process_bspline_data();
-    void _compute_degree();
-    void _compute_knots();
-    void _compute_R0();
-    void _compute_complex_knots();
-    void _compute_gauss();
-    
 
-    void _compute_laser_vectors();
-    void _compute_nonzero_components();
-    void _compute_amplitude();
-    void _process_laser_data();
+    void compute_spacetime();
+    void compute_degree();
+    void compute_knots();
+    void compute_R0();
+    void compute_complex_knots();
+    void compute_gauss();
+    void compute_laser_vectors();
+    void compute_nonzero_components();
+    void compute_amplitude();
+    void compute_lm_expansion();
+    void invert_lm_expansion();
+    void compute_n_blocks();
+    void z_expansion();
+    void xy_expansion();
+    void zxy_expansion();
+    void compute_energy();
 
-    void _compute_spacetime();
-    void _process_grid_data();
-
-    void _compute_lm_expansion();
-    void _invert_lm_expansion();
-    void _z_expansion();
-    void _xy_expansion();
-    void _zxy_expansion();
-    void _compute_n_blocks();
-    void _process_angular_data();
-
-    void _compute_energy();
-    void _process_observable_data();
 
 
    

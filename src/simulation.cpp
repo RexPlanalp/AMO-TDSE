@@ -14,315 +14,299 @@ using Vec3 = std::array<double,3>;
 using lm_dict = std::map<std::pair<int,int>,int>;
 using block_dict = std::map<int,std::pair<int,int>>;
 using int_tuple = std::pair<int,int>;
+using Complex = std::complex<double>;
 
-simulation::simulation(const std::string& filename)
+
+
+
+simulation::simulation()
 {
-    json input_par = read_json(filename);
-    _read_input_par(input_par);
-
-    _process_bspline_data();
-    _process_grid_data();
-    _process_laser_data();
-    _process_angular_data();
-    _process_observable_data();
-
-}
-void simulation::_read_input_par(const nlohmann::json& input_par)
-{
-    try 
+    // Step 1: Read in input parameters
+    std::ifstream input_file(input_path);
+    if (!input_file.is_open())
     {
-        bspline_data = input_par.at("bsplines");
-        grid_data = input_par.at("grid");
-        angular_data = input_par.at("angular");
-        tdse_data = input_par.at("TDSE");
-        tise_data = input_par.at("TISE");
-        laser_data = input_par.at("laser");   
-        observable_data = input_par.at("observables");
-        debug = input_par.value("debug",0);
+        throw std::runtime_error("Could not open input file: " + input_path);
     }
-    catch (const std::exception& e)
+    try
     {
-        throw std::runtime_error("Error parsing JSON:" + std::string(e.what()));
+        input_file >> processed_input_par;
     }
-}
-void simulation::save_debug_info(int rank)
-{
-    if (!debug) return; // Only save if debugging is enabled
-
-    if (rank == 0)
+    catch(const std::exception& e)
     {
-        if (mkdir("debug", 0777) == 0) 
-        {
-            std::cout << "Debug Directory Created" << "\n";
-        } 
-        else 
-        {
-            std::cout << "Error Creating Debug Directory" << "\n";
-        }
-
-        nlohmann::json debug_info;
-        debug_info["bspline_data"] = bspline_data;
-        debug_info["grid_data"] = grid_data;
-        debug_info["angular_data"] = angular_data;
-        debug_info["tise_data"] = tise_data;
-        debug_info["tdse_data"] = tdse_data;
-        debug_info["laser_data"] = laser_data;
-        debug_info["observable_data"] = observable_data;
-
-        std::string filename = "debug/debug.json";
-
-        std::ofstream file(filename);
-        if (file.is_open())
-        {
-            file << std::setw(4) << debug_info; // Pretty-print JSON with indentation
-            file.close();
-            std::cout << "Debug information saved to " << filename << std::endl;
-        }
-        else
-        {
-            std::cerr << "Error: Unable to open file for writing: " << filename << std::endl;
-        }
-
-
-        save_lm_expansion(lm_to_block, "debug/lm_to_block.txt");
+        throw std::runtime_error("Error parsing JSON file: " + std::string(e.what()));
     }
-    
+
+    // Step 2: Process input parameters
+    process_input_data();
+
+
+
+
 }
 
-
-
-
-void simulation::_process_bspline_data()
-{
-    _compute_degree();
-    _compute_knots();
-    _compute_R0();
-    _compute_complex_knots();
-    _compute_gauss();
-}
-
-void simulation::_compute_degree()
+void simulation::process_input_data()
 {   
-    bspline_data["degree"] = bspline_data.at("order").get<int>() - 1;
+    // First set all basic parameters from JSON
+    
+    // 1. Set grid basic parameters
+    grid_params.N = processed_input_par["grid"].at("N").get<double>();
+    grid_params.dt = processed_input_par["grid"].at("time_spacing").get<double>();
+    grid_params.dr = processed_input_par["grid"].at("grid_spacing").get<double>();
+    grid_params.grid_size = processed_input_par["grid"].at("grid_size").get<double>();
+
+    // 2. Set bspline basic parameters
+    bspline_params.n_basis = processed_input_par["bsplines"].at("n_basis").get<int>();
+    bspline_params.order = processed_input_par["bsplines"].at("order").get<int>();
+    bspline_params.R0_input = processed_input_par["bsplines"].at("R0_input").get<double>();
+    bspline_params.eta = processed_input_par["bsplines"].at("eta").get<double>();
+    bspline_params.debug = processed_input_par["bsplines"].at("debug").get<int>();
+
+    // 3. Set laser basic parameters
+    laser_params.w = processed_input_par["laser"].at("w").get<double>();
+    laser_params.I = processed_input_par["laser"].at("I").get<double>();
+    laser_params.ell = processed_input_par["laser"].at("ell").get<double>();
+    laser_params.cep = processed_input_par["laser"].at("CEP").get<double>();
+
+    // 4. set angular basic parameters
+    angular_params.lmax = processed_input_par["angular"].at("lmax").get<int>();
+    angular_params.nmax = processed_input_par["angular"].at("nmax").get<int>();
+    angular_params.mmin = processed_input_par["angular"].at("mmin").get<int>();
+    angular_params.mmax = processed_input_par["angular"].at("mmax").get<int>();
+
+    // 5. Set observable basic parameters
+    std::array<double,2> E_array = processed_input_par["observables"].at("E").get<std::array<double,2>>();
+    observable_params.dE = E_array[0];
+    observable_params.Emax = E_array[1];
+
+    observable_params.hhg = processed_input_par["observables"].at("HHG").get<int>();
+    observable_params.cont = processed_input_par["observables"].at("CONT").get<int>();
+    observable_params.SLICE = processed_input_par["observables"].at("SLICE").get<std::string>();
+
+    
+
+
+    // Then compute derived values
+    compute_spacetime();
+    compute_degree();
+    compute_knots();
+    compute_R0();
+    compute_complex_knots();
+    compute_gauss();
+    compute_amplitude();
+    compute_laser_vectors();
+    compute_nonzero_components();
+    compute_lm_expansion();
+    invert_lm_expansion();
+    compute_n_blocks();
+    compute_energy();
+
+    debug = processed_input_par["debug"].get<int>();
+
 }
 
-void simulation::_compute_knots()
+Complex simulation::ecs_x(double x) const
 {
-    int N_knots = bspline_data.at("n_basis").get<int>() + bspline_data.at("order").get<int>();
-    int N_middle = N_knots - 2 * (bspline_data.at("order").get<int>() - 2);
-    
-    double step_size  = grid_data.at("grid_size").get<double>() / (N_middle-1);
+    if (x < bspline_params.R0)
+    {
+        return Complex(x, 0.0);
+    }
+    else
+    {
+        return bspline_params.R0 +
+               (x - bspline_params.R0) *
+               std::exp(Complex(0, M_PI * bspline_params.eta));
+    }
+}
 
-    std::vector<std::complex<double>> knots_middle;
-    for (int idx = 0; idx < N_middle; ++idx)
+Complex simulation::ecs_w(double x, double w) const
+{
+    if (x < bspline_params.R0)
+    {
+        return Complex(w, 0.0);
+    }
+    else 
+    {
+        return w * std::exp(Complex(0, M_PI * bspline_params.eta));
+    }
+}
+
+
+
+
+void simulation::compute_spacetime()
+{
+    double w = processed_input_par["laser"].at("w").get<double>();
+    
+    grid_params.time_size = processed_input_par["grid"]["time_size"] = grid_params.N * 2 * M_PI / w;
+    grid_params.Nt = processed_input_par["grid"]["Nt"] = std::nearbyint(grid_params.N * 2 * M_PI / (w * grid_params.dt));
+    grid_params.Nr = processed_input_par["grid"]["Nr"] = std::nearbyint(grid_params.grid_size / grid_params.dr);
+}
+
+void simulation::compute_degree()
+{   
+    bspline_params.degree = processed_input_par["bsplines"]["degree"] = bspline_params.order - 1;
+}
+
+void simulation::compute_R0()
+{
+    double min_val = std::abs(bspline_params.knots[0] - bspline_params.R0_input);
+    double knot_val = bspline_params.knots[0].real();
+
+    for (size_t idx = 1; idx < bspline_params.knots.size(); ++idx)
+    {
+        double diff = std::abs(bspline_params.knots[idx] - bspline_params.R0_input);
+        if (diff < min_val)
+        {
+            min_val = diff;
+            knot_val = bspline_params.knots[idx].real();
+        }
+    }
+
+    bspline_params.R0 = processed_input_par["bsplines"]["R0"] = knot_val;
+}
+
+void simulation::compute_knots()
+{
+    int n_basis = bspline_params.n_basis;
+    int order = bspline_params.order;
+    double grid_size = grid_params.grid_size;
+
+    int N_knots = n_basis + order;
+    int N_middle = N_knots - 2 * (order - 2);
+    
+    double step_size  = grid_size / (N_middle-1);
+
+    std::vector<Complex> knots_middle;
+    knots_middle.reserve(N_middle);
+    for (int idx = 0; idx < N_middle; idx++)
     {
         knots_middle.push_back(idx*step_size);
     }
 
-    std::vector<std::complex<double>> knots_start(bspline_data.at("order").get<int>() - 2, 0.0);
-    std::vector<std::complex<double>> knots_end(bspline_data.at("order").get<int>()-2,grid_data.at("grid_size").get<double>() );
+    std::vector<Complex> knots_start(order - 2, 0.0);
+    std::vector<Complex> knots_end(order-2, grid_size);
 
     knots_start.insert(knots_start.end(),knots_middle.begin(),knots_middle.end());
     knots_start.insert(knots_start.end(),knots_end.begin(),knots_end.end());
 
-    knots = knots_start;
+    bspline_params.knots = knots_start;
 }
 
-void simulation::_compute_R0()
-{
-    double R0_input = bspline_data.at("R0_input").get<double>();
-
-    double min_val = std::abs(knots[0]-R0_input);
-    double knot_val = knots[0].real();
-
-    for (size_t idx = 1; idx<knots.size(); ++idx)
-    {
-        double diff = std::abs(knots[idx]-R0_input);
-        if (diff < min_val)
-        {
-            min_val = diff;
-            knot_val = knots[idx].real();
-        }
-    }
-
-    bspline_data["R0"] = knot_val;
-}
-
-std::complex<double> simulation::ecs_x(double x) const
-{
-    if (x < bspline_data.at("R0").get<double>())
-    {
-        return std::complex<double>(x, 0.0);
-    }
-    else
-    {
-        return bspline_data.at("R0").get<double>() +
-               (x - bspline_data.at("R0").get<double>()) *
-               std::exp(std::complex<double>(0, M_PI * bspline_data.at("eta").get<double>()));
-    }
-}
-
-std::complex<double> simulation::ecs_w(double x, double w) const
-{
-    if (x < bspline_data.at("R0").get<double>())
-    {
-        return std::complex<double>(w, 0.0);
-    }
-    else 
-    {
-        return w * std::exp(std::complex<double>(0, M_PI * bspline_data.at("eta").get<double>()));
-    }
-}
-
-void simulation::_compute_complex_knots()
+void simulation::compute_complex_knots()
 {   
-    for (size_t i = 0; i < knots.size(); i++)  
+    bspline_params.complex_knots.reserve(bspline_params.knots.size());
+    for (const auto& knot_val : bspline_params.knots)
     {
-        complex_knots.push_back(ecs_x(knots[i].real())); 
+        bspline_params.complex_knots.push_back(ecs_x(knot_val.real()));
     }
 }
 
-void simulation::_compute_gauss()
-{
-    if (gauss.find(bspline_data.at("order").get<int>()) != gauss.end()) {
-        std::pair<std::vector<double>, std::vector<double>> values = gauss[bspline_data.at("order").get<int>()];
+void simulation::compute_gauss()
+{   
+    int order = bspline_params.order;
 
-        // Accessing the first vector
-        roots = values.first;
-        weights = values.second;
+    if (gauss.find(order) != gauss.end()) {
+        std::pair<std::vector<double>, std::vector<double>> values = gauss[order];
 
-        
+        bspline_params.roots = values.first;
+        bspline_params.weights = values.second;
     } else {
-        std::cout << "Key not found!\n";
+        throw std::runtime_error("Gauss-Legendre quadrature not implemented for order " + std::to_string(order));
     }
 }
 
-
-void simulation::_process_laser_data()
+void simulation::compute_amplitude()
 {
-    _compute_laser_vectors();
-    _compute_amplitude();
-    _compute_nonzero_components();
+    double I = laser_params.I;
+    double w = laser_params.w;
+    double A_0 = std::sqrt(I/I_au) / w;
+    laser_params.A_0 = processed_input_par["laser"]["A_0"] = A_0;
 }
 
-void simulation::_compute_laser_vectors()
+void simulation::compute_laser_vectors()
 {   
-    Vec3 polarization = laser_data.at("polarization").get<Vec3>();
-    Vec3 poynting = laser_data.at("poynting").get<Vec3>();
-    Vec3 elliptiity = {};
+    Vec3 polarization = processed_input_par["laser"].at("polarization").get<Vec3>();
+    Vec3 poynting = processed_input_par["laser"].at("poynting").get<Vec3>();
+    Vec3 ellipticity = {};
 
-    cross_product(polarization,poynting,elliptiity);
-    normalize_array(elliptiity);
+    cross_product(polarization,poynting,ellipticity);
+    normalize_array(ellipticity);
     normalize_array(polarization);
     normalize_array(poynting);
 
-    laser_data["ellipticity"] = elliptiity;
-    laser_data["polarization"] = polarization;
-    laser_data["poynting"] = poynting;
+    laser_params.ellipticity = processed_input_par["laser"]["ellipticity"] = ellipticity;
+    laser_params.polarization = processed_input_par["laser"]["polarization"] = polarization;
+    laser_params.poynting = processed_input_par["laser"]["poynting"] = poynting;
 }
 
-void simulation::_compute_nonzero_components()
+void simulation::compute_nonzero_components()
 {    
-    Vec3 result = {};
+    Vec3 components = {};
 
-    double ell = laser_data.at("ell").get<double>();
-    for (int idx = 0; idx < 3; ++idx)
+    for (int idx = 0; idx < 3; idx++)
     {
-        result[idx] = (laser_data.at("polarization").get<Vec3>()[idx] != 0 || ell*laser_data.at("ellipticity").get<Vec3>()[idx] != 0) ? 1 : 0;
+        components[idx] = (laser_params.polarization[idx] != 0 || laser_params.ell*laser_params.ellipticity[idx] != 0) ? 1 : 0;
     }
-    laser_data["components"] = result;
-}
-
-void simulation::_compute_amplitude()
-{
-    double I = laser_data.at("I").get<double>();
-    double w = laser_data.at("w").get<double>();
-    double A_0 = std::sqrt(I/I_au) / w;
-    laser_data["A_0"] = A_0;
+    laser_params.components = processed_input_par["laser"]["components"] = components;
 }
 
 
 
-
-void simulation::_compute_spacetime()
-{
-    double N = grid_data.at("N").get<double>();
-    double w = laser_data.at("w").get<double>();
-    double dt = grid_data.at("time_spacing").get<double>();
-    grid_data["time_size"] = N * 2 * M_PI / w;
-    grid_data["Nt"] = static_cast<int>(std::nearbyint(N * 2 * M_PI / (w*dt)));
-
-    double dr = grid_data.at("grid_spacing").get<double>();
-    double grid_size  = grid_data.at("grid_size").get<double>();
-    grid_data["Nr"] = static_cast<int>(std::nearbyint(grid_size/dr));
-}
-
-void simulation::_process_grid_data()
-{
-    _compute_spacetime();
-}
-
-
-void simulation::_process_angular_data()
-{
-    _compute_lm_expansion();
-    _invert_lm_expansion();
-    _compute_n_blocks();
-}
-
-void simulation::_compute_n_blocks()
-{
-    angular_data["n_blocks"] = lm_to_block.size();
-}
-
-void simulation::_compute_lm_expansion()
+void simulation::compute_lm_expansion()
 {   
 
-    Vec3 components = laser_data.at("components").get<Vec3>(); 
+    Vec3 components = laser_params.components; 
     if (components[2] && !(components[1] || components[0]))
     {
-        _z_expansion();
+        z_expansion();
     }
     else if ((components[0] || components[1]) && !components[2])
     {
-        _xy_expansion();
+        xy_expansion();
     }
     else
     {
-        _zxy_expansion();
+        zxy_expansion();
     }
     
 }
 
-void simulation::_invert_lm_expansion()
+void simulation::invert_lm_expansion()
 {
-    for (const auto& pair : lm_to_block) // ✅ Works in C++14
+    for (const auto& pair : angular_params.lm_to_block) 
     {
-        block_to_lm[pair.second] = pair.first; 
+        angular_params.block_to_lm[pair.second] = pair.first; 
     }
 }
 
-void simulation::_z_expansion()
-{   
-    int lmax = angular_data.at("lmax").get<int>();
+void simulation::compute_n_blocks()
+{
+    angular_params.n_blocks = processed_input_par["angular"]["n_blocks"] = angular_params.lm_to_block.size();
+}
 
-    for (int l = 0; l<=lmax;++l)
+void simulation::z_expansion()
+{   
+    int lmax = angular_params.lmax;
+
+    for (int l = 0; l<=lmax;l++)
     {
-        lm_to_block[int_tuple(l,0)] = l;
+        angular_params.lm_to_block[int_tuple(l,0)] = l;
     }
 }
 
-void simulation::_xy_expansion()
-{   
+void simulation::xy_expansion()
+{    
+    int lmax = angular_params.lmax;
+
     int block_idx = 0;
-    for (int l = 0; l<=angular_data.at("lmax").get<int>(); ++l)
+    for (int l = 0; l<=lmax; l++)
     {
         int temp_idx = 0;
         for (int m = -l; m<=l; ++m)
         {
             if (temp_idx%2 == 0)
             {
-                lm_to_block[int_tuple(l,m)] = block_idx;
+                angular_params.lm_to_block[int_tuple(l,m)] = block_idx;
                 block_idx++;
             }
             temp_idx++;
@@ -331,33 +315,77 @@ void simulation::_xy_expansion()
     }
 }
 
-void simulation::_zxy_expansion()
-{
+void simulation::zxy_expansion()
+{   
+    int lmax = angular_params.lmax;
+
     int block_idx = 0;
-    for (int l = 0; l<=angular_data.at("lmax").get<int>(); ++l)
+    for (int l = 0; l<=lmax; l++)
     {
         for (int m = -l; m<=l; ++m)
         {
-            lm_to_block[int_tuple(l,m)] = block_idx;
+            angular_params.lm_to_block[int_tuple(l,m)] = block_idx;
             block_idx++;
         }
     }
 }
 
-void simulation::_process_observable_data()
+
+
+
+
+void simulation::compute_energy()
 {
-    _compute_energy();
+    double dE = observable_params.dE;
+    double Emax = observable_params.Emax;
+
+    observable_params.Ne = processed_input_par["observables"]["Ne"] = std::nearbyint(Emax/dE);
 }
 
-void simulation::_compute_energy()
+
+
+void simulation::save_debug_info(int rank)
 {
-    std::array<double,2> energy = observable_data.at("E").get<std::array<double,2>>();
-    double dE = energy[0];
-    double Emax = energy[1];
+   if (!debug) return;
 
-    observable_data["Ne"] = static_cast<int>(std::nearbyint(Emax/dE));
+   if (rank == 0)
+   {
+       try {
+           create_directory(rank,"debug");
+
+           std::string filename = "debug/processed_input.json";
+           std::ofstream file(filename);
+           if (!file.is_open())
+           {
+               throw std::runtime_error("Unable to open file for writing: " + filename);
+           }
+
+           file << std::setw(4) << processed_input_par;
+           file.close();
+           std::cout << "Debug information saved to " << filename << "\n";
+
+           // Save lm expansion mapping
+           filename = "debug/lm_to_block.txt";
+           std::ofstream map_file(filename);
+           if (!map_file.is_open())
+           {
+               throw std::runtime_error("Unable to open file for writing: " + filename);
+           }
+
+           for (const auto& pair : angular_params.lm_to_block)
+           {
+               map_file << "(" << pair.first.first << "," << pair.first.second << ") -> " 
+                       << pair.second << "\n";
+           }
+           map_file.close();
+           std::cout << "LM mapping saved to " << filename << "\n";
+       }
+       catch (const std::exception& e)
+       {
+           throw std::runtime_error("Error in save_debug_info: " + std::string(e.what()));
+       }
+   }
 }
-
 
 
 
