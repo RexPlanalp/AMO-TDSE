@@ -125,6 +125,33 @@ TDSE/fast:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/build
 .PHONY : TDSE/fast
 
+bsplines.o: bsplines.cpp.o
+
+.PHONY : bsplines.o
+
+# target to build an object file
+bsplines.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.o
+.PHONY : bsplines.cpp.o
+
+bsplines.i: bsplines.cpp.i
+
+.PHONY : bsplines.i
+
+# target to preprocess a source file
+bsplines.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.i
+.PHONY : bsplines.cpp.i
+
+bsplines.s: bsplines.cpp.s
+
+.PHONY : bsplines.s
+
+# target to generate assembly for a file
+bsplines.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.s
+.PHONY : bsplines.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -206,6 +233,33 @@ simulation.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/simulation.cpp.s
 .PHONY : simulation.cpp.s
 
+tise.o: tise.cpp.o
+
+.PHONY : tise.o
+
+# target to build an object file
+tise.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tise.cpp.o
+.PHONY : tise.cpp.o
+
+tise.i: tise.cpp.i
+
+.PHONY : tise.i
+
+# target to preprocess a source file
+tise.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tise.cpp.i
+.PHONY : tise.cpp.i
+
+tise.s: tise.cpp.s
+
+.PHONY : tise.s
+
+# target to generate assembly for a file
+tise.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tise.cpp.s
+.PHONY : tise.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -215,6 +269,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... TDSE"
+	@echo "... bsplines.o"
+	@echo "... bsplines.i"
+	@echo "... bsplines.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
@@ -224,6 +281,9 @@ help:
 	@echo "... simulation.o"
 	@echo "... simulation.i"
 	@echo "... simulation.s"
+	@echo "... tise.o"
+	@echo "... tise.i"
+	@echo "... tise.s"
 .PHONY : help
 
 

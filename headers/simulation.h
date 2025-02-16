@@ -98,6 +98,18 @@ class simulation
     ObservableParams observable_params;  
 
 
+    struct SchrodingerParams
+    {
+       
+        double tise_tol;
+        int tise_max_iter;
+        double tdse_tol;
+        std::array<int,3> state;
+    }; 
+    
+    SchrodingerParams schrodinger_params;  
+
+
   
     
 

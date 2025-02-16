@@ -82,6 +82,13 @@ void simulation::process_input_data()
     observable_params.cont = processed_input_par["observables"].at("CONT").get<int>();
     observable_params.SLICE = processed_input_par["observables"].at("SLICE").get<std::string>();
 
+    // 6. Set TISE and TDSE basic parameters
+
+    schrodinger_params.tise_tol = processed_input_par["TISE"].at("tolerance").get<double>();
+    schrodinger_params.tise_max_iter = processed_input_par["TISE"].at("max_iter").get<int>();
+    schrodinger_params.tdse_tol = processed_input_par["TDSE"].at("tolerance").get<double>();
+    schrodinger_params.state = processed_input_par["TDSE"].at("state").get<std::array<int,3>>();
+
     
 
 

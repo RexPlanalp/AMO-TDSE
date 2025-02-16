@@ -26,53 +26,53 @@ int main(int argc, char **argv) {
     simulation sim;
 
     sim.save_debug_info(rank);
-    //bsplines::save_debug_bsplines(rank, sim);
+    bsplines::save_debug_bsplines(rank, sim);
     //laser::save_debug_laser(rank, sim);
 
     // // Check for command-line arguments
-    // bool run_tise = false;
-    // bool run_tdse = false;
-    // bool run_block = false;
-    // bool run_pes = false;
+    bool run_tise = false;
+    bool run_tdse = false;
+    bool run_block = false;
+    bool run_pes = false;
 
-    // for (int i = 1; i < argc; ++i) 
-    // {
-    //     std::string arg = argv[i];
-    //     if (arg == "--tise") 
-    //     {
-    //         run_tise = true;
-    //     } else if (arg == "--tdse") 
-    //     {
-    //         run_tdse = true;
-    //     } else if (arg == "--block") 
-    //     {
-    //         run_block = true;
-    //     } else if (arg == "--pes") 
-    //     {
-    //         run_pes = true;
-    //     } else if (arg == "--all") 
-    //     {
-    //         run_tise = true;
-    //         run_tdse = true;
-    //         run_block = true;
-    //         run_pes = true;
-    //     }
-    // }
+    for (int i = 1; i < argc; ++i) 
+    {
+        std::string arg = argv[i];
+        if (arg == "--tise") 
+        {
+            run_tise = true;
+        } else if (arg == "--tdse") 
+        {
+            run_tdse = true;
+        } else if (arg == "--block") 
+        {
+            run_block = true;
+        } else if (arg == "--pes") 
+        {
+            run_pes = true;
+        } else if (arg == "--all") 
+        {
+            run_tise = true;
+            run_tdse = true;
+            run_block = true;
+            run_pes = true;
+        }
+    }
 
-    // // If no flags are provided, default to running everything
-    // if (!run_tise && !run_tdse && !run_block && !run_pes) 
-    // {
-    //     run_tise = true;
-    //     run_tdse = true;
-    //     run_block = true;
-    //     run_pes = true;
-    // }
+    // If no flags are provided, default to running everything
+    if (!run_tise && !run_tdse && !run_block && !run_pes) 
+    {
+        run_tise = true;
+        run_tdse = true;
+        run_block = true;
+        run_pes = true;
+    }
 
-    // // Execute selected computations
-    // if (run_tise) 
-    // {
-    //     ierr = tise::solve_tise(sim, rank); CHKERRQ(ierr);
-    // }
+    // Execute selected computations
+    if (run_tise) 
+    {
+        ierr = tise::solve_tise(sim, rank); CHKERRQ(ierr);
+    }
 
     // if (run_tdse) 
     // {

@@ -9,9 +9,11 @@
 
 namespace bsplines 
 {
+
+
 void save_debug_bsplines(int rank, const simulation& sim)
 {
-    if (!sim.debug or !sim.bspline_data.at("debug").get<int>()) return; // Only save if debugging is enabled
+    if (!sim.debug or !sim.bspline_params.debug) return; 
 
     if (rank == 0)
     {
@@ -29,25 +31,22 @@ void save_debug_bsplines(int rank, const simulation& sim)
             return;
         }
 
-        int n_basis = sim.bspline_data.at("n_basis").get<int>();
-        int Nr = sim.grid_data.at("Nr").get<int>();
-        double grid_spacing = sim.grid_data.at("grid_spacing").get<double>();
-        int degree = sim.bspline_data.at("degree").get<int>();
+        
 
-        for (int i = 0; i < n_basis; i++)
+        for (int i = 0; i < sim.bspline_params.n_basis; i++)
         {
-            for (int idx = 0; idx < Nr; ++idx)
+            for (int idx = 0; idx < sim.grid_params.Nr; ++idx)
             {
 
 
                 
-                double x_val = idx * grid_spacing;
+                double x_val = idx * sim.grid_params.dr;
 
-                if (x_val > sim.knots[i].real() && x_val < sim.knots[i+sim.bspline_data.at("degree").get<int>()+1].real())
+                if (x_val > sim.bspline_params.knots[i].real() && x_val < sim.bspline_params.knots[i+sim.bspline_params.degree+1].real())
                 {
                     std::complex<double> x = sim.ecs_x(x_val);
-                    std::complex<double> val_B = B(i, degree, x, sim.complex_knots);
-                    std::complex<double> val_dB = dB(i, degree, x, sim.complex_knots);
+                    std::complex<double> val_B = B(i, sim.bspline_params.degree, x, sim.bspline_params.complex_knots);
+                    std::complex<double> val_dB = dB(i, sim.bspline_params.degree, x, sim.bspline_params.complex_knots);
                     
                     file1 << val_B.real() << "\t" << val_B.imag() << "\n";
                     file2 << val_dB.real() << "\t" << val_dB.imag() << "\n";
@@ -123,10 +122,10 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
     int lower = std::min(i, j);
     int upper = std::max(i, j);
 
-    for (int k = lower; k <= upper + sim.bspline_data.at("degree").get<int>(); ++k)
+    for (int k = lower; k <= upper + sim.bspline_params.degree; ++k)
     {
-        double a = sim.knots[k].real();
-        double b = sim.knots[k + 1].real();
+        double a = sim.bspline_params.knots[k].real();
+        double b = sim.bspline_params.knots[k + 1].real();
 
 
         if (a == b)
@@ -138,23 +137,23 @@ std::complex<double> integrate_matrix_element(int i, int j,std::function<std::co
         double half_b_plus_a = 0.5 * (b + a);
 
 
-        for (size_t r = 0; r < sim.roots.size(); ++r)
+        for (size_t r = 0; r < sim.bspline_params.roots.size(); ++r)
         {
-            double x_val = half_b_minus_a * sim.roots[r] + half_b_plus_a;
-            double weight_val = sim.weights[r];
+            double x_val = half_b_minus_a * sim.bspline_params.roots[r] + half_b_plus_a;
+            double weight_val = sim.bspline_params.weights[r];
 
             if (use_ecs)
             {
                 std::complex<double> x = sim.ecs_x(x_val);
                 std::complex<double> weight = sim.ecs_w(x_val, weight_val) * half_b_minus_a;
-                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.complex_knots);
+                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_params.degree,sim.bspline_params.complex_knots);
                 total += weight * integrand_val;
             }
             else
             {
                 std::complex<double> x = x_val;
                 std::complex<double> weight = weight_val* half_b_minus_a;
-                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_data.at("degree").get<int>(),sim.knots);
+                std::complex<double> integrand_val = integrand(i, j, x, sim.bspline_params.degree,sim.bspline_params.knots);
                 total += weight * integrand_val;
             }
         }
@@ -196,12 +195,12 @@ std::complex<double> der_integrand(int i, int j, std::complex<double> x,int degr
 PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, int,std::vector<std::complex<double>>)> integrand,bool use_mpi,bool use_ecs)
 {
     PetscErrorCode ierr;
-    int nnz_per_row = 2 * sim.bspline_data.value("degree",0) + 1;
+    int nnz_per_row = 2 * sim.bspline_params.degree + 1;
 
     if (use_mpi)
     {
         ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
-        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_params.n_basis, sim.bspline_params.n_basis); CHKERRQ(ierr);
         ierr = MatSetFromOptions(M); CHKERRQ(ierr);
         ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
         ierr = MatSetUp(M); CHKERRQ(ierr);
@@ -209,7 +208,7 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
     else
     {
         ierr = MatCreate(PETSC_COMM_SELF, &M); CHKERRQ(ierr);
-        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_data.value("n_basis",0), sim.bspline_data.value("n_basis",0)); CHKERRQ(ierr);
+        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_params.n_basis, sim.bspline_params.n_basis); CHKERRQ(ierr);
         ierr = MatSetFromOptions(M); CHKERRQ(ierr);
         ierr = MatSeqAIJSetPreallocation(M, nnz_per_row, NULL); CHKERRQ(ierr);
         ierr = MatSetUp(M); CHKERRQ(ierr);
@@ -220,13 +219,13 @@ PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std
         ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
     } else {
         start_row = 0;
-        end_row = sim.bspline_data.value("n_basis", 0);
+        end_row = sim.bspline_params.n_basis;
     }
 
     for (int i = start_row; i < end_row; i++) 
     {
-        int col_start = std::max(0, i - sim.bspline_data.value("order",0) + 1);
-        int col_end = std::min(sim.bspline_data.value("n_basis",0), i + sim.bspline_data.value("order",0));
+        int col_start = std::max(0, i - sim.bspline_params.order + 1);
+        int col_end = std::min(sim.bspline_params.n_basis, i + sim.bspline_params.order);
 
         for (int j = col_start; j < col_end; j++) 
         {

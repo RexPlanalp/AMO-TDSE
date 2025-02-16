@@ -16,51 +16,15 @@
 
 namespace tise
 {
-    struct tise_filepaths
-    {
-        static constexpr const char* tise_output = "TISE_files/tise_output.h5";
-        static constexpr const char* K = "TISE_files/K.bin";
-        static constexpr const char* Inv_r2 = "TISE_files/Inv_r2.bin";
-        static constexpr const char* Inv_r = "TISE_files/Inv_r.bin";
-        static constexpr const char* S = "TISE_files/S.bin";
-        static constexpr const char* Der = "TISE_files/Der.bin";
-    };
 
-    struct tise_context 
-    {
-        int lmax;
-        int nmax;
-        int tise_mat_iter;
-        double tise_tolerance;
-
-        static tise_context set_config(const simulation& sim)
-        {
-            try
-            {
-                tise_context config;
-                config.lmax = sim.angular_data.at("lmax").get<int>();
-                config.nmax = sim.angular_data.at("nmax").get<int>();
-                config.tise_tolerance = sim.tise_data.at("tolerance").get<double>();
-                config.tise_mat_iter = sim.tise_data.at("max_iter").get<int>();
-                return config;
-            }
-            catch(const std::exception& e)
-            {
-                std::cerr << "Error in setting up Time Independent Schrodinger Equation Context: " << "\n\n " <<  e.what() << "\n\n";
-                throw;
-            }
-            
-        }
-    };
-
-    PetscErrorCode setup_eigenvalue_problem(const tise_context& config, EPS& eps)
+    PetscErrorCode setup_eigenvalue_problem(const simulation& sim, EPS& eps)
     {   
         PetscErrorCode ierr;
         ierr = EPSCreate(PETSC_COMM_WORLD, &eps); CHKERRQ(ierr);
         ierr = EPSSetProblemType(eps, EPS_GNHEP); CHKERRQ(ierr);
         ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); CHKERRQ(ierr);
         ierr = EPSSetType(eps,EPSKRYLOVSCHUR); CHKERRQ(ierr);
-        ierr = EPSSetTolerances(eps,config.tise_tolerance,config.tise_mat_iter); CHKERRQ(ierr);
+        ierr = EPSSetTolerances(eps,sim.schrodinger_params.tise_tol,sim.schrodinger_params.tise_max_iter); CHKERRQ(ierr);
         return ierr;
     }
 
@@ -132,7 +96,7 @@ namespace tise
         return ierr;
     }
 
-    PetscErrorCode solve_eigensystem(const simulation& sim, const tise_context& config, const tise_filepaths& filepaths)
+    PetscErrorCode solve_eigensystem(const simulation& sim)
     {   
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
@@ -150,23 +114,23 @@ namespace tise
 
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
         PetscViewer viewTISE;
-        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,filepaths.tise_output, FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
+        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,(sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
         EPS eps;
-        ierr = setup_eigenvalue_problem(config,eps); CHKERRQ(ierr);
+        ierr = setup_eigenvalue_problem(sim,eps); CHKERRQ(ierr);
 
 
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
         int nconv;
         Mat temp;
-        for (int l = 0; l<= config.lmax; ++l)
+        for (int l = 0; l<= sim.angular_params.lmax; ++l)
         {
             ierr = MatDuplicate(K,MAT_COPY_VALUES,&temp); CHKERRQ(ierr);
             ierr = MatAXPY(temp, l*(l+1)*0.5,Inv_r2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
             ierr = MatAXPY(temp,-1.0,Inv_r,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 
-            int num_of_energies = config.nmax - l;
+            int num_of_energies = sim.angular_params.nmax - l;
             if (num_of_energies <= 0)
             {
                 continue;
@@ -260,16 +224,12 @@ namespace tise
     }
 
     PetscErrorCode solve_tise(const simulation& sim,int rank)
-    {   
-        
+    {    
         double start_time = MPI_Wtime();
-
-        tise_filepaths filepaths = tise_filepaths();
-        tise_context config = tise_context::set_config(sim);
         PetscErrorCode ierr;
 
         create_directory(rank, "TISE_files");
-        ierr = solve_eigensystem(sim,config,filepaths); CHKERRQ(ierr);
+        ierr = solve_eigensystem(sim); CHKERRQ(ierr);
         ierr = prepare_matrices(sim); CHKERRQ(ierr);
 
 
