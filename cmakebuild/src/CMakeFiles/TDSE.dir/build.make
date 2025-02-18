@@ -122,13 +122,69 @@ src/CMakeFiles/TDSE.dir/simulation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TDSE.dir/simulation.cpp.s"
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.cpp -o CMakeFiles/TDSE.dir/simulation.cpp.s
 
+src/CMakeFiles/TDSE.dir/laser.cpp.o: src/CMakeFiles/TDSE.dir/flags.make
+src/CMakeFiles/TDSE.dir/laser.cpp.o: ../src/laser.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/TDSE.dir/laser.cpp.o"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TDSE.dir/laser.cpp.o -c /users/becker/dopl4670/Research/TDSE_PETSC/src/laser.cpp
+
+src/CMakeFiles/TDSE.dir/laser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TDSE.dir/laser.cpp.i"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /users/becker/dopl4670/Research/TDSE_PETSC/src/laser.cpp > CMakeFiles/TDSE.dir/laser.cpp.i
+
+src/CMakeFiles/TDSE.dir/laser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TDSE.dir/laser.cpp.s"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /users/becker/dopl4670/Research/TDSE_PETSC/src/laser.cpp -o CMakeFiles/TDSE.dir/laser.cpp.s
+
+src/CMakeFiles/TDSE.dir/tdse.cpp.o: src/CMakeFiles/TDSE.dir/flags.make
+src/CMakeFiles/TDSE.dir/tdse.cpp.o: ../src/tdse.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/TDSE.dir/tdse.cpp.o"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TDSE.dir/tdse.cpp.o -c /users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp
+
+src/CMakeFiles/TDSE.dir/tdse.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TDSE.dir/tdse.cpp.i"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp > CMakeFiles/TDSE.dir/tdse.cpp.i
+
+src/CMakeFiles/TDSE.dir/tdse.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TDSE.dir/tdse.cpp.s"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp -o CMakeFiles/TDSE.dir/tdse.cpp.s
+
+src/CMakeFiles/TDSE.dir/block.cpp.o: src/CMakeFiles/TDSE.dir/flags.make
+src/CMakeFiles/TDSE.dir/block.cpp.o: ../src/block.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object src/CMakeFiles/TDSE.dir/block.cpp.o"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TDSE.dir/block.cpp.o -c /users/becker/dopl4670/Research/TDSE_PETSC/src/block.cpp
+
+src/CMakeFiles/TDSE.dir/block.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TDSE.dir/block.cpp.i"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /users/becker/dopl4670/Research/TDSE_PETSC/src/block.cpp > CMakeFiles/TDSE.dir/block.cpp.i
+
+src/CMakeFiles/TDSE.dir/block.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TDSE.dir/block.cpp.s"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /users/becker/dopl4670/Research/TDSE_PETSC/src/block.cpp -o CMakeFiles/TDSE.dir/block.cpp.s
+
+src/CMakeFiles/TDSE.dir/pes.cpp.o: src/CMakeFiles/TDSE.dir/flags.make
+src/CMakeFiles/TDSE.dir/pes.cpp.o: ../src/pes.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object src/CMakeFiles/TDSE.dir/pes.cpp.o"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TDSE.dir/pes.cpp.o -c /users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp
+
+src/CMakeFiles/TDSE.dir/pes.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TDSE.dir/pes.cpp.i"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp > CMakeFiles/TDSE.dir/pes.cpp.i
+
+src/CMakeFiles/TDSE.dir/pes.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TDSE.dir/pes.cpp.s"
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && /jilasoft/software/gcc/6.3.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /users/becker/dopl4670/Research/TDSE_PETSC/src/pes.cpp -o CMakeFiles/TDSE.dir/pes.cpp.s
+
 # Object files for target TDSE
 TDSE_OBJECTS = \
 "CMakeFiles/TDSE.dir/main.cpp.o" \
 "CMakeFiles/TDSE.dir/misc.cpp.o" \
 "CMakeFiles/TDSE.dir/bsplines.cpp.o" \
 "CMakeFiles/TDSE.dir/tise.cpp.o" \
-"CMakeFiles/TDSE.dir/simulation.cpp.o"
+"CMakeFiles/TDSE.dir/simulation.cpp.o" \
+"CMakeFiles/TDSE.dir/laser.cpp.o" \
+"CMakeFiles/TDSE.dir/tdse.cpp.o" \
+"CMakeFiles/TDSE.dir/block.cpp.o" \
+"CMakeFiles/TDSE.dir/pes.cpp.o"
 
 # External object files for target TDSE
 TDSE_EXTERNAL_OBJECTS =
@@ -138,6 +194,10 @@ bin/simulation.exe: src/CMakeFiles/TDSE.dir/misc.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/bsplines.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/tise.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/simulation.cpp.o
+bin/simulation.exe: src/CMakeFiles/TDSE.dir/laser.cpp.o
+bin/simulation.exe: src/CMakeFiles/TDSE.dir/tdse.cpp.o
+bin/simulation.exe: src/CMakeFiles/TDSE.dir/block.cpp.o
+bin/simulation.exe: src/CMakeFiles/TDSE.dir/pes.cpp.o
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/build.make
 bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libgsl.so
 bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libgslcblas.so
@@ -145,7 +205,7 @@ bin/simulation.exe: /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge
 bin/simulation.exe: /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/lib/libpetsc.so
 bin/simulation.exe: /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/lib/libmpi.so
 bin/simulation.exe: src/CMakeFiles/TDSE.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../bin/simulation.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable ../bin/simulation.exe"
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/TDSE.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

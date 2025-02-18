@@ -11,15 +11,15 @@ import pickle
 import sys
 import json
 
-with open("debug/debug.json") as f:
+with open("input.json") as f:
     data = json.load(f)
 
 if not os.path.exists("images"):
     os.makedirs("images")
 
 if "BLOCK" in sys.argv:
-    lmax = data["angular_data"]["lmax"]
-    lm_to_block_txt = np.loadtxt("debug/lm_to_block.txt")
+    lmax = data["angular"]["lmax"]
+    lm_to_block_txt = np.loadtxt("BLOCK_files/lm_to_block.txt")
     probabilities_txt = np.loadtxt("BLOCK_files/block_norms.txt")
     fig,ax = plt.subplots(figsize=(10, 8))
     space_size =lmax + 1
@@ -81,8 +81,8 @@ if "PES" in sys.argv:
     norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
     #norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
 
-    sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
-    #sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
+    #sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
+    sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
     ax.set_aspect("equal",adjustable = "box")
     fig.colorbar(sc,ax=ax)
     fig.savefig("pad.png")

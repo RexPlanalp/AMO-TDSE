@@ -125,6 +125,33 @@ TDSE/fast:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/build
 .PHONY : TDSE/fast
 
+block.o: block.cpp.o
+
+.PHONY : block.o
+
+# target to build an object file
+block.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.o
+.PHONY : block.cpp.o
+
+block.i: block.cpp.i
+
+.PHONY : block.i
+
+# target to preprocess a source file
+block.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.i
+.PHONY : block.cpp.i
+
+block.s: block.cpp.s
+
+.PHONY : block.s
+
+# target to generate assembly for a file
+block.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.s
+.PHONY : block.cpp.s
+
 bsplines.o: bsplines.cpp.o
 
 .PHONY : bsplines.o
@@ -151,6 +178,33 @@ bsplines.s: bsplines.cpp.s
 bsplines.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.s
 .PHONY : bsplines.cpp.s
+
+laser.o: laser.cpp.o
+
+.PHONY : laser.o
+
+# target to build an object file
+laser.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.o
+.PHONY : laser.cpp.o
+
+laser.i: laser.cpp.i
+
+.PHONY : laser.i
+
+# target to preprocess a source file
+laser.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.i
+.PHONY : laser.cpp.i
+
+laser.s: laser.cpp.s
+
+.PHONY : laser.s
+
+# target to generate assembly for a file
+laser.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.s
+.PHONY : laser.cpp.s
 
 main.o: main.cpp.o
 
@@ -206,6 +260,33 @@ misc.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.s
 .PHONY : misc.cpp.s
 
+pes.o: pes.cpp.o
+
+.PHONY : pes.o
+
+# target to build an object file
+pes.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.o
+.PHONY : pes.cpp.o
+
+pes.i: pes.cpp.i
+
+.PHONY : pes.i
+
+# target to preprocess a source file
+pes.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.i
+.PHONY : pes.cpp.i
+
+pes.s: pes.cpp.s
+
+.PHONY : pes.s
+
+# target to generate assembly for a file
+pes.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.s
+.PHONY : pes.cpp.s
+
 simulation.o: simulation.cpp.o
 
 .PHONY : simulation.o
@@ -232,6 +313,33 @@ simulation.s: simulation.cpp.s
 simulation.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/simulation.cpp.s
 .PHONY : simulation.cpp.s
+
+tdse.o: tdse.cpp.o
+
+.PHONY : tdse.o
+
+# target to build an object file
+tdse.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.o
+.PHONY : tdse.cpp.o
+
+tdse.i: tdse.cpp.i
+
+.PHONY : tdse.i
+
+# target to preprocess a source file
+tdse.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.i
+.PHONY : tdse.cpp.i
+
+tdse.s: tdse.cpp.s
+
+.PHONY : tdse.s
+
+# target to generate assembly for a file
+tdse.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.s
+.PHONY : tdse.cpp.s
 
 tise.o: tise.cpp.o
 
@@ -269,18 +377,30 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... TDSE"
+	@echo "... block.o"
+	@echo "... block.i"
+	@echo "... block.s"
 	@echo "... bsplines.o"
 	@echo "... bsplines.i"
 	@echo "... bsplines.s"
+	@echo "... laser.o"
+	@echo "... laser.i"
+	@echo "... laser.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
 	@echo "... misc.o"
 	@echo "... misc.i"
 	@echo "... misc.s"
+	@echo "... pes.o"
+	@echo "... pes.i"
+	@echo "... pes.s"
 	@echo "... simulation.o"
 	@echo "... simulation.i"
 	@echo "... simulation.s"
+	@echo "... tdse.o"
+	@echo "... tdse.i"
+	@echo "... tdse.s"
 	@echo "... tise.o"
 	@echo "... tise.i"
 	@echo "... tise.s"

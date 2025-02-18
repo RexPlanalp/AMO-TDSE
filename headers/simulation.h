@@ -18,6 +18,8 @@ class simulation
     std::string input_path = "input.json";
     std::string tise_output_path = "TISE_files";
     std::string tdse_output_path = "TDSE_files";
+    std::string pes_output_path = "PES_files";
+    std::string block_output_path = "BLOCK_files";
 
 
     nlohmann::json processed_input_par;

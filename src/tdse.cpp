@@ -1,14 +1,17 @@
-#include "tdse.h"
-#include "simulation.h"
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <petscmat.h>
 #include <petscvec.h>
 #include <petscviewerhdf5.h>
 #include <petscksp.h>
+
+#include "tdse.h"
+#include "simulation.h"
 #include "laser.h"
-#include <sys/stat.h>
-#include <sys/types.h>
+
 using Vec3 = std::array<double, 3>;
 
 namespace tdse 
@@ -17,10 +20,10 @@ namespace tdse
 {   
     PetscErrorCode ierr;
 
-    int n_basis = sim.bspline_data.value("n_basis", 0);
-    int n_blocks = sim.angular_data.value("n_blocks", 0);
-    std::array<int, 3> state = sim.tdse_data.value("state", std::array<int, 3>{0, 0, 0});
-    int block_idx = sim.lm_to_block.at({state[1], state[2]});
+    int n_basis = sim.bspline_params.n_basis;
+    int n_blocks = sim.angular_params.n_blocks;
+    std::array<int, 3> state = sim.schrodinger_params.state;
+    int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
     int total_size = n_basis * n_blocks;
 
     ierr = VecCreate(PETSC_COMM_WORLD, &tdse_state); CHKERRQ(ierr);
@@ -29,7 +32,6 @@ namespace tdse
     ierr = VecSetFromOptions(tdse_state); CHKERRQ(ierr);
     ierr = VecSet(tdse_state, 0.0); CHKERRQ(ierr);
 
-    // Create vector for TISE output (only on rank 0)
     Vec tise_state;
     PetscScalar* tise_state_array = nullptr;
     int rank;
@@ -42,43 +44,40 @@ namespace tdse
         ierr = VecSetFromOptions(tise_state); CHKERRQ(ierr);
         ierr = VecSet(tise_state, 0.0); CHKERRQ(ierr);
 
-        // Set the name of the vector to match the dataset in the HDF5 group
         std::stringstream ss;
         ss << "eigenvectors/psi_" << state[0] << "_" << state[1];
         std::string state_path = ss.str();
         ierr = PetscObjectSetName((PetscObject)tise_state, state_path.c_str()); CHKERRQ(ierr);
 
-        // Open HDF5 file and load the vector
         PetscViewer viewer;
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, "TISE_files/tise_output.h5", FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, (sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
         ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
-        // Get array from tise_state
         ierr = VecGetArray(tise_state, &tise_state_array); CHKERRQ(ierr);
     }
 
-    // Allocate memory on all ranks for broadcasting
-    if (rank != 0) {
+    if (rank != 0) 
+    {
         tise_state_array = new PetscScalar[n_basis];
     }
 
-    // Broadcast tise_state_array to all processes
     MPI_Bcast(tise_state_array, n_basis, MPIU_SCALAR, 0, PETSC_COMM_WORLD);
 
-    // Set values in tdse_state
     PetscInt start, end;
     ierr = VecGetOwnershipRange(tdse_state, &start, &end); CHKERRQ(ierr);
 
-    for (int i = 0; i < n_basis; ++i) {
+    for (int i = 0; i < n_basis; ++i) 
+    {
         int global_index = block_idx * n_basis + i;
-        if (global_index >= start && global_index < end) {
+        if (global_index >= start && global_index < end) 
+        {
             ierr = VecSetValue(tdse_state, global_index, tise_state_array[i], INSERT_VALUES); CHKERRQ(ierr);
         }
     }
 
-    // Cleanup
-    if (rank == 0) {
+    if (rank == 0) 
+    {
         ierr = VecRestoreArray(tise_state, &tise_state_array); CHKERRQ(ierr);
         ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
     } else {
@@ -91,12 +90,12 @@ namespace tdse
     return ierr; 
 }
 
-    PetscErrorCode load_matrix(const char* filename, Mat *matrix)
+    PetscErrorCode load_matrix(std::string filename, Mat *matrix)
     {
         PetscErrorCode ierr;
         PetscViewer viewer;
 
-        ierr = PetscViewerBinaryOpen(PETSC_COMM_SELF,filename, FILE_MODE_READ,&viewer); CHKERRQ(ierr);
+        ierr = PetscViewerBinaryOpen(PETSC_COMM_SELF,filename.c_str(), FILE_MODE_READ,&viewer); CHKERRQ(ierr);
 
         ierr = MatCreate(PETSC_COMM_SELF,matrix); CHKERRQ(ierr);
         ierr = MatSetType(*matrix,MATSEQAIJ); CHKERRQ(ierr);
@@ -222,7 +221,7 @@ namespace tdse
         Mat S;
         ierr = load_matrix("TISE_files/S.bin",&S); CHKERRQ(ierr);
 
-        int n_blocks = sim.angular_data.value("n_blocks",0);
+        int n_blocks = sim.angular_params.n_blocks;
         
         Mat I; 
         ierr = MatCreate(PETSC_COMM_SELF,&I); CHKERRQ(ierr);
@@ -247,15 +246,15 @@ namespace tdse
     {
         PetscErrorCode ierr; 
 
-        int n_blocks = sim.angular_data.value("n_blocks",0);
-        int n_basis = sim.bspline_data.value("n_basis",0);
-        int degree = sim.bspline_data.value("degree",0);
-        int lmax = sim.angular_data.value("lmax",0);
+        int n_blocks = sim.angular_params.n_blocks;
+        int n_basis = sim.bspline_params.n_basis;
+        int degree = sim.bspline_params.degree;
+        int lmax = sim.angular_params.lmax;
 
         Mat K,Inv_r2,Inv_r;
-        ierr = load_matrix("TISE_files/K.bin",&K); CHKERRQ(ierr);
-        ierr = load_matrix("TISE_files/Inv_r2.bin",&Inv_r2); CHKERRQ(ierr);
-        ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/K.bin",&K); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Inv_r2.bin",&Inv_r2); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
 
         ierr = MatAXPY(K,-1.0,Inv_r,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
 
@@ -276,7 +275,7 @@ namespace tdse
             std::vector<int> indices;
             for (int i = 0; i < n_blocks; ++i)
             {   
-                auto lm_pair = sim.block_to_lm.at(i);  // Retrieve (l, m) pair
+                auto lm_pair = sim.angular_params.block_to_lm.at(i);  // Retrieve (l, m) pair
                 if (lm_pair.first == l) // Compare only 'l' component
                 {
                     indices.push_back(i);
@@ -318,7 +317,7 @@ namespace tdse
 
     PetscErrorCode _construct_atomic_interaction(const simulation& sim,Mat& H_atomic,Mat& S_atomic, Mat& atomic_left,Mat& atomic_right)
     {   
-        double dt = sim.grid_data.value("time_spacing",0.0);
+        double dt = sim.grid_params.dt;
         std::complex<double> alpha  = PETSC_i * (dt / 2.0);
         PetscErrorCode ierr;
         ierr = MatDuplicate(S_atomic,MAT_COPY_VALUES,&atomic_left); CHKERRQ(ierr);
@@ -383,11 +382,11 @@ namespace tdse
     {
         PetscErrorCode ierr;
 
-        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
+        int n_blocks = sim.angular_params.n_blocks;
 
         Mat Der,Inv_r;
-        ierr = load_matrix("TISE_files/Der.bin",&Der); CHKERRQ(ierr);
-        ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Der.bin",&Der); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
 
         Mat H_lm_1;
         ierr = MatCreate(PETSC_COMM_SELF,&H_lm_1); CHKERRQ(ierr);
@@ -397,12 +396,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_1); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -428,12 +427,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_2); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -467,12 +466,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_3); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -497,12 +496,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_4); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -551,7 +550,7 @@ namespace tdse
     {
         PetscErrorCode ierr;
 
-        int n_blocks = sim.angular_data.at("n_blocks").get<int>();
+        int n_blocks = sim.angular_params.n_blocks;
 
         Mat H_lm_1;
         ierr = MatCreate(PETSC_COMM_SELF, &H_lm_1); CHKERRQ(ierr);
@@ -561,12 +560,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_1); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -594,12 +593,12 @@ namespace tdse
         ierr = MatSetUp(H_lm_2); CHKERRQ(ierr);
         for (int i = 0; i < n_blocks; ++i)
         {
-            std::pair<int,int> lm_pair = sim.block_to_lm.at(i);
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
             for (int j = 0; j < n_blocks; ++j)
             {
-                std::pair<int,int> lm_pair_prime = sim.block_to_lm.at(j);
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;
                 int mprime = lm_pair_prime.second;
 
@@ -618,8 +617,8 @@ namespace tdse
 
 
         Mat Der,Inv_r;
-        ierr = load_matrix("TISE_files/Der.bin",&Der); CHKERRQ(ierr);
-        ierr = load_matrix("TISE_files/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Der.bin",&Der); CHKERRQ(ierr);
+        ierr = load_matrix(sim.tise_output_path+"/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
 
         Mat H_z_2;
         ierr = KroneckerProductParallel(H_lm_1,Der,&H_z); CHKERRQ(ierr);
@@ -644,25 +643,15 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     PetscErrorCode ierr;
     Vec state;
     ierr = load_starting_state(sim, state); CHKERRQ(ierr);
-    Vec3 components = sim.laser_data.at("components").get<Vec3>();
-    std::complex<double> alpha = PETSC_i * (sim.grid_data.at("time_spacing").get<double>() / 2.0);
-    int Nt = sim.grid_data.value("Nt", 0);
-    double dt = sim.grid_data.value("time_spacing", 0.0);
+    Vec3 components = sim.laser_params.components;
+    double dt = sim.grid_params.dt;
+    int Nt = sim.grid_params.Nt;
+    std::complex<double> alpha = PETSC_i * (dt / 2.0);
 
-    if (rank == 0) 
-        {
-            if (mkdir("TDSE_files", 0777) == 0) 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory created: %s\n\n", "TDSE_files");
-            } 
-            else 
-            {
-                PetscPrintf(PETSC_COMM_WORLD, "Directory already exists: %s\n\n", "DISE_files");
-            }
-        }
+    create_directory(rank, sim.tdse_output_path);
 
     PetscViewer viewTDSE;
-    ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,"TDSE_files/tdse_output.h5", FILE_MODE_WRITE, &viewTDSE); CHKERRQ(ierr);
+    ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,(sim.tdse_output_path+"/tdse_output.h5").c_str(), FILE_MODE_WRITE, &viewTDSE); CHKERRQ(ierr);
 
 
     PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
@@ -695,7 +684,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     PetscPrintf(PETSC_COMM_WORLD, "Setting up Linear Solver\n\n");
     KSP ksp;
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
-    ierr = KSPSetTolerances(ksp, sim.tdse_data.at("tolerance").get<double>(), PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
+    ierr = KSPSetTolerances(ksp, sim.schrodinger_params.tdse_tol, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
     ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
 
     PetscPrintf(PETSC_COMM_WORLD, "Preallocating Temporary Petsc Objects\n\n");

@@ -372,11 +372,10 @@ void simulation::save_debug_info(int rank)
            std::cout << "Debug information saved to " << filename << "\n";
 
            // Save lm expansion mapping
-           filename = "debug/lm_to_block.txt";
-           std::ofstream map_file(filename);
+           std::ofstream map_file("debug/lm_to_block.txt");
            if (!map_file.is_open())
            {
-               throw std::runtime_error("Unable to open file for writing: " + filename);
+               throw std::runtime_error(std::string("Unable to open file for writing: ") + "debug/lm_to_block.txt");
            }
 
            for (const auto& pair : angular_params.lm_to_block)
