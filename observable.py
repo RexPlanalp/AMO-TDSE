@@ -81,8 +81,8 @@ if "PES" in sys.argv:
     norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
     #norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
 
-    #sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
-    sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
+    sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
+    #sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
     ax.set_aspect("equal",adjustable = "box")
     fig.colorbar(sc,ax=ax)
     fig.savefig("pad.png")

@@ -7,7 +7,7 @@ import numpy as np
 import sys
 import json
 
-with open("debug/debug.json") as f:
+with open("debug/processed_input.json") as f:
     data = json.load(f)
 
 if "BSPLINE" in sys.argv:
@@ -39,7 +39,7 @@ if "BSPLINE" in sys.argv:
     fig.savefig("debug/bsplines.png")
 
 if "LM" in sys.argv:
-    lmax = data["angular_data"]["lmax"]
+    lmax = data["angular"]["lmax"]
     lm_to_block_txt = np.loadtxt("debug/lm_to_block.txt")
     fig,ax = plt.subplots()
     space_size =lmax + 1
