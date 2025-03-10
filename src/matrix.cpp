@@ -13,7 +13,7 @@
 // Destructory: destroy the matrix
 PetscMatrix::~PetscMatrix()
 {
-    MatDestroy(&getMatrix());
+    MatDestroy(&matrix);
 };
 
 // Method: get the matrix

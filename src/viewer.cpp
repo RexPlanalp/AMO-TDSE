@@ -16,7 +16,7 @@
 // Destructory: destroy the viewer
 PetscSaver::~PetscSaver()
 {
-    PetscViewerDestroy(&getViewer());
+    PetscViewerDestroy(&viewer);
 }
 
 // Method: get the viewer
