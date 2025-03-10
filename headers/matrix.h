@@ -2,13 +2,21 @@
 
 #include <petscmat.h>
 
+enum class RadialMatrixType
+{
+    SEQUENTIAL,
+    PARALLEL
+};
+
 class PetscMatrix 
 {
     public:
         PetscMatrix() = default;
         ~PetscMatrix();
         
-        Mat getMatrix();
+        Mat& getMatrix();
+
+        void saveMatrix();
 
     private:
         Mat matrix;
@@ -17,7 +25,10 @@ class PetscMatrix
 class RadialMatrix : public PetscMatrix
 {
     public:
-        RadialMatrix()
+        RadialMatrix(int size, int nnz, RadialMatrixType matrixType);
 
-}
+        int local_start,local_end;
+
+};
+
 
