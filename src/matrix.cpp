@@ -2,6 +2,7 @@
 #include "utility.h"
 #include "simulation.h"
 #include "bsplines.h"
+#include "viewer.h"
 
 ////////////////////////////
 //  Matrix Baseclass //
@@ -22,14 +23,21 @@ Mat& PetscMatrix::getMatrix()
     return matrix;
 };
 
+void PetscMatrix::saveMatrix(const char* filename)
+{
+    PetscSaverBinary saver(filename);
+    saver.saveMatrix(*this);
+}
+
 ////////////////////////////
 // Radial Matrix Subclass //
 ////////////////////////////
 
 // Constructor: create a matrix
-RadialMatrix::RadialMatrix(const simulation& sim, int nnz, RadialMatrixType matrixType)
+RadialMatrix::RadialMatrix(const simulation& sim,RadialMatrixType matrixType)
 {   
-    int size = sim.bspline_params.n_basis;
+    int n_basis = sim.bspline_params.n_basis;
+    int order = sim.bspline_params.order;
 
 
     PetscErrorCode ierr;
@@ -38,20 +46,20 @@ RadialMatrix::RadialMatrix(const simulation& sim, int nnz, RadialMatrixType matr
     {
         case RadialMatrixType::SEQUENTIAL:
         ierr = MatCreate(PETSC_COMM_SELF, &getMatrix()); checkError(ierr,"Error Creating Matrix");
-        ierr = MatSetSizes(getMatrix(), PETSC_DECIDE, PETSC_DECIDE, size, size); checkError(ierr,"Error Setting Matrix Size");
+        ierr = MatSetSizes(getMatrix(), PETSC_DECIDE, PETSC_DECIDE, n_basis, n_basis); checkError(ierr,"Error Setting Matrix Size");
         ierr = MatSetFromOptions(getMatrix()); checkError(ierr,"Error Setting Matrix Options");
-        ierr = MatSeqAIJSetPreallocation(getMatrix(), nnz, NULL); checkError(ierr,"Error Preallocating Matrix");
+        ierr = MatSeqAIJSetPreallocation(getMatrix(), 2*order+1, NULL); checkError(ierr,"Error Preallocating Matrix");
         ierr = MatSetUp(getMatrix()); checkError(ierr,"Error Setting Up Matrix");
        
         local_start = 0;
-        local_end = size;
+        local_end = n_basis;
         break;
 
         case RadialMatrixType::PARALLEL:
         ierr = MatCreate(PETSC_COMM_WORLD, &getMatrix()); checkError(ierr, "Error Creating Matrix");
-        ierr = MatSetSizes(getMatrix(), PETSC_DECIDE, PETSC_DECIDE, size, size); checkError(ierr, "Error Setting Matrix Size");
+        ierr = MatSetSizes(getMatrix(), PETSC_DECIDE, PETSC_DECIDE, n_basis, n_basis); checkError(ierr, "Error Setting Matrix Size");
         ierr = MatSetFromOptions(getMatrix()); checkError(ierr, "Error Setting Matrix Options");
-        ierr = MatMPIAIJSetPreallocation(getMatrix(), nnz, NULL, nnz, NULL); checkError(ierr, "Error Preallocating Matrix");
+        ierr = MatMPIAIJSetPreallocation(getMatrix(), 2*order+1, NULL, 2*order+1, NULL); checkError(ierr, "Error Preallocating Matrix");
         ierr = MatSetUp(getMatrix()); checkError(ierr, "Error Setting Up Matrix");
         ierr = MatGetOwnershipRange(getMatrix(), &local_start, &local_end); checkError(ierr, "Error Getting Ownership Range");
        
@@ -66,10 +74,21 @@ void RadialMatrix::setIntegrand(radialIntegrand integrand)
 }
 
 // Method: populate the matrix
-void RadialMatrix::populateMatrix(const simulation& sim,bool use_ecs)
+void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
 {   
     int n_basis = sim.bspline_params.n_basis;
     int order = sim.bspline_params.order;
+
+    bool use_ecs;
+    switch(ecs)
+    {
+        case ECSMode::ON:
+        use_ecs = true;
+        break;
+
+        case ECSMode::OFF:
+        use_ecs = false;
+    }
 
 
     PetscErrorCode ierr;

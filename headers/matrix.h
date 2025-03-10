@@ -14,6 +14,12 @@ enum class RadialMatrixType
     PARALLEL
 };
 
+enum class ECSMode
+{
+    ON,
+    OFF
+};
+
 class PetscMatrix 
 {
     public:
@@ -22,7 +28,8 @@ class PetscMatrix
         
         Mat& getMatrix();
 
-        void saveMatrix();
+        void saveMatrix(const char* filename);
+
 
     private:
         Mat matrix;
@@ -31,7 +38,7 @@ class PetscMatrix
 class RadialMatrix : public PetscMatrix
 {
     public:
-        RadialMatrix(const simulation& sim, int nnz, RadialMatrixType matrixType);
+        RadialMatrix::RadialMatrix(const simulation& sim,RadialMatrixType matrixType);
 
         
 
@@ -40,7 +47,7 @@ class RadialMatrix : public PetscMatrix
         radialIntegrand integrand_func;
         void setIntegrand(radialIntegrand integrand);
 
-        void RadialMatrix::populateMatrix(const simulation& sim,bool use_ecs);
+        void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs);
 };
 
 

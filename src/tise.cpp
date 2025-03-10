@@ -13,6 +13,11 @@
 #include "misc.h"
 
 
+// NEW INCLUDES
+
+#include "matrix.h"
+
+
 
 namespace tise
 {
@@ -100,17 +105,24 @@ namespace tise
     {   
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,true,false); CHKERRQ(ierr);
 
-        Mat K;
-        ierr = bsplines::construct_matrix(sim,K,bsplines::kinetic_integrand,true,false); CHKERRQ(ierr);
 
-        Mat Inv_r2;
-        ierr = bsplines::construct_matrix(sim,Inv_r2,bsplines::invr2_integrand,true,false); CHKERRQ(ierr);
+        RadialMatrix S(sim,RadialMatrixType::PARALLEL);
+        S.setIntegrand(bsplines::overlap_integrand);
+        S.populateMatrix(sim,ECSMode::OFF);
 
-        Mat Inv_r;
-        ierr = bsplines::construct_matrix(sim,Inv_r,bsplines::invr_integrand,true,false); CHKERRQ(ierr);
+        RadialMatrix K(sim,RadialMatrixType::PARALLEL);
+        K.setIntegrand(bsplines::kinetic_integrand);
+        K.populateMatrix(sim,ECSMode::OFF);
+
+        RadialMatrix Inv_r2(sim,RadialMatrixType::PARALLEL);
+        Inv_r2.setIntegrand(bsplines::invr2_integrand);
+        Inv_r2.populateMatrix(sim,ECSMode::OFF);
+
+        RadialMatrix Inv_r(sim,RadialMatrixType::PARALLEL);
+        Inv_r.setIntegrand(bsplines::invr_integrand);
+        Inv_r.populateMatrix(sim,ECSMode::OFF);
+
 
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
         PetscViewer viewTISE;
