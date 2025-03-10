@@ -71,28 +71,28 @@ int main(int argc, char **argv) {
     // Execute selected computations
     if (run_tise) 
     {
-        ierr = tise::solve_tise(sim, rank); CHKERRQ(ierr);
+        tise::solve_tise(sim, rank); 
     }
 
-    if (run_tdse) 
-    {
-        ierr = tdse::solve_tdse(sim, rank); CHKERRQ(ierr);
-    }
+    // if (run_tdse) 
+    // {
+    //     ierr = tdse::solve_tdse(sim, rank); CHKERRQ(ierr);
+    // }
 
-    if (run_block) 
-    {
-        ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
-    }
+    // if (run_block) 
+    // {
+    //     ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
+    // }
     
-    if (run_pes) 
-    {   
-        int code {};
-        code = pes::compute_pes(rank,sim);
-        if (code != 0)
-        {
-            std::cerr << "Error in computing PES" << std::endl;
-        }
-    }
+    // if (run_pes) 
+    // {   
+    //     int code {};
+    //     code = pes::compute_pes(rank,sim);
+    //     if (code != 0)
+    //     {
+    //         std::cerr << "Error in computing PES" << std::endl;
+    //     }
+    // }
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);
     return 0;

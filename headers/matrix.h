@@ -29,7 +29,15 @@ class PetscMatrix
         Mat& getMatrix();
 
         void saveMatrix(const char* filename);
+        void duplicateMatrix(PetscMatrix& M);
 
+        template <typename T>
+        void axpy(T alpha, PetscMatrix& X, MatStructure PATTERN);
+        
+
+
+
+       
 
     private:
         Mat matrix;
@@ -38,7 +46,7 @@ class PetscMatrix
 class RadialMatrix : public PetscMatrix
 {
     public:
-        RadialMatrix::RadialMatrix(const simulation& sim,RadialMatrixType matrixType);
+        RadialMatrix(const simulation& sim,RadialMatrixType matrixType);
 
         
 
@@ -47,7 +55,7 @@ class RadialMatrix : public PetscMatrix
         radialIntegrand integrand_func;
         void setIntegrand(radialIntegrand integrand);
 
-        void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs);
+        void populateMatrix(const simulation& sim,ECSMode ecs);
 };
 
 

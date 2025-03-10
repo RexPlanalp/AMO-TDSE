@@ -22,11 +22,27 @@ Mat& PetscMatrix::getMatrix()
 {
     return matrix;
 };
-
+ 
+// Method: save the matrix
 void PetscMatrix::saveMatrix(const char* filename)
 {
     PetscSaverBinary saver(filename);
     saver.saveMatrix(*this);
+}
+
+// Method: duplicate the matrix
+void PetscMatrix::duplicateMatrix(PetscMatrix& M)
+{
+    PetscErrorCode ierr;
+    ierr = MatDuplicate(M.getMatrix(),MAT_COPY_VALUES,&getMatrix()); checkError(ierr,"Error Duplicating Matrix");
+}
+
+//Method: axpy 
+template <typename T>
+void PetscMatrix::axpy(T alpha, PetscMatrix& X, MatStructure PATTERN)
+{
+    PetscErrorCode ierr;
+    ierr = MatAXPY(getMatrix(),alpha,X.getMatrix(),PATTERN); checkError(ierr,"Error Performing AXPY Operation");
 }
 
 ////////////////////////////
@@ -79,7 +95,7 @@ void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
     int n_basis = sim.bspline_params.n_basis;
     int order = sim.bspline_params.order;
 
-    bool use_ecs;
+    bool use_ecs = false;
     switch(ecs)
     {
         case ECSMode::ON:
@@ -108,3 +124,10 @@ void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
     ierr = MatAssemblyBegin(getMatrix(), MAT_FINAL_ASSEMBLY); checkError(ierr, "Error Beginning Assembly");
     ierr = MatAssemblyEnd(getMatrix(), MAT_FINAL_ASSEMBLY); checkError(ierr, "Error Ending Assembly");
 }
+
+
+// Explicit instantiations for PetscMatrix::axpy with double and std::complex<double>
+template void PetscMatrix::axpy<double>(double, PetscMatrix&, MatStructure);
+template void PetscMatrix::axpy<std::complex<double>>(std::complex<double>, PetscMatrix&, MatStructure);
+template void PetscMatrix::axpy<int>(int, PetscMatrix&, MatStructure);
+

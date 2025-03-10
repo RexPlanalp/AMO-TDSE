@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/jilasoft/software/cmake/3.14.5/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -125,33 +125,6 @@ TDSE/fast:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/build
 .PHONY : TDSE/fast
 
-block.o: block.cpp.o
-
-.PHONY : block.o
-
-# target to build an object file
-block.cpp.o:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.o
-.PHONY : block.cpp.o
-
-block.i: block.cpp.i
-
-.PHONY : block.i
-
-# target to preprocess a source file
-block.cpp.i:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.i
-.PHONY : block.cpp.i
-
-block.s: block.cpp.s
-
-.PHONY : block.s
-
-# target to generate assembly for a file
-block.cpp.s:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.s
-.PHONY : block.cpp.s
-
 bsplines.o: bsplines.cpp.o
 
 .PHONY : bsplines.o
@@ -179,32 +152,32 @@ bsplines.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.s
 .PHONY : bsplines.cpp.s
 
-laser.o: laser.cpp.o
+eps.o: eps.cpp.o
 
-.PHONY : laser.o
+.PHONY : eps.o
 
 # target to build an object file
-laser.cpp.o:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.o
-.PHONY : laser.cpp.o
+eps.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/eps.cpp.o
+.PHONY : eps.cpp.o
 
-laser.i: laser.cpp.i
+eps.i: eps.cpp.i
 
-.PHONY : laser.i
+.PHONY : eps.i
 
 # target to preprocess a source file
-laser.cpp.i:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.i
-.PHONY : laser.cpp.i
+eps.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/eps.cpp.i
+.PHONY : eps.cpp.i
 
-laser.s: laser.cpp.s
+eps.s: eps.cpp.s
 
-.PHONY : laser.s
+.PHONY : eps.s
 
 # target to generate assembly for a file
-laser.cpp.s:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.s
-.PHONY : laser.cpp.s
+eps.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/eps.cpp.s
+.PHONY : eps.cpp.s
 
 main.o: main.cpp.o
 
@@ -233,6 +206,33 @@ main.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+matrix.o: matrix.cpp.o
+
+.PHONY : matrix.o
+
+# target to build an object file
+matrix.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/matrix.cpp.o
+.PHONY : matrix.cpp.o
+
+matrix.i: matrix.cpp.i
+
+.PHONY : matrix.i
+
+# target to preprocess a source file
+matrix.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/matrix.cpp.i
+.PHONY : matrix.cpp.i
+
+matrix.s: matrix.cpp.s
+
+.PHONY : matrix.s
+
+# target to generate assembly for a file
+matrix.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/matrix.cpp.s
+.PHONY : matrix.cpp.s
+
 misc.o: misc.cpp.o
 
 .PHONY : misc.o
@@ -259,33 +259,6 @@ misc.s: misc.cpp.s
 misc.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.s
 .PHONY : misc.cpp.s
-
-pes.o: pes.cpp.o
-
-.PHONY : pes.o
-
-# target to build an object file
-pes.cpp.o:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.o
-.PHONY : pes.cpp.o
-
-pes.i: pes.cpp.i
-
-.PHONY : pes.i
-
-# target to preprocess a source file
-pes.cpp.i:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.i
-.PHONY : pes.cpp.i
-
-pes.s: pes.cpp.s
-
-.PHONY : pes.s
-
-# target to generate assembly for a file
-pes.cpp.s:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.s
-.PHONY : pes.cpp.s
 
 simulation.o: simulation.cpp.o
 
@@ -314,33 +287,6 @@ simulation.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/simulation.cpp.s
 .PHONY : simulation.cpp.s
 
-tdse.o: tdse.cpp.o
-
-.PHONY : tdse.o
-
-# target to build an object file
-tdse.cpp.o:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.o
-.PHONY : tdse.cpp.o
-
-tdse.i: tdse.cpp.i
-
-.PHONY : tdse.i
-
-# target to preprocess a source file
-tdse.cpp.i:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.i
-.PHONY : tdse.cpp.i
-
-tdse.s: tdse.cpp.s
-
-.PHONY : tdse.s
-
-# target to generate assembly for a file
-tdse.cpp.s:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.s
-.PHONY : tdse.cpp.s
-
 tise.o: tise.cpp.o
 
 .PHONY : tise.o
@@ -368,6 +314,87 @@ tise.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tise.cpp.s
 .PHONY : tise.cpp.s
 
+utility.o: utility.cpp.o
+
+.PHONY : utility.o
+
+# target to build an object file
+utility.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/utility.cpp.o
+.PHONY : utility.cpp.o
+
+utility.i: utility.cpp.i
+
+.PHONY : utility.i
+
+# target to preprocess a source file
+utility.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/utility.cpp.i
+.PHONY : utility.cpp.i
+
+utility.s: utility.cpp.s
+
+.PHONY : utility.s
+
+# target to generate assembly for a file
+utility.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/utility.cpp.s
+.PHONY : utility.cpp.s
+
+vector.o: vector.cpp.o
+
+.PHONY : vector.o
+
+# target to build an object file
+vector.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/vector.cpp.o
+.PHONY : vector.cpp.o
+
+vector.i: vector.cpp.i
+
+.PHONY : vector.i
+
+# target to preprocess a source file
+vector.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/vector.cpp.i
+.PHONY : vector.cpp.i
+
+vector.s: vector.cpp.s
+
+.PHONY : vector.s
+
+# target to generate assembly for a file
+vector.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/vector.cpp.s
+.PHONY : vector.cpp.s
+
+viewer.o: viewer.cpp.o
+
+.PHONY : viewer.o
+
+# target to build an object file
+viewer.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/viewer.cpp.o
+.PHONY : viewer.cpp.o
+
+viewer.i: viewer.cpp.i
+
+.PHONY : viewer.i
+
+# target to preprocess a source file
+viewer.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/viewer.cpp.i
+.PHONY : viewer.cpp.i
+
+viewer.s: viewer.cpp.s
+
+.PHONY : viewer.s
+
+# target to generate assembly for a file
+viewer.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/viewer.cpp.s
+.PHONY : viewer.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -377,33 +404,36 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... TDSE"
-	@echo "... block.o"
-	@echo "... block.i"
-	@echo "... block.s"
 	@echo "... bsplines.o"
 	@echo "... bsplines.i"
 	@echo "... bsplines.s"
-	@echo "... laser.o"
-	@echo "... laser.i"
-	@echo "... laser.s"
+	@echo "... eps.o"
+	@echo "... eps.i"
+	@echo "... eps.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... matrix.o"
+	@echo "... matrix.i"
+	@echo "... matrix.s"
 	@echo "... misc.o"
 	@echo "... misc.i"
 	@echo "... misc.s"
-	@echo "... pes.o"
-	@echo "... pes.i"
-	@echo "... pes.s"
 	@echo "... simulation.o"
 	@echo "... simulation.i"
 	@echo "... simulation.s"
-	@echo "... tdse.o"
-	@echo "... tdse.i"
-	@echo "... tdse.s"
 	@echo "... tise.o"
 	@echo "... tise.i"
 	@echo "... tise.s"
+	@echo "... utility.o"
+	@echo "... utility.i"
+	@echo "... utility.s"
+	@echo "... vector.o"
+	@echo "... vector.i"
+	@echo "... vector.s"
+	@echo "... viewer.o"
+	@echo "... viewer.i"
+	@echo "... viewer.s"
 .PHONY : help
 
 

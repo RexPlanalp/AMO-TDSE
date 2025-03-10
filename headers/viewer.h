@@ -2,6 +2,7 @@
 
 #include <petscviewer.h>
 #include "matrix.h"
+#include "vector.h"
 
 class PetscSaver
 {
@@ -20,7 +21,17 @@ class PetscSaverBinary : public PetscSaver
 {
     public:
         PetscSaverBinary(const char* filename);
-        ~PetscSaverBinary();
 
         void saveMatrix(PetscMatrix& matrix);
+};
+
+class PetscSaverHDF5 : public PetscSaver
+{
+    public: 
+        PetscSaverHDF5(const char* filename);
+
+        void saveVector(PetscVector& vector, const char* groupname,const char* vectorname);
+
+
+        void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
 };
