@@ -16,7 +16,7 @@ class PetscVector
 
         PetscVector(int size, VectorType type);
 
-        PetscVector(const Vec& existingVec);
+        // PetscVector(const Vec& existingVec);
 
         ~PetscVector();
 

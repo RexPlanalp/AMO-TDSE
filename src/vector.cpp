@@ -33,13 +33,13 @@ PetscVector::PetscVector(int size, VectorType type)
     }
 }
 
-// Copy Constructor
-PetscVector::PetscVector(const Vec& existingVec)
-{
-    PetscErrorCode ierr;
-    ierr = VecDuplicate(existingVec, &vector); checkError(ierr, "Error duplicating vector");
-    ierr = VecCopy(existingVec, vector); checkError(ierr, "Error copying vector");
-}
+// // Copy Constructor
+// PetscVector::PetscVector(const Vec& existingVec)
+// {
+//     PetscErrorCode ierr;
+//     ierr = VecDuplicate(existingVec, &vector); checkError(ierr, "Error duplicating vector");
+//     ierr = VecCopy(existingVec, vector); checkError(ierr, "Error copying vector");
+// }
 
 // Destructor: Destroys the vector
 PetscVector::~PetscVector()
@@ -57,7 +57,6 @@ Vec& PetscVector::getVector()
 // Method: Get the size of the vector
 void PetscVector::getSize(int& size)
 {
-    PetscInt size;
     PetscErrorCode ierr = VecGetSize(vector, &size);
     checkError(ierr, "Error getting vector size");
 }
