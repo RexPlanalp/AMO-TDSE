@@ -1,5 +1,7 @@
 #include "matrix.h"
 #include "utility.h"
+#include "simulation.h"
+#include "bsplines.h"
 
 ////////////////////////////
 //  Matrix Baseclass //
@@ -25,8 +27,11 @@ Mat& PetscMatrix::getMatrix()
 ////////////////////////////
 
 // Constructor: create a matrix
-RadialMatrix::RadialMatrix(int size, int nnz, RadialMatrixType matrixType)
+RadialMatrix::RadialMatrix(const simulation& sim, int nnz, RadialMatrixType matrixType)
 {   
+    int size = sim.bspline_params.n_basis;
+
+
     PetscErrorCode ierr;
 
     switch(matrixType)
@@ -52,5 +57,35 @@ RadialMatrix::RadialMatrix(int size, int nnz, RadialMatrixType matrixType)
        
         break;
     }
+}
 
+// Method: set the integrand function
+void RadialMatrix::setIntegrand(radialIntegrand integrand)
+{
+    integrand_func = integrand;
+}
+
+// Method: populate the matrix
+void RadialMatrix::populateMatrix(const simulation& sim,bool use_ecs)
+{   
+    int n_basis = sim.bspline_params.n_basis;
+    int order = sim.bspline_params.order;
+
+
+    PetscErrorCode ierr;
+    
+    for (int i = local_start; i < local_end; i++) 
+    {
+        int col_start = std::max(0, i - order + 1);
+        int col_end = std::min(n_basis, i + order);
+
+        for (int j = col_start; j < col_end; j++) 
+        {
+            std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand_func, sim,use_ecs);
+            ierr = MatSetValue(getMatrix(), i, j, result, INSERT_VALUES); checkError(ierr, "Error Setting Matrix Value");
+        }
+    }
+
+    ierr = MatAssemblyBegin(getMatrix(), MAT_FINAL_ASSEMBLY); checkError(ierr, "Error Beginning Assembly");
+    ierr = MatAssemblyEnd(getMatrix(), MAT_FINAL_ASSEMBLY); checkError(ierr, "Error Ending Assembly");
 }
