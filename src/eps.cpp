@@ -20,8 +20,6 @@ PetscEPS::PetscEPS(const simulation& sim)
     ierr = EPSSetProblemType(eps, EPS_GNHEP); checkError(ierr,"Error setting problem type");
     ierr = EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL); checkError(ierr,"Error setting which eigenpairs");
     ierr = EPSSetType(eps,EPSKRYLOVSCHUR); checkError(ierr,"Error setting type");
-    ierr = EPSSetFromOptions(eps); checkError(ierr,"Error setting options");
-    ierr = EPSSetUp(eps); checkError(ierr,"Error setting up EPS");
     ierr = EPSSetTolerances(eps,sim.schrodinger_params.tise_tol,sim.schrodinger_params.tise_max_iter); checkError(ierr,"Error setting tolerances");
 }
 
@@ -37,6 +35,7 @@ void PetscEPS::setParameters(int num_of_energies)
 {
     PetscErrorCode ierr;
     ierr = EPSSetDimensions(eps,num_of_energies,PETSC_DEFAULT,PETSC_DEFAULT); checkError(ierr,"Error setting dimensions");
+    ierr = EPSSetFromOptions(eps); checkError(ierr,"Error setting options");
 }
 
 // Method: solve eigenvalue problem
@@ -44,6 +43,7 @@ void PetscEPS::setOperators(PetscMatrix& H, PetscMatrix& S)
 {
     PetscErrorCode ierr;
     ierr = EPSSetOperators(eps,H.getMatrix(),S.getMatrix()); checkError(ierr,"Error setting operators");
+    ierr = EPSSetUp(eps); checkError(ierr,"Error setting up EPS");
 }
 
 // Method: solve eigenvalue problem

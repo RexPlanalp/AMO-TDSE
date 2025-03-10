@@ -12,18 +12,34 @@ enum class VectorType
 class PetscVector 
 {
     public:
+        // Default constructor: Creates a parallel vector
+        PetscVector();
+
+        // Constructor: Creates a vector of given size and type
         PetscVector(int size, VectorType type);
-        PetscVector() = default;
+
+        // Copy constructor: Creates a vector by duplicating an existing PETSc Vec
+        PetscVector(const Vec& existingVec);
+
+        // Destructor: Ensures proper cleanup of PETSc vector
         ~PetscVector();
 
+        // Returns the PETSc Vec object
         Vec& getVector();
 
+        // Returns the global size of the vector
+        PetscInt getSize();
+
+        // Set value in the vector
         void setValue(int i, std::complex<double> value);
 
+        // Assemble the vector after setting values
         void assemble();
 
+        // Compute the norm with respect to a given matrix
         void computeNorm(std::complex<double>& norm, PetscMatrix& S);
 
+        // Scale the vector by a factor
         template <typename T>
         void scale(T factor);
 
@@ -32,18 +48,3 @@ class PetscVector
 };
 
 
-
-
-
-
-// PetscErrorCode extract_normalized_eigenvector(Vec& eigenvector,const EPS& eps, const Mat& S, int i)
-// {   
-//     PetscErrorCode ierr;
-//     ierr = MatCreateVecs(S,&eigenvector, NULL); CHKERRQ(ierr);
-//     ierr = EPSGetEigenvector(eps,i,eigenvector,NULL); CHKERRQ(ierr);
-
-//     std::complex<double> norm;
-//     ierr = compute_eigenvector_norm(eigenvector,S,norm); CHKERRQ(ierr);
-//     ierr = VecScale(eigenvector,1.0/norm.real()); CHKERRQ(ierr);
-//     return ierr;
-// }
