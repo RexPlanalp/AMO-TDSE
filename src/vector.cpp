@@ -55,12 +55,11 @@ Vec& PetscVector::getVector()
 }
 
 // Method: Get the size of the vector
-PetscInt PetscVector::getSize()
+void PetscVector::getSize(int& size)
 {
     PetscInt size;
     PetscErrorCode ierr = VecGetSize(vector, &size);
     checkError(ierr, "Error getting vector size");
-    return size;
 }
 
 // Method: Set the value of the vector
@@ -83,7 +82,9 @@ void PetscVector::assemble()
 void PetscVector::computeNorm(std::complex<double>& norm, PetscMatrix& S)
 {
     PetscErrorCode ierr;
-    PetscVector temp_vector(getSize(), VectorType::PARALLEL); // Ensure parallel vector
+    int size;
+    getSize(size);
+    PetscVector temp_vector(size, VectorType::PARALLEL); // Ensure parallel vector
 
     ierr = VecDuplicate(vector, &temp_vector.getVector()); checkError(ierr, "Error duplicating vector");
     ierr = MatMult(S.getMatrix(), vector, temp_vector.getVector()); checkError(ierr, "Error multiplying matrix");

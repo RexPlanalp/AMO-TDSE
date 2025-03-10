@@ -12,23 +12,18 @@ enum class VectorType
 class PetscVector 
 {
     public:
-        // Default constructor: Creates a parallel vector
         PetscVector();
 
-        // Constructor: Creates a vector of given size and type
         PetscVector(int size, VectorType type);
 
-        // Copy constructor: Creates a vector by duplicating an existing PETSc Vec
         PetscVector(const Vec& existingVec);
 
-        // Destructor: Ensures proper cleanup of PETSc vector
         ~PetscVector();
 
-        // Returns the PETSc Vec object
         Vec& getVector();
 
         // Returns the global size of the vector
-        PetscInt getSize();
+        void getSize(int& size);
 
         // Set value in the vector
         void setValue(int i, std::complex<double> value);
