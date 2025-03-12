@@ -24,7 +24,7 @@ namespace tise
     void solve_eigensystem(const simulation& sim)
     {   
 
-        double internal_start = MPI_Wtime();
+    
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         
@@ -60,12 +60,13 @@ namespace tise
         
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
 
-        double internal_end = MPI_Wtime();
-
-        PetscPrintf(PETSC_COMM_WORLD,"Time to reach end %.3f\n",internal_end-internal_start);
+        
+       
+       
         
         for (int l = 0; l<= sim.angular_params.lmax; ++l)
         {   
+            double internal_start = MPI_Wtime();
             PetscMatrix temp(K);
             ierr = MatAXPY(temp.matrix,l*(l+1)*0.5,Inv_r2.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
             ierr = MatAXPY(temp.matrix,-1.0,Inv_r.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
@@ -81,6 +82,8 @@ namespace tise
             int converged_pairs = eps.solve();
             PetscPrintf(PETSC_COMM_WORLD, "Eigenvalues Requested %d, Eigenvalues Converged: %d \n\n", converged_pairs,requested_pairs); checkErr(ierr,"Error in PetscPrintf");
 
+            double internal_end = MPI_Wtime();
+            PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE for l = %d %.3f\n\n",l,internal_end-internal_start);
             for (int pair_idx = 0; pair_idx < converged_pairs; ++pair_idx)
             {
                 std::complex<double> eigenvalue = eps.getEigenvalue(pair_idx);
