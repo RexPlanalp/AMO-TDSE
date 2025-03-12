@@ -44,6 +44,22 @@ class PetscHDF5Viewer : public PetscFileViewer
         void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
 };
 
+//////////////////////////
+// HDF5 Binary Wrapper  //
+//////////////////////////
+
+class PetscBinaryViewer : public PetscFileViewer
+{
+    public:
+    
+        // Explicit Constructor
+        PetscBinaryViewer(const char* filename);  
+        
+        void saveMatrix(const PetscMatrix& matrix);
+};
+
+
+
 
 
 

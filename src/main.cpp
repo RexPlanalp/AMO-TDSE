@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     // Execute selected computations
     if (run_tise) 
     {
-        ierr = tise::solve_tise(sim, rank); CHKERRQ(ierr);
+        tise::solve_tise(sim, rank); 
     }
 
     // if (run_tdse) 

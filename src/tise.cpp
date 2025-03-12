@@ -105,59 +105,67 @@ namespace tise
         }
     }
 
-    // PetscErrorCode prepare_matrices(const simulation& sim)
-    // {   
-    //     double time_start = MPI_Wtime();
+    void prepare_matrices(const simulation& sim)
+    {   
+        double time_start = MPI_Wtime();
 
-    //     PetscPrintf(PETSC_COMM_WORLD, "Declaring Petsc Objects  \n\n");
-    //     PetscErrorCode ierr;
-    //     Mat K;
-    //     Mat Inv_r2;
-    //     Mat Inv_r;
-    //     Mat S;
-    //     Mat Der;
+        PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
+
         
-    //     PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
-    //     ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,true,true); CHKERRQ(ierr);
-    //     ierr = bsplines::construct_matrix(sim,K,bsplines::kinetic_integrand,true,true); CHKERRQ(ierr);
-    //     ierr = bsplines::construct_matrix(sim,Inv_r2,bsplines::invr2_integrand,true,true); CHKERRQ(ierr);
-    //     ierr = bsplines::construct_matrix(sim,Inv_r,bsplines::invr_integrand,true,true); CHKERRQ(ierr);
-    //     ierr = bsplines::construct_matrix(sim,Der,bsplines::der_integrand,true,true); CHKERRQ(ierr);
+        RadialMatrix K(sim,MatrixType::PARALLEL);
+        RadialMatrix Inv_r2(sim,MatrixType::PARALLEL);
+        RadialMatrix Inv_r(sim,MatrixType::PARALLEL);
+        RadialMatrix S(sim,MatrixType::PARALLEL);
+        RadialMatrix Der(sim,MatrixType::PARALLEL);
 
-    //     PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
-    //     ierr = bsplines::save_matrix(K,"TISE_files/K.bin"); CHKERRQ(ierr);
-    //     ierr = bsplines::save_matrix(Inv_r2,"TISE_files/Inv_r2.bin"); CHKERRQ(ierr);
-    //     ierr = bsplines::save_matrix(Inv_r,"TISE_files/Inv_r.bin"); CHKERRQ(ierr);
-    //     ierr = bsplines::save_matrix(S,"TISE_files/S.bin"); CHKERRQ(ierr);
-    //     ierr = bsplines::save_matrix(Der,"TISE_files/Der.bin"); CHKERRQ(ierr);
+        K.bindElement(bsplines::kinetic_integrand);
+        Inv_r2.bindElement(bsplines::invr2_integrand);
+        Inv_r.bindElement(bsplines::invr_integrand);
+        S.bindElement(bsplines::overlap_integrand);
+        Der.bindElement(bsplines::der_integrand);
 
-    //     PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects  \n\n");
-    //     ierr = MatDestroy(&K); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&Inv_r2); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&S); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&Der); CHKERRQ(ierr);
+        K.populateMatrix(sim,ECSMode::ON);
+        Inv_r2.populateMatrix(sim,ECSMode::ON);
+        Inv_r.populateMatrix(sim,ECSMode::ON);
+        S.populateMatrix(sim,ECSMode::ON);
+        Der.populateMatrix(sim,ECSMode::ON);
 
-    //     double time_end = MPI_Wtime();
-    //     PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",time_end-time_start);
-    //     return ierr;
-        
-    // }
+        K.assemble();
+        Inv_r2.assemble();
+        Inv_r.assemble();
+        S.assemble();
+        Der.assemble();
 
-    PetscErrorCode solve_tise(const simulation& sim,int rank)
+        PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
+        PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str());
+        PetscBinaryViewer viewInv_r2((sim.tise_output_path+"/Inv_r2.bin").c_str());
+        PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str());
+        PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str());
+        PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str());
+
+        viewK.saveMatrix(K);
+        viewInv_r2.saveMatrix(Inv_r2);
+        viewInv_r.saveMatrix(Inv_r);
+        viewS.saveMatrix(S);
+        viewDer.saveMatrix(Der);
+
+        double time_end = MPI_Wtime();
+        PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",time_end-time_start);   
+    }
+
+    void solve_tise(const simulation& sim,int rank)
     {    
         double start_time = MPI_Wtime();
-        PetscErrorCode ierr;
+ 
 
         create_directory(rank, "TISE_files");
-        solve_eigensystem(sim); checkErr(ierr,"Error in solve_eigensystem");
-        //ierr = prepare_matrices(sim); CHKERRQ(ierr);
+        solve_eigensystem(sim); 
+        prepare_matrices(sim); 
 
 
 
         double end_time = MPI_Wtime();
         PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE %.3f\n\n",end_time-start_time);
-        return ierr;
     }
 
     

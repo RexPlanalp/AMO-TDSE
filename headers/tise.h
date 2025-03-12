@@ -6,7 +6,7 @@
 
 namespace tise 
 {
-    PetscErrorCode solve_tise(const simulation& sim,int rank);
-    PetscErrorCode prepare_matrices(const simulation& sim,int rank);
+    void solve_tise(const simulation& sim,int rank);
+    void prepare_matrices(const simulation& sim,int rank);
 }
 

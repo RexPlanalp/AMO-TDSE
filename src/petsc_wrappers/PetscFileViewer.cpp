@@ -47,3 +47,19 @@ void PetscHDF5Viewer::saveValue(std::complex<double> value, const char* groupnam
     this->saveVector(temp,groupname,valuename);
    
 }
+
+//////////////////////////
+// Binary Viewer Wrapper//
+//////////////////////////
+
+PetscBinaryViewer::PetscBinaryViewer(const char* filename)
+{
+    PetscErrorCode ierr;
+    ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE,&viewer); checkErr(ierr, "Error creating binary viewer");
+}
+
+void PetscBinaryViewer::saveMatrix(const PetscMatrix& input_matrix)
+{
+    PetscErrorCode ierr;
+    ierr = MatView(input_matrix.matrix,viewer); checkErr(ierr, "Error viewing matrix");
+}
