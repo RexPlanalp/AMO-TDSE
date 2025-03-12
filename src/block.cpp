@@ -8,6 +8,7 @@
 #include "bsplines.h"
 #include <map>
 #include <iomanip>
+#include "matrix.h"
 
 
 
@@ -36,7 +37,7 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode project_out_bound(std::string filename, Mat& S, Vec& state, const simulation& sim)
+    PetscErrorCode project_out_bound(std::string filename, RadialMatrix& S, Vec& state, const simulation& sim)
     {
         PetscErrorCode ierr;
         Vec state_block, tise_state,temp;
@@ -76,7 +77,7 @@ namespace block
                     ierr = PetscObjectSetName((PetscObject)tise_state, dataset_name.str().c_str()); CHKERRQ(ierr);
                     ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
 
-                    ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
+                    ierr = MatMult(S.getMatrix(),state_block,temp); CHKERRQ(ierr);
                     ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
                     ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); // Subtract projection 
                 }
@@ -103,8 +104,9 @@ namespace block
         file << std::fixed << std::setprecision(15);
 
         std::cout << "Constructing Overlap Matrix" << std::endl;
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
+        RadialMatrix S(sim,RadialMatrixType::SEQUENTIAL);
+        S.setIntegrand(bsplines::overlap_integrand);
+        S.populateMatrix(sim,ECSMode::OFF);
 
         std::cout << "Loading Final State" << std::endl;
         Vec state;
@@ -127,7 +129,7 @@ namespace block
             ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
-            ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
+            ierr = MatMult(S.getMatrix(),state_block,temp); CHKERRQ(ierr);
             ierr = VecDot(state_block,temp,&block_norm); CHKERRQ(ierr);
             file << block_norm.real() << " " << block_norm.imag() << "\n";
             ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);

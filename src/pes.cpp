@@ -14,7 +14,8 @@
 
 #include "simulation.h"
 #include "bsplines.h"
-#include "misc.h"
+#include "utility.h"
+#include "matrix.h"
 
 using lm_pair = std::pair<int, int>;
 using energy_l_pair = std::pair<double, int>;
@@ -60,8 +61,9 @@ namespace pes
         // Open HDF5 file for reading
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
 
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
+        RadialMatrix S(sim,RadialMatrixType::SEQUENTIAL);
+        S.setIntegrand(bsplines::overlap_integrand);
+        S.populateMatrix(sim,ECSMode::ON);
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
@@ -91,7 +93,7 @@ namespace pes
                     ierr = PetscObjectSetName((PetscObject)tise_state, dataset_name.str().c_str()); CHKERRQ(ierr);
                     ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
 
-                    ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
+                    ierr = MatMult(S.getMatrix(),state_block,temp); CHKERRQ(ierr);
                     ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
                     ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); 
                 }

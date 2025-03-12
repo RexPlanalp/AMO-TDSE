@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "simulation.h"
-#include "misc.h"
+#include "utility.h"
 
 using json = nlohmann::json;
 using Vec3 = std::array<double,3>;
