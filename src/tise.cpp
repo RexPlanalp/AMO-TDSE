@@ -12,6 +12,8 @@
 #include "bsplines.h"
 #include "misc.h"
 
+#include "petsc_wrappers/PetscMatrix.h"
+#include "petsc_wrappers/PetscFileViewer.h"
 
 
 namespace tise
@@ -98,23 +100,33 @@ namespace tise
 
     PetscErrorCode solve_eigensystem(const simulation& sim)
     {   
-        PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,true,false); CHKERRQ(ierr);
+        
+        RadialMatrix K(sim,MatrixType::PARALLEL);
+        RadialMatrix Inv_r2(sim,MatrixType::PARALLEL);
+        RadialMatrix Inv_r(sim,MatrixType::PARALLEL);
+        RadialMatrix S(sim,MatrixType::PARALLEL);
 
-        Mat K;
-        ierr = bsplines::construct_matrix(sim,K,bsplines::kinetic_integrand,true,false); CHKERRQ(ierr);
+        K.bindElement(bsplines::kinetic_integrand);
+        Inv_r2.bindElement(bsplines::invr2_integrand);
+        Inv_r.bindElement(bsplines::invr_integrand);
+        S.bindElement(bsplines::overlap_integrand);
 
-        Mat Inv_r2;
-        ierr = bsplines::construct_matrix(sim,Inv_r2,bsplines::invr2_integrand,true,false); CHKERRQ(ierr);
+        K.populateMatrix(sim,ECSMode::OFF);
+        Inv_r2.populateMatrix(sim,ECSMode::OFF);
+        Inv_r.populateMatrix(sim,ECSMode::OFF);
+        S.populateMatrix(sim,ECSMode::OFF);
 
-        Mat Inv_r;
-        ierr = bsplines::construct_matrix(sim,Inv_r,bsplines::invr_integrand,true,false); CHKERRQ(ierr);
+        K.assemble();
+        Inv_r2.assemble();
+        Inv_r.assemble();
+        S.assemble();
+
+        
 
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
-        PetscViewer viewTISE;
-        ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,(sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_WRITE, &viewTISE); CHKERRQ(ierr);
+        PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str());
+        
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
         EPS eps;

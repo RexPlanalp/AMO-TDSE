@@ -192,52 +192,6 @@ std::complex<double> der_integrand(int i, int j, std::complex<double> x,int degr
            bsplines::dB(j, degree, x, knot_vector);
 }
 
-PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, int,std::vector<std::complex<double>>)> integrand,bool use_mpi,bool use_ecs)
-{
-    PetscErrorCode ierr;
-    int nnz_per_row = 2 * sim.bspline_params.degree + 1;
-
-    if (use_mpi)
-    {
-        ierr = MatCreate(PETSC_COMM_WORLD, &M); CHKERRQ(ierr);
-        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_params.n_basis, sim.bspline_params.n_basis); CHKERRQ(ierr);
-        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
-        ierr = MatMPIAIJSetPreallocation(M, nnz_per_row, NULL, nnz_per_row, NULL); CHKERRQ(ierr);
-        ierr = MatSetUp(M); CHKERRQ(ierr);
-    }
-    else
-    {
-        ierr = MatCreate(PETSC_COMM_SELF, &M); CHKERRQ(ierr);
-        ierr = MatSetSizes(M, PETSC_DECIDE, PETSC_DECIDE, sim.bspline_params.n_basis, sim.bspline_params.n_basis); CHKERRQ(ierr);
-        ierr = MatSetFromOptions(M); CHKERRQ(ierr);
-        ierr = MatSeqAIJSetPreallocation(M, nnz_per_row, NULL); CHKERRQ(ierr);
-        ierr = MatSetUp(M); CHKERRQ(ierr);
-    }
-    
-    int start_row,end_row;
-    if (use_mpi) {
-        ierr = MatGetOwnershipRange(M, &start_row, &end_row); CHKERRQ(ierr);
-    } else {
-        start_row = 0;
-        end_row = sim.bspline_params.n_basis;
-    }
-
-    for (int i = start_row; i < end_row; i++) 
-    {
-        int col_start = std::max(0, i - sim.bspline_params.order + 1);
-        int col_end = std::min(sim.bspline_params.n_basis, i + sim.bspline_params.order);
-
-        for (int j = col_start; j < col_end; j++) 
-        {
-            std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim,use_ecs);
-            ierr = MatSetValue(M, i, j, result, INSERT_VALUES); CHKERRQ(ierr);
-        }
-    }
-
-    ierr = MatAssemblyBegin(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    ierr = MatAssemblyEnd(M, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    return ierr;
-}
 
 
 PetscErrorCode save_matrix(Mat A, const char *filename)
