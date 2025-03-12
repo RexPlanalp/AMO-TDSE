@@ -34,7 +34,7 @@ class PetscMatrix
         PetscMatrix(const PetscMatrix& other);
 
         // Copy assignment operator
-        PetscMatrix& PetscMatrix::operator=(const PetscMatrix& other);
+        PetscMatrix& operator=(const PetscMatrix& other);
         
         // Destructor
         ~PetscMatrix();

@@ -41,6 +41,7 @@ class PetscHDF5Viewer : public PetscFileViewer
         PetscHDF5Viewer(const char* filename);  
         
         void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
+        void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
 };
 
 

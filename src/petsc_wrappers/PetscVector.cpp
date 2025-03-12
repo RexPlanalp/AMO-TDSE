@@ -48,7 +48,7 @@ std::complex<double> Wavefunction::computeNorm(const PetscMatrix& S)
     PetscVector temp(*this);
     ierr = MatMult(S.matrix, vector,temp.vector); checkErr(ierr, "Error in MatMult");
     ierr = VecDot(vector, temp.vector, &norm); checkErr(ierr, "Error in VecDot");
-    return norm;
+    return std::sqrt(norm);
 }
 
 

@@ -36,7 +36,7 @@ class PetscEPS
         std::complex<double> getEigenvalue(int i);
 
         // Get the eigenvector of pair
-        PetscVector getEigenvector(int i, const PetscMatrix& S);
+        Wavefunction getEigenvector(int i, const PetscMatrix& S);
 
         // Internal EPS 
         EPS eps;

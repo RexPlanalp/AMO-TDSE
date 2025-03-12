@@ -58,7 +58,7 @@ std::complex<double> PetscEPS::getEigenvalue(int i)
     return eigenvalue;
 }
 
-PetscVector PetscEPS::getEigenvector(int i, const PetscMatrix& S)
+Wavefunction PetscEPS::getEigenvector(int i, const PetscMatrix& S)
 {
     PetscErrorCode ierr;
     Wavefunction eigenvector;
