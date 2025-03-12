@@ -32,6 +32,9 @@ class PetscMatrix
 
         // Copy Constructor
         PetscMatrix(const PetscMatrix& other);
+
+        // Copy assignment operator
+        PetscMatrix& PetscMatrix::operator=(const PetscMatrix& other);
         
         // Destructor
         ~PetscMatrix();
@@ -40,7 +43,7 @@ class PetscMatrix
         void assemble();
 
         // Internal matrix
-        Mat matrix;
+        Mat matrix = nullptr;
 };
 
 //////////////////////////

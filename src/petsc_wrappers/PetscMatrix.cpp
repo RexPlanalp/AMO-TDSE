@@ -14,6 +14,18 @@ PetscMatrix::PetscMatrix(const PetscMatrix& other)
     ierr = MatDuplicate(other.matrix, MAT_COPY_VALUES, &matrix); checkErr(ierr,"Error Copying Matrix"); 
 }
 
+PetscMatrix& PetscMatrix::operator=(const PetscMatrix& other)
+{
+    if (this != &other)  
+    {
+        if (matrix) {
+            MatDestroy(&matrix);
+        }
+        MatDuplicate(other.matrix,MAT_COPY_VALUES, &matrix);
+    }
+    return *this;
+}
+
 
 
 PetscMatrix::~PetscMatrix()
