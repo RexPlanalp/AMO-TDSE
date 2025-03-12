@@ -1,3 +1,5 @@
+#pragma once
+
 #include <petscvec.h>
 #include <complex>
 #include "petsc_wrappers/PetscMatrix.h"

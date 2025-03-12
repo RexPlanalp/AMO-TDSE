@@ -3,6 +3,8 @@
 #include <petscviewer.h>
 #include <petscviewerhdf5.h>
 
+#include "petsc_wrappers/PetscVector.h"
+
 //////////////////////////
 // Petsc Viewer Wrapper //
 //////////////////////////
@@ -36,7 +38,9 @@ class PetscHDF5Viewer : public PetscFileViewer
     public:
 
         // Explicit Constructor
-        PetscHDF5Viewer(const char* filename);      
+        PetscHDF5Viewer(const char* filename);  
+        
+        void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
 };
 
 

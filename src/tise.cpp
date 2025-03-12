@@ -122,9 +122,9 @@ namespace tise
         Inv_r.assemble();
         S.assemble();
 
-        
-
+    
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
+        
         PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str());
         
 
