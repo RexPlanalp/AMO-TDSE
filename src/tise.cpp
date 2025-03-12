@@ -23,6 +23,8 @@ namespace tise
 {
     void solve_eigensystem(const simulation& sim)
     {   
+
+        double internal_start = MPI_Wtime();
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         
@@ -58,6 +60,9 @@ namespace tise
         
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
 
+        double internal_end = MPI_Wtime();
+
+        PetscPrintf(PETSC_COMM_WORLD,"Time to reach end %.3f\n",internal_end-internal_start);
         
         for (int l = 0; l<= sim.angular_params.lmax; ++l)
         {   
