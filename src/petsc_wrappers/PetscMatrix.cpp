@@ -3,6 +3,7 @@
 #include "utility.h"
 #include "simulation.h"
 #include "bsplines.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc Matrix Wrapper //
@@ -46,7 +47,7 @@ void PetscMatrix::assemble()
 //    Radial Subclass   //
 //////////////////////////
 
-RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type)
+RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type) 
 {
     int n_basis = sim.bspline_params.n_basis;
     int order = sim.bspline_params.order;
@@ -56,7 +57,10 @@ RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type)
     switch(type)
     {
         case MatrixType::SEQUENTIAL:
-            ierr = MatCreate(PETSC_COMM_SELF, &matrix); checkErr(ierr,"Error Creating Matrix");
+            comm = PETSC_COMM_SELF;
+
+
+            ierr = MatCreate(comm, &matrix); checkErr(ierr,"Error Creating Matrix");
             ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,n_basis,n_basis); checkErr(ierr,"Error Setting Matrix Size");
             ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
             ierr = MatSeqAIJSetPreallocation(matrix,2*order+1,NULL); checkErr(ierr,"Error Preallocating Matrix");
@@ -67,7 +71,9 @@ RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type)
             break;
 
         case MatrixType::PARALLEL:
-            ierr = MatCreate(PETSC_COMM_WORLD,&matrix); checkErr(ierr,"Error Creating Matrix");
+            comm = PETSC_COMM_WORLD;
+
+            ierr = MatCreate(comm,&matrix); checkErr(ierr,"Error Creating Matrix");
             ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,n_basis,n_basis); checkErr(ierr,"Error Setting Matrix Size");
             ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
             ierr = MatMPIAIJSetPreallocation(matrix,2*order+1,NULL,2*order+1,NULL); checkErr(ierr,"Error Preallocating Matrix");

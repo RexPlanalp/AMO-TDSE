@@ -62,11 +62,11 @@ namespace tise
     
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
         
-        PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str());
+        PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str(), PETSC_COMM_WORLD);
         
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
-        PetscEPS eps;
+        PetscEPS eps(PETSC_COMM_WORLD);
         eps.setConvergenceParams(sim);
         
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
@@ -162,11 +162,11 @@ namespace tise
         Der.assemble();
 
         PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
-        PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str());
-        PetscBinaryViewer viewInv_r2((sim.tise_output_path+"/Inv_r2.bin").c_str());
-        PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str());
-        PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str());
-        PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str());
+        PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str(),PETSC_COMM_WORLD);
+        PetscBinaryViewer viewInv_r2((sim.tise_output_path+"/Inv_r2.bin").c_str(),PETSC_COMM_WORLD);
+        PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str(),PETSC_COMM_WORLD);
+        PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str(),PETSC_COMM_WORLD);
+        PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str(),PETSC_COMM_WORLD);
 
         viewK.saveMatrix(K);
         viewInv_r2.saveMatrix(Inv_r2);

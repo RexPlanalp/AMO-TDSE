@@ -4,6 +4,7 @@
 #include "simulation.h"
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscVector.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc EPS Wrapper   //
@@ -15,7 +16,7 @@ class PetscEPS
     public:
 
         // Default Constructor
-        PetscEPS();
+        PetscEPS(MPI_Comm comm);
 
         // Destructor
         ~PetscEPS();
@@ -40,4 +41,7 @@ class PetscEPS
 
         // Internal EPS 
         EPS eps;
+
+        // Internal communicator
+        MPI_Comm comm = MPI_COMM_NULL;
 };

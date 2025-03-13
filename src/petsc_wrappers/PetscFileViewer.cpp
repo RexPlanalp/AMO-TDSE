@@ -2,6 +2,7 @@
 #include <petscviewerhdf5.h>
 #include "petsc_wrappers/PetscFileViewer.h"
 #include "utility.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc Viewer Wrapper //
@@ -17,10 +18,10 @@ PetscFileViewer::~PetscFileViewer()
 //////////////////////////
 
 
-PetscHDF5Viewer::PetscHDF5Viewer(const char* filename)
+PetscHDF5Viewer::PetscHDF5Viewer(const char* filename, MPI_Comm comm) : comm(comm)
 {
     PetscErrorCode ierr;
-    ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+    ierr = PetscViewerHDF5Open(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
 }
 
 void PetscHDF5Viewer::saveVector(const PetscVector& input_vector, const char* groupname, const char* vectorname)
@@ -38,7 +39,7 @@ void PetscHDF5Viewer::saveValue(std::complex<double> value, const char* groupnam
     PetscVector temp;
 
  
-    ierr = VecCreate(PETSC_COMM_WORLD, &temp.vector); checkErr(ierr, "Error creating vector");
+    ierr = VecCreate(comm, &temp.vector); checkErr(ierr, "Error creating vector");
     ierr = VecSetSizes(temp.vector,PETSC_DECIDE,1); checkErr(ierr, "Error setting vector size");
     ierr = VecSetFromOptions(temp.vector); checkErr(ierr, "Error setting vector options");
     ierr=  VecSetValue(temp.vector,0,value,INSERT_VALUES); checkErr(ierr, "Error setting value");
@@ -52,10 +53,10 @@ void PetscHDF5Viewer::saveValue(std::complex<double> value, const char* groupnam
 // Binary Viewer Wrapper//
 //////////////////////////
 
-PetscBinaryViewer::PetscBinaryViewer(const char* filename)
+PetscBinaryViewer::PetscBinaryViewer(const char* filename, MPI_Comm comm) : comm(comm)
 {
     PetscErrorCode ierr;
-    ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE,&viewer); checkErr(ierr, "Error creating binary viewer");
+    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_WRITE,&viewer); checkErr(ierr, "Error creating binary viewer");
 }
 
 void PetscBinaryViewer::saveMatrix(const PetscMatrix& input_matrix)

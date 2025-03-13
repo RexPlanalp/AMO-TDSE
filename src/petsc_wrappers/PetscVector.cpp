@@ -2,6 +2,7 @@
 #include "petsc_wrappers/PetscVector.h"
 #include <complex>
 #include "utility.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc Vector Wrapper //
@@ -71,7 +72,9 @@ Wavefunction::Wavefunction(int size, VectorType type)
     switch(type)
     {
         case VectorType::SEQUENTIAL:
-            ierr = VecCreate(PETSC_COMM_SELF, &vector); checkErr(ierr, "Error Creating Vector");
+            comm = PETSC_COMM_SELF;
+
+            ierr = VecCreate(comm, &vector); checkErr(ierr, "Error Creating Vector");
             ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
             ierr = VecSetType(vector, VECSEQ); checkErr(ierr, "Error Setting Vector Type");
             ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");
@@ -82,7 +85,10 @@ Wavefunction::Wavefunction(int size, VectorType type)
             break;
 
         case VectorType::PARALLEL:
-            ierr = VecCreate(PETSC_COMM_WORLD, &vector); checkErr(ierr, "Error Creating Vector");
+            comm = PETSC_COMM_WORLD;
+
+
+            ierr = VecCreate(comm, &vector); checkErr(ierr, "Error Creating Vector");
             ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
             ierr = VecSetType(vector,VECMPI); checkErr(ierr, "Error Setting Vector Type");
             ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");

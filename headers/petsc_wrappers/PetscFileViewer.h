@@ -4,6 +4,7 @@
 #include <petscviewerhdf5.h>
 
 #include "petsc_wrappers/PetscVector.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc Viewer Wrapper //
@@ -38,10 +39,14 @@ class PetscHDF5Viewer : public PetscFileViewer
     public:
 
         // Explicit Constructor
-        PetscHDF5Viewer(const char* filename);  
+        PetscHDF5Viewer(const char* filename, MPI_Comm comm);  
         
         void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
         void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
+
+        // Internal communicator
+        MPI_Comm comm = MPI_COMM_NULL;
+
 };
 
 //////////////////////////
@@ -53,9 +58,12 @@ class PetscBinaryViewer : public PetscFileViewer
     public:
     
         // Explicit Constructor
-        PetscBinaryViewer(const char* filename);  
+        PetscBinaryViewer(const char* filename, MPI_Comm comm);  
         
         void saveMatrix(const PetscMatrix& matrix);
+
+        // Internal communicator
+        MPI_Comm comm = MPI_COMM_NULL;
 };
 
 

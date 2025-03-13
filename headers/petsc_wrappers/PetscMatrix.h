@@ -3,7 +3,7 @@
 #include <petscmat.h>
 #include "simulation.h"
 #include <functional>
-
+#include "mpi.h"
 //////////////////////////
 // Petsc Matrix Wrapper //
 //////////////////////////
@@ -44,6 +44,7 @@ class PetscMatrix
 
         // Internal matrix
         Mat matrix = nullptr;
+
 };
 
 //////////////////////////
@@ -71,6 +72,9 @@ class RadialMatrix : public PetscMatrix
 
     // Matrix element function
     radialElement element;
+
+    // Internal communicator
+    MPI_Comm comm = MPI_COMM_NULL;
 };  
 
 

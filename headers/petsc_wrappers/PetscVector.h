@@ -3,6 +3,7 @@
 #include <petscvec.h>
 #include <complex>
 #include "petsc_wrappers/PetscMatrix.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc Vector Wrapper //
@@ -54,4 +55,5 @@ class Wavefunction : public PetscVector
         void normalize(const PetscMatrix& S);
 
         int local_start,local_end;
+        MPI_Comm comm = MPI_COMM_NULL;
 };

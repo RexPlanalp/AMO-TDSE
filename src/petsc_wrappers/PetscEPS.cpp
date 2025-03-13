@@ -2,15 +2,16 @@
 #include "utility.h"
 #include "petsc_wrappers/PetscVector.h"
 #include "petsc_wrappers/PetscMatrix.h"
+#include "mpi.h"
 
 //////////////////////////
 // Petsc EPS Wrapper   //
 //////////////////////////
 
-PetscEPS::PetscEPS()
+PetscEPS::PetscEPS(MPI_Comm comm) : comm(comm)
 {   
     PetscErrorCode ierr;
-    ierr = EPSCreate(PETSC_COMM_WORLD, &eps); checkErr(ierr, "Error creating EPS object");
+    ierr = EPSCreate(comm, &eps); checkErr(ierr, "Error creating EPS object");
     ierr = EPSSetProblemType(eps,EPS_GNHEP); checkErr(ierr, "Error setting problem type");
     ierr = EPSSetWhichEigenpairs(eps,EPS_SMALLEST_REAL); checkErr(ierr, "Error setting which eigenpairs");
     ierr = EPSSetType(eps,EPSKRYLOVSCHUR); checkErr(ierr, "Error setting type");
