@@ -11,7 +11,6 @@
 namespace bsplines 
 {
 
-
 void save_debug_bsplines(int rank, const simulation& sim)
 {
     if (!sim.debug or !sim.bspline_params.debug) return; 
@@ -205,53 +204,6 @@ std::complex<double> He_integrand(int i, int j, std::complex<double> x,int degre
     return bsplines::B(i, degree, x, knot_vector) * 
            bsplines::B(j, degree, x, knot_vector) *
            He(x);
-}
-
-PetscErrorCode save_matrix(Mat A, const char *filename)
-    {
-        PetscErrorCode ierr;
-        PetscViewer viewer;
-
-        // Open a binary viewer in write mode
-        ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename, FILE_MODE_WRITE, &viewer); CHKERRQ(ierr);
-
-        // Write the matrix to the file in parallel
-        ierr = MatView(A, viewer); CHKERRQ(ierr);
-
-        // Clean up the viewer
-        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
-
-        return ierr;
-    }
-
-PetscErrorCode SaveMatrixToCSV(Mat M, const std::string& filename) {
-    PetscErrorCode ierr;
-    PetscInt m, n;
-
-    // Get matrix dimensions
-    ierr = MatGetSize(M, &m, &n); CHKERRQ(ierr);
-
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return PETSC_ERR_FILE_OPEN;
-    }
-
-    // Write matrix values row by row
-    for (PetscInt i = 0; i < m; ++i) {
-        for (PetscInt j = 0; j < n; ++j) {
-            PetscScalar value;
-            ierr = MatGetValues(M, 1, &i, 1, &j, &value); CHKERRQ(ierr);
-            file << value;
-            if (j < n - 1) {
-                file << ", ";  // Add CSV separator
-            }
-        }
-        file << "\n"; // Newline for next row
-    }
-
-    file.close();
-    return ierr;
 }
 
 }
