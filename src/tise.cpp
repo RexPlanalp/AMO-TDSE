@@ -84,12 +84,7 @@ namespace tise
             
             eps.setSolverParams(requested_pairs);
             eps.setOperators(temp,S);
-           
-
-            double start = MPI_Wtime();
             int converged_pairs = eps.solve();
-            double end = MPI_Wtime();
-            PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE for l = %d : %.3f\n",l,end-start); checkErr(ierr,"Error in PetscPrintf");
             
             PetscPrintf(PETSC_COMM_WORLD, "Eigenvalues Requested %d, Eigenvalues Converged: %d \n\n", converged_pairs,requested_pairs); checkErr(ierr,"Error in PetscPrintf");
 
