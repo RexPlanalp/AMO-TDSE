@@ -152,6 +152,33 @@ bsplines.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/bsplines.cpp.s
 .PHONY : bsplines.cpp.s
 
+laser.o: laser.cpp.o
+
+.PHONY : laser.o
+
+# target to build an object file
+laser.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.o
+.PHONY : laser.cpp.o
+
+laser.i: laser.cpp.i
+
+.PHONY : laser.i
+
+# target to preprocess a source file
+laser.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.i
+.PHONY : laser.cpp.i
+
+laser.s: laser.cpp.s
+
+.PHONY : laser.s
+
+# target to generate assembly for a file
+laser.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/laser.cpp.s
+.PHONY : laser.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -341,6 +368,33 @@ simulation.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/simulation.cpp.s
 .PHONY : simulation.cpp.s
 
+tdse.o: tdse.cpp.o
+
+.PHONY : tdse.o
+
+# target to build an object file
+tdse.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.o
+.PHONY : tdse.cpp.o
+
+tdse.i: tdse.cpp.i
+
+.PHONY : tdse.i
+
+# target to preprocess a source file
+tdse.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.i
+.PHONY : tdse.cpp.i
+
+tdse.s: tdse.cpp.s
+
+.PHONY : tdse.s
+
+# target to generate assembly for a file
+tdse.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/tdse.cpp.s
+.PHONY : tdse.cpp.s
+
 tise.o: tise.cpp.o
 
 .PHONY : tise.o
@@ -407,6 +461,9 @@ help:
 	@echo "... bsplines.o"
 	@echo "... bsplines.i"
 	@echo "... bsplines.s"
+	@echo "... laser.o"
+	@echo "... laser.i"
+	@echo "... laser.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
@@ -428,6 +485,9 @@ help:
 	@echo "... simulation.o"
 	@echo "... simulation.i"
 	@echo "... simulation.s"
+	@echo "... tdse.o"
+	@echo "... tdse.i"
+	@echo "... tdse.s"
 	@echo "... tise.o"
 	@echo "... tise.i"
 	@echo "... tise.s"

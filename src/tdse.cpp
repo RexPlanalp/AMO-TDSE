@@ -22,69 +22,49 @@ using Vec3 = std::array<double, 3>;
 namespace tdse 
 {
 
-    // PetscErrorCode load_starting_state(const simulation& sim, Vec& tdse_state)
-    // {   
-    //     PetscErrorCode ierr;
+    Wavefunction load_starting_state(const simulation& sim)
+    {   
+        PetscErrorCode ierr;
 
-    //     int n_basis = sim.bspline_params.n_basis;
-    //     int n_blocks = sim.angular_params.n_blocks;
-    //     std::array<int, 3> state = sim.schrodinger_params.state;
-    //     int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
-    //     int total_size = n_basis * n_blocks;
+        int n_basis = sim.bspline_params.n_basis;
+        int n_blocks = sim.angular_params.n_blocks;
+        std::array<int, 3> state = sim.schrodinger_params.state;
+        int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
+        int total_size = n_basis * n_blocks;
 
-    //     Wavefunction starting_state(total_size,VectorType::PARALLEL);
-    //     ierr = VecSet(starting_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
+        Wavefunction starting_state(total_size,VectorType::PARALLEL);
+        ierr = VecSet(starting_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
-    //     Wavefunction tise_state(n_basis,VectorType::SEQUENTIAL);
-    //     ierr = VecSet(tise_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
+        Wavefunction tise_state(n_basis,VectorType::SEQUENTIAL);
+        ierr = VecSet(tise_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
-    //     std::stringstream ss;
-    //     ss << "eigenvectors/psi_" << state[0] << "_" << state[1];
-    //     std::string state_name = ss.str();
+        std::stringstream ss;
+        ss << "eigenvectors/psi_" << state[0] << "_" << state[1];
+        std::string state_name = ss.str();
 
-    //     tise_state.setName(state_name.c_str());
+        tise_state.setName(state_name.c_str());
 
+        PetscHDF5Viewer TISEViewer((sim.tise_output_path+"/tise_output.h5").c_str(),PETSC_COMM_SELF,FILE_MODE_READ);
 
-    //         PetscViewer viewer;
-    //         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, (sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-    //         ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
-    //         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
+        ierr = VecLoad(tise_state.vector,TISEViewer.viewer); checkErr(ierr, "Error loading TISE state");
 
-    //         ierr = VecGetArray(tise_state, &tise_state_array); CHKERRQ(ierr);
-    //     }
+        const PetscScalar *tise_state_array;
+        ierr = VecGetArrayRead(tise_state.vector,&tise_state_array); checkErr(ierr, "Error getting array");
 
-    //     if (rank != 0) 
-    //     {
-    //         tise_state_array = new PetscScalar[n_basis];
-    //     }
+        for (int local_idx = 0; local_idx < n_basis; local_idx++)
+        {
+            int global_idx = block_idx * n_basis + local_idx;
+            if (global_idx >= starting_state.local_start && global_idx < starting_state.local_end)
+            {
+                ierr = VecSetValue(starting_state.vector,global_idx, tise_state_array[local_idx],INSERT_VALUES); checkErr(ierr, "Error setting value");
+            }
+        }
 
-    //     MPI_Bcast(tise_state_array, n_basis, MPIU_SCALAR, 0, PETSC_COMM_WORLD);
+        starting_state.assemble();
+        ierr = VecRestoreArrayRead(tise_state.vector,&tise_state_array); checkErr(ierr, "Error restoring array");
 
-    //     PetscInt start, end;
-    //     ierr = VecGetOwnershipRange(tdse_state, &start, &end); CHKERRQ(ierr);
-
-    //     for (int i = 0; i < n_basis; ++i) 
-    //     {
-    //         int global_index = block_idx * n_basis + i;
-    //         if (global_index >= start && global_index < end) 
-    //         {
-    //             ierr = VecSetValue(tdse_state, global_index, tise_state_array[i], INSERT_VALUES); CHKERRQ(ierr);
-    //         }
-    //     }
-
-    //     if (rank == 0) 
-    //     {
-    //         ierr = VecRestoreArray(tise_state, &tise_state_array); CHKERRQ(ierr);
-    //         ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
-    //     } else {
-    //         delete[] tise_state_array;
-    //     }
-
-    //     ierr = VecAssemblyBegin(tdse_state); CHKERRQ(ierr);
-    //     ierr = VecAssemblyEnd(tdse_state); CHKERRQ(ierr);
-
-    //     return ierr; 
-    // }
+        return starting_state;
+    }
 
     PetscErrorCode load_matrix(std::string filename, Mat *matrix)
     {
@@ -637,8 +617,8 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
 
     PetscPrintf(PETSC_COMM_WORLD, "Loading Information\n\n");
     PetscErrorCode ierr;
-    Vec state;
-    ierr = load_starting_state(sim, state); CHKERRQ(ierr);
+    
+    Wavefunction state = load_starting_state(sim); CHKERRQ(ierr);
     Vec3 components = sim.laser_params.components;
     double dt = sim.grid_params.dt;
     int Nt = sim.grid_params.Nt;
@@ -672,9 +652,9 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
     std::complex<double> norm;
     Vec y; 
-    ierr = VecDuplicate(state, &y); CHKERRQ(ierr);
-    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
-    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
+    ierr = VecDuplicate(state.vector, &y); CHKERRQ(ierr);
+    ierr = MatMult(S_atomic, state.vector, y); CHKERRQ(ierr);
+    ierr = VecDot(state.vector, y, &norm); CHKERRQ(ierr);
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n\n", norm.real(), norm.imag());
 
     PetscPrintf(PETSC_COMM_WORLD, "Setting up Linear Solver\n\n");
@@ -688,7 +668,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     Mat atomic_left_temp, atomic_right_temp;
     ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
     ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
-    ierr = VecDuplicate(state, &state_temp); CHKERRQ(ierr);
+    ierr = VecDuplicate(state.vector, &state_temp); CHKERRQ(ierr);
 
     PetscPrintf(PETSC_COMM_WORLD, "Solving TDSE\n\n");
     for (int idx = 0; idx < Nt; ++idx) 
@@ -726,24 +706,24 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
 
         }
 
-        ierr = MatMult(atomic_right_temp, state, state_temp); CHKERRQ(ierr);
+        ierr = MatMult(atomic_right_temp, state.vector, state_temp); CHKERRQ(ierr);
 
         // Reuse KSP operator
         ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr);
         ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); CHKERRQ(ierr);
 
-        ierr = KSPSolve(ksp, state_temp, state); CHKERRQ(ierr);
+        ierr = KSPSolve(ksp, state_temp, state.vector); CHKERRQ(ierr);
 
         
     }
 
     PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
-    ierr = MatMult(S_atomic, state, y); CHKERRQ(ierr);
-    ierr = VecDot(state, y, &norm); CHKERRQ(ierr);
+    ierr = MatMult(S_atomic, state.vector, y); CHKERRQ(ierr);
+    ierr = VecDot(state.vector, y, &norm); CHKERRQ(ierr);
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
 
-    ierr = PetscObjectSetName((PetscObject)state,"final_state"); CHKERRQ(ierr);
-    ierr = VecView(state, viewTDSE); CHKERRQ(ierr);
+    ierr = PetscObjectSetName((PetscObject)state.vector,"final_state"); CHKERRQ(ierr);
+    ierr = VecView(state.vector, viewTDSE); CHKERRQ(ierr);
 
     PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects\n\n");
     ierr = VecDestroy(&y); CHKERRQ(ierr);
@@ -763,7 +743,6 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = MatDestroy(&S_atomic); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
-    ierr = VecDestroy(&state); CHKERRQ(ierr);
     ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
     ierr = PetscViewerDestroy(&viewTDSE); CHKERRQ(ierr);
     double time_end = MPI_Wtime();

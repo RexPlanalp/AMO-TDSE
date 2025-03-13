@@ -39,7 +39,7 @@ class PetscHDF5Viewer : public PetscFileViewer
     public:
 
         // Explicit Constructor
-        PetscHDF5Viewer(const char* filename, MPI_Comm comm);  
+        PetscHDF5Viewer(const char* filename, MPI_Comm comm, PetscFileMode mode);  
         
         void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
         void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
@@ -58,7 +58,7 @@ class PetscBinaryViewer : public PetscFileViewer
     public:
     
         // Explicit Constructor
-        PetscBinaryViewer(const char* filename, MPI_Comm comm);  
+        PetscBinaryViewer(const char* filename, MPI_Comm comm, PetscFileMode mode);  
         
         void saveMatrix(const PetscMatrix& matrix);
 
