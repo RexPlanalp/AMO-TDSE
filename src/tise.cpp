@@ -71,20 +71,26 @@ namespace tise
             ierr = MatAXPY(temp.matrix,l*(l+1)*0.5,Inv_r2.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
             ierr = MatAXPY(temp.matrix,-1.0,Inv_r.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
             
+            
 
-
+            
             int requested_pairs = sim.angular_params.nmax - l;
             if (requested_pairs <= 0)
             {
                 continue;
             }
+            
 
-            double start = MPI_Wtime();
+            
             eps.setSolverParams(requested_pairs);
             eps.setOperators(temp,S);
+           
+
+            double start = MPI_Wtime();
             int converged_pairs = eps.solve();
             double end = MPI_Wtime();
             PetscPrintf(PETSC_COMM_WORLD,"Time to solve TISE for l = %d : %.3f\n",l,end-start); checkErr(ierr,"Error in PetscPrintf");
+            
             PetscPrintf(PETSC_COMM_WORLD, "Eigenvalues Requested %d, Eigenvalues Converged: %d \n\n", converged_pairs,requested_pairs); checkErr(ierr,"Error in PetscPrintf");
 
             

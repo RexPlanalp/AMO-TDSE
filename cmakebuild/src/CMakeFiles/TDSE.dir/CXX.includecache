@@ -92,6 +92,16 @@ bsplines.h
 petscsys.h
 -
 
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscMatrix.cpp
+petsc_wrappers/PetscMatrix.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/petsc_wrappers/PetscMatrix.h
+utility.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/utility.h
+simulation.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/simulation.h
+bsplines.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/bsplines.h
+
 /users/becker/dopl4670/Research/TDSE_PETSC/src/tise.cpp
 sys/stat.h
 -

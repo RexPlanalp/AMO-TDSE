@@ -96,6 +96,7 @@ void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
 
         case ECSMode::OFF:
         use_ecs = false;
+        break;
     }
 
 
