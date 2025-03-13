@@ -30,7 +30,7 @@ void PetscEPS::setConvergenceParams(const simulation& sim)
 void PetscEPS::setSolverParams(int requested_pairs)
 {
     PetscErrorCode ierr;
-    ierr = EPSSetDimensions(eps,requested_pairs,PETSC_DECIDE,PETSC_DECIDE); checkErr(ierr, "Error setting dimensions");
+    ierr = EPSSetDimensions(eps,requested_pairs,PETSC_DEFAULT,PETSC_DEFAULT); checkErr(ierr, "Error setting dimensions");
     ierr = EPSSetFromOptions(eps); checkErr(ierr, "Error setting options");
 }
 
