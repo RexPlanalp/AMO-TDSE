@@ -122,7 +122,7 @@ std::complex<double> pes_simpsons_method(const std::vector<std::complex<double>>
 
 }
 
-double H(double r)
+std::complex<double> H(std::complex<double> r)
 {
     return -1.0/(r+1E-25);
 }
