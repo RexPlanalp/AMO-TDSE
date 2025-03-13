@@ -47,7 +47,7 @@ simulation::simulation()
 void simulation::process_input_data()
 {   
     // First set all basic parameters from JSON
-    
+
     // 1. Set grid basic parameters
     grid_params.N = processed_input_par["grid"].at("N").get<double>();
     grid_params.dt = processed_input_par["grid"].at("time_spacing").get<double>();
@@ -106,6 +106,7 @@ void simulation::process_input_data()
     invert_lm_expansion();
     compute_n_blocks();
     compute_energy();
+    compute_species();
 
     debug = processed_input_par["debug"].get<int>();
 
@@ -349,7 +350,21 @@ void simulation::compute_energy()
     observable_params.Ne = processed_input_par["observables"]["Ne"] = std::nearbyint(Emax/dE);
 }
 
-
+void simulation::compute_species()
+{
+    if (processed_input_par["species"].get<std::string>()=="H")
+    {
+        potential_type = PotentialType::H;
+    }
+    else if (processed_input_par["species"].get<std::string>()=="He")
+    {
+        potential_type = PotentialType::He;
+    }
+    else
+    {
+        throw std::runtime_error("Species not recognized: " + processed_input_par["species"].get<std::string>());
+    }
+}
 
 void simulation::save_debug_info(int rank)
 {

@@ -200,6 +200,13 @@ std::complex<double> H_integrand(int i, int j, std::complex<double> x,int degree
            H(x);
 }
 
+std::complex<double> He_integrand(int i, int j, std::complex<double> x,int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::B(j, degree, x, knot_vector) *
+           He(x);
+}
+
 PetscErrorCode save_matrix(Mat A, const char *filename)
     {
         PetscErrorCode ierr;

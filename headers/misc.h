@@ -21,4 +21,5 @@ void pes_pointwise_magsq(const std::vector<std::complex<double>>& vec, std::vect
 std::complex<double> pes_simpsons_method(const std::vector<std::complex<double>>& vec,double dr);
 
 std::complex<double> H(std::complex<double> r);
+std::complex<double> He(std::complex<double> r);
 void scale_vector(std::vector<double>& vec, double scale);

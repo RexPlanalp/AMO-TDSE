@@ -9,6 +9,12 @@
 #include <nlohmann/json.hpp>
 #include "misc.h"
 
+enum class PotentialType
+{
+    H,
+    He
+};
+
 
 class simulation 
 {
@@ -26,6 +32,16 @@ class simulation
     int debug;
     simulation();
     void process_input_data();
+
+
+    struct Species
+    {
+        std::string name;
+    };
+
+    Species species;
+
+
 
 
     struct BSplineParams 
@@ -120,6 +136,7 @@ class simulation
     void save_debug_info(int rank);
     std::complex<double> ecs_x(double x) const;
     std::complex<double> ecs_w(double x, double w) const;
+    PotentialType potential_type;
 
   
     
@@ -164,6 +181,7 @@ class simulation
     void xy_expansion();
     void zxy_expansion();
     void compute_energy();
+    void compute_species();
 
 
 

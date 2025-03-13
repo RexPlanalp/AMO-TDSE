@@ -35,7 +35,18 @@ namespace tise
 
         K.bindElement(bsplines::kinetic_integrand);
         Inv_r2.bindElement(bsplines::invr2_integrand);
-        Potential.bindElement(bsplines::H_integrand);
+
+        switch(sim.potential_type)
+        {
+            case PotentialType::H:
+                Potential.bindElement(bsplines::H_integrand);
+                break;
+            case PotentialType::He:
+                Potential.bindElement(bsplines::He_integrand);
+                break;
+        }
+
+
         S.bindElement(bsplines::overlap_integrand);
 
         K.populateMatrix(sim,ECSMode::OFF);

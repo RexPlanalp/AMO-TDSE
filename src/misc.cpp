@@ -127,6 +127,11 @@ std::complex<double> H(std::complex<double> r)
     return -1.0/(r+1E-25);
 }
 
+std::complex<double> He(std::complex<double> r)
+{
+    return -1.0/(r+1E-25) - 1.0*std::exp(-2.0329*r)/(r+1E-25) - 0.3953*std::exp(-6.1805*r);
+}
+
 void scale_vector(std::vector<double>& vec, double scale)
 {
     for (double& val : vec)
