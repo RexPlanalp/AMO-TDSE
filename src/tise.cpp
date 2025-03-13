@@ -30,22 +30,22 @@ namespace tise
         
         RadialMatrix K(sim,MatrixType::PARALLEL);
         RadialMatrix Inv_r2(sim,MatrixType::PARALLEL);
-        RadialMatrix Inv_r(sim,MatrixType::PARALLEL);
+        RadialMatrix Potential(sim,MatrixType::PARALLEL);
         RadialMatrix S(sim,MatrixType::PARALLEL);
 
         K.bindElement(bsplines::kinetic_integrand);
         Inv_r2.bindElement(bsplines::invr2_integrand);
-        Inv_r.bindElement(bsplines::invr_integrand);
+        Potential.bindElement(bsplines::H_integrand);
         S.bindElement(bsplines::overlap_integrand);
 
         K.populateMatrix(sim,ECSMode::OFF);
         Inv_r2.populateMatrix(sim,ECSMode::OFF);
-        Inv_r.populateMatrix(sim,ECSMode::OFF);
+        Potential.populateMatrix(sim,ECSMode::OFF);
         S.populateMatrix(sim,ECSMode::OFF);
 
         K.assemble();
         Inv_r2.assemble();
-        Inv_r.assemble();
+        Potential.assemble();
         S.assemble();
 
     
@@ -69,7 +69,7 @@ namespace tise
             
             PetscMatrix temp(K);
             ierr = MatAXPY(temp.matrix,l*(l+1)*0.5,Inv_r2.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
-            ierr = MatAXPY(temp.matrix,-1.0,Inv_r.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+            ierr = MatAXPY(temp.matrix,1.0,Potential.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
             
             
 

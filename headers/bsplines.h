@@ -18,6 +18,7 @@ namespace bsplines
     std::complex<double> invr_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector);
     std::complex<double> invr2_integrand(int i, int j, std::complex<double> x, int degree,const std::vector<std::complex<double>>& knot_vector);
     std::complex<double> der_integrand(int i, int j, std::complex<double> x,int degree,const std::vector<std::complex<double>>& knot_vector);
+    std::complex<double> H_integrand(int i, int j, std::complex<double> x,int degree,const std::vector<std::complex<double>>& knot_vector);
     PetscErrorCode construct_matrix(const simulation& sim, Mat& M, std::function<std::complex<double>(int, int, std::complex<double>, int,std::vector<std::complex<double>>)> integrand,bool use_mpi,bool use_ecs);
    
 

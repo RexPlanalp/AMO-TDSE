@@ -6,6 +6,7 @@
 
 #include "bsplines.h"
 #include "simulation.h"
+#include "misc.h"
 
 namespace bsplines 
 {
@@ -192,7 +193,12 @@ std::complex<double> der_integrand(int i, int j, std::complex<double> x,int degr
            bsplines::dB(j, degree, x, knot_vector);
 }
 
-
+std::complex<double> H_integrand(int i, int j, std::complex<double> x,int degree,const std::vector<std::complex<double>>& knot_vector)
+{
+    return bsplines::B(i, degree, x, knot_vector) * 
+           bsplines::B(j, degree, x, knot_vector) *
+           H(x);
+}
 
 PetscErrorCode save_matrix(Mat A, const char *filename)
     {
