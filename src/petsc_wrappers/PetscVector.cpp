@@ -36,6 +36,12 @@ void PetscVector::assemble()
     VecAssemblyEnd(vector);
 }
 
+void PetscVector::setName(const char* name)
+{
+    PetscErrorCode ierr;
+    ierr = PetscObjectSetName((PetscObject)vector,name); checkErr(ierr,"Error setting name");
+}
+
 //////////////////////////
 // Wavefunction Subclass//
 //////////////////////////
@@ -67,6 +73,7 @@ Wavefunction::Wavefunction(int size, VectorType type)
         case VectorType::SEQUENTIAL:
             ierr = VecCreate(PETSC_COMM_SELF, &vector); checkErr(ierr, "Error Creating Vector");
             ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
+            ierr = VecSetType(vector, VECSEQ); checkErr(ierr, "Error Setting Vector Type");
             ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");
             ierr = VecSetUp(vector); checkErr(ierr, "Error Setting Up Vector");
 
@@ -77,6 +84,7 @@ Wavefunction::Wavefunction(int size, VectorType type)
         case VectorType::PARALLEL:
             ierr = VecCreate(PETSC_COMM_WORLD, &vector); checkErr(ierr, "Error Creating Vector");
             ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
+            ierr = VecSetType(vector,VECMPI); checkErr(ierr, "Error Setting Vector Type");
             ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");
             ierr = VecSetUp(vector); checkErr(ierr, "Error Setting Up Vector");
             ierr = VecGetOwnershipRange(vector, &local_start, &local_end); checkErr(ierr, "Error Getting Ownership Range");

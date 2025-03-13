@@ -33,6 +33,9 @@ class PetscVector
         // Assemble the vector
         void assemble();
 
+        // Set petsc name
+        void setName(const char* name);
+
         // Internal vector
         Vec vector = nullptr;
 };

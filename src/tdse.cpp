@@ -12,84 +12,79 @@
 #include "simulation.h"
 #include "laser.h"
 
+#include "petsc_wrappers/PetscVector.h"
+#include "utility.h"
+#include "petsc_wrappers/PetscFileViewer.h"
+#include "petsc_wrappers/PetscMatrix.h"
+
 using Vec3 = std::array<double, 3>;
 
 namespace tdse 
 {
 
-    PetscErrorCode load_starting_state(const simulation& sim, Vec& tdse_state)
-    {   
-        PetscErrorCode ierr;
+    // PetscErrorCode load_starting_state(const simulation& sim, Vec& tdse_state)
+    // {   
+    //     PetscErrorCode ierr;
 
-        int n_basis = sim.bspline_params.n_basis;
-        int n_blocks = sim.angular_params.n_blocks;
-        std::array<int, 3> state = sim.schrodinger_params.state;
-        int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
-        int total_size = n_basis * n_blocks;
+    //     int n_basis = sim.bspline_params.n_basis;
+    //     int n_blocks = sim.angular_params.n_blocks;
+    //     std::array<int, 3> state = sim.schrodinger_params.state;
+    //     int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
+    //     int total_size = n_basis * n_blocks;
 
-        ierr = VecCreate(PETSC_COMM_WORLD, &tdse_state); CHKERRQ(ierr);
-        ierr = VecSetSizes(tdse_state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
-        ierr = VecSetType(tdse_state, VECMPI); CHKERRQ(ierr);
-        ierr = VecSetFromOptions(tdse_state); CHKERRQ(ierr);
-        ierr = VecSet(tdse_state, 0.0); CHKERRQ(ierr);
+    //     Wavefunction starting_state(total_size,VectorType::PARALLEL);
+    //     ierr = VecSet(starting_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
-        Vec tise_state;
-        PetscScalar* tise_state_array = nullptr;
-        int rank;
-        MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+    //     Wavefunction tise_state(n_basis,VectorType::SEQUENTIAL);
+    //     ierr = VecSet(tise_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
-        if (rank == 0) {
-            ierr = VecCreate(PETSC_COMM_SELF, &tise_state); CHKERRQ(ierr);
-            ierr = VecSetSizes(tise_state, PETSC_DECIDE, n_basis); CHKERRQ(ierr);
-            ierr = VecSetType(tise_state, VECSEQ); CHKERRQ(ierr);
-            ierr = VecSetFromOptions(tise_state); CHKERRQ(ierr);
-            ierr = VecSet(tise_state, 0.0); CHKERRQ(ierr);
+    //     std::stringstream ss;
+    //     ss << "eigenvectors/psi_" << state[0] << "_" << state[1];
+    //     std::string state_name = ss.str();
 
-            std::stringstream ss;
-            ss << "eigenvectors/psi_" << state[0] << "_" << state[1];
-            std::string state_path = ss.str();
-            ierr = PetscObjectSetName((PetscObject)tise_state, state_path.c_str()); CHKERRQ(ierr);
+    //     tise_state.setName(state_name.c_str());
 
-            PetscViewer viewer;
-            ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, (sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-            ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
-            ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
-            ierr = VecGetArray(tise_state, &tise_state_array); CHKERRQ(ierr);
-        }
+    //         PetscViewer viewer;
+    //         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, (sim.tise_output_path+"/tise_output.h5").c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+    //         ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
+    //         ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
 
-        if (rank != 0) 
-        {
-            tise_state_array = new PetscScalar[n_basis];
-        }
+    //         ierr = VecGetArray(tise_state, &tise_state_array); CHKERRQ(ierr);
+    //     }
 
-        MPI_Bcast(tise_state_array, n_basis, MPIU_SCALAR, 0, PETSC_COMM_WORLD);
+    //     if (rank != 0) 
+    //     {
+    //         tise_state_array = new PetscScalar[n_basis];
+    //     }
 
-        PetscInt start, end;
-        ierr = VecGetOwnershipRange(tdse_state, &start, &end); CHKERRQ(ierr);
+    //     MPI_Bcast(tise_state_array, n_basis, MPIU_SCALAR, 0, PETSC_COMM_WORLD);
 
-        for (int i = 0; i < n_basis; ++i) 
-        {
-            int global_index = block_idx * n_basis + i;
-            if (global_index >= start && global_index < end) 
-            {
-                ierr = VecSetValue(tdse_state, global_index, tise_state_array[i], INSERT_VALUES); CHKERRQ(ierr);
-            }
-        }
+    //     PetscInt start, end;
+    //     ierr = VecGetOwnershipRange(tdse_state, &start, &end); CHKERRQ(ierr);
 
-        if (rank == 0) 
-        {
-            ierr = VecRestoreArray(tise_state, &tise_state_array); CHKERRQ(ierr);
-            ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
-        } else {
-            delete[] tise_state_array;
-        }
+    //     for (int i = 0; i < n_basis; ++i) 
+    //     {
+    //         int global_index = block_idx * n_basis + i;
+    //         if (global_index >= start && global_index < end) 
+    //         {
+    //             ierr = VecSetValue(tdse_state, global_index, tise_state_array[i], INSERT_VALUES); CHKERRQ(ierr);
+    //         }
+    //     }
 
-        ierr = VecAssemblyBegin(tdse_state); CHKERRQ(ierr);
-        ierr = VecAssemblyEnd(tdse_state); CHKERRQ(ierr);
+    //     if (rank == 0) 
+    //     {
+    //         ierr = VecRestoreArray(tise_state, &tise_state_array); CHKERRQ(ierr);
+    //         ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
+    //     } else {
+    //         delete[] tise_state_array;
+    //     }
 
-        return ierr; 
-    }
+    //     ierr = VecAssemblyBegin(tdse_state); CHKERRQ(ierr);
+    //     ierr = VecAssemblyEnd(tdse_state); CHKERRQ(ierr);
+
+    //     return ierr; 
+    // }
 
     PetscErrorCode load_matrix(std::string filename, Mat *matrix)
     {
