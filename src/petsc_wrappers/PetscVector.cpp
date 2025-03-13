@@ -58,6 +58,32 @@ void Wavefunction::normalize(const PetscMatrix& S)
     ierr = VecScale(vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
 }
 
+Wavefunction::Wavefunction(int size, VectorType type)
+{
+    PetscErrorCode ierr;
+
+    switch(type)
+    {
+        case VectorType::SEQUENTIAL:
+            ierr = VecCreate(PETSC_COMM_SELF, &vector); checkErr(ierr, "Error Creating Vector");
+            ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
+            ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");
+            ierr = VecSetUp(vector); checkErr(ierr, "Error Setting Up Vector");
+
+            local_start = 0;
+            local_end = size;
+            break;
+
+        case VectorType::PARALLEL:
+            ierr = VecCreate(PETSC_COMM_WORLD, &vector); checkErr(ierr, "Error Creating Vector");
+            ierr = VecSetSizes(vector, PETSC_DECIDE, size); checkErr(ierr, "Error Setting Vector Size");
+            ierr = VecSetFromOptions(vector); checkErr(ierr, "Error Setting Vector Options");
+            ierr = VecSetUp(vector); checkErr(ierr, "Error Setting Up Vector");
+            ierr = VecGetOwnershipRange(vector, &local_start, &local_end); checkErr(ierr, "Error Getting Ownership Range");
+            break;
+    }
+}
+
 
 
 
