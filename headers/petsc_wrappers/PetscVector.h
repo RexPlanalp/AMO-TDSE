@@ -47,4 +47,5 @@ class Wavefunction : public PetscVector
     public:
 
         std::complex<double> computeNorm(const PetscMatrix& S);
+        void normalize(const PetscMatrix& S);
 };

@@ -104,6 +104,7 @@ namespace tise
                 viewTISE.saveValue(eigenvalue, "eigenvalues", eigenvalue_name.c_str());
 
                 Wavefunction eigenvector = eps.getEigenvector(pair_idx,S);
+                eigenvector.normalize(S);
 
                 viewTISE.saveVector(eigenvector, "eigenvectors", eigenvector_name.c_str());
                 

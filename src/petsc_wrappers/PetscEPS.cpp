@@ -66,10 +66,6 @@ Wavefunction PetscEPS::getEigenvector(int i, const PetscMatrix& S)
     ierr = MatCreateVecs(S.matrix,&eigenvector.vector,NULL); checkErr(ierr, "Error creating eigenvector");
     ierr = EPSGetEigenvector(eps,i,eigenvector.vector,NULL); checkErr(ierr, "Error getting eigenvector");
 
-
-    std::complex<double> norm = eigenvector.computeNorm(S);
-    ierr = VecScale(eigenvector.vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
-
     return eigenvector;
 }
 

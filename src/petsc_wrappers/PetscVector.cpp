@@ -51,5 +51,14 @@ std::complex<double> Wavefunction::computeNorm(const PetscMatrix& S)
     return std::sqrt(norm);
 }
 
+void Wavefunction::normalize(const PetscMatrix& S)
+{
+    PetscErrorCode ierr;
+    std::complex<double> norm = computeNorm(S);
+    ierr = VecScale(vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
+}
+
+
+
 
 
