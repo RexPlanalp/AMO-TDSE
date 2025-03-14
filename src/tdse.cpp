@@ -194,12 +194,15 @@ namespace tdse
     PetscErrorCode _construct_S_atomic(const simulation& sim, Mat& S_atomic)
     {
         PetscErrorCode ierr;
-        Mat S;
-        ierr = load_matrix("TISE_files/S.bin",&S); CHKERRQ(ierr);
-
         int n_blocks = sim.angular_params.n_blocks;
-        
-        Mat I; 
+
+        PetscBinaryViewer SViewer((sim.tise_output_path+"/S.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix S = SViewer.loadMatrix();
+
+    
+        PetscMatrix I;
+
+
         ierr = MatCreate(PETSC_COMM_SELF,&I); CHKERRQ(ierr);
         ierr = MatSetSizes(I,PETSC_DECIDE,PETSC_DECIDE,n_blocks,n_blocks); CHKERRQ(ierr);
         ierr = MatSetType(I,MATSEQAIJ); CHKERRQ(ierr);
@@ -626,8 +629,9 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
 
     create_directory(rank, sim.tdse_output_path);
 
-    PetscViewer viewTDSE;
-    ierr = PetscViewerHDF5Open(PETSC_COMM_WORLD,(sim.tdse_output_path+"/tdse_output.h5").c_str(), FILE_MODE_WRITE, &viewTDSE); CHKERRQ(ierr);
+    PetscHDF5Viewer viewTDSE((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+
+    
 
 
     PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
@@ -723,7 +727,7 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
 
     ierr = PetscObjectSetName((PetscObject)state.vector,"final_state"); CHKERRQ(ierr);
-    ierr = VecView(state.vector, viewTDSE); CHKERRQ(ierr);
+    ierr = VecView(state.vector, viewTDSE.viewer); CHKERRQ(ierr);
 
     PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects\n\n");
     ierr = VecDestroy(&y); CHKERRQ(ierr);
@@ -744,7 +748,6 @@ PetscErrorCode solve_tdse(const simulation& sim, int rank)
     ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);
     ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
     ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
-    ierr = PetscViewerDestroy(&viewTDSE); CHKERRQ(ierr);
     double time_end = MPI_Wtime();
     PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",time_end-time_start);
 

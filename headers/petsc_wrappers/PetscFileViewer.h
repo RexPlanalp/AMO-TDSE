@@ -67,6 +67,7 @@ class PetscBinaryViewer : public PetscFileViewer
         PetscBinaryViewer(const char* filename, RunMode run, OpenMode mode);
         
         void saveMatrix(const PetscMatrix& matrix);
+        PetscMatrix loadMatrix();
 
         // Internal communicator
         MPI_Comm comm = MPI_COMM_NULL;

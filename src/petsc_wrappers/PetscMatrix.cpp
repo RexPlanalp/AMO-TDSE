@@ -121,7 +121,9 @@ void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
     }
 }
 
-
+//////////////////////////
+//    Angular Subclass  //
+//////////////////////////
 
 
 

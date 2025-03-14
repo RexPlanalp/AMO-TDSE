@@ -121,3 +121,22 @@ void PetscBinaryViewer::saveMatrix(const PetscMatrix& input_matrix)
     PetscErrorCode ierr;
     ierr = MatView(input_matrix.matrix,viewer); checkErr(ierr, "Error viewing matrix");
 }
+
+PetscMatrix PetscBinaryViewer::loadMatrix()
+{
+    PetscErrorCode ierr;
+    PetscMatrix M;
+    ierr = MatCreate(comm,&M.matrix); checkErr(ierr, "Error creating matrix");
+    
+    if (comm = PETSC_COMM_SELF)
+    {
+        ierr = MatSetType(M.matrix,MATSEQAIJ); checkErr(ierr, "Error setting matrix type");
+    }
+    else
+    {
+        ierr = MatSetType(M.matrix,MATMPIAIJ); checkErr(ierr, "Error setting matrix type");
+    }
+
+    ierr = MatLoad(M.matrix,viewer); checkErr(ierr, "Error loading matrix");
+    return M; 
+}
