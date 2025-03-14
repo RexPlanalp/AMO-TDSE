@@ -44,7 +44,7 @@ namespace tdse
 
         tise_state.setName(state_name.c_str());
 
-        PetscHDF5Viewer TISEViewer((sim.tise_output_path+"/tise_output.h5").c_str(),PETSC_COMM_SELF,FILE_MODE_READ);
+        PetscHDF5Viewer TISEViewer((sim.tise_output_path+"/tise_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
 
         ierr = VecLoad(tise_state.vector,TISEViewer.viewer); checkErr(ierr, "Error loading TISE state");
 
