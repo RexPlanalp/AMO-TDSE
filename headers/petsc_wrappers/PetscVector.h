@@ -9,12 +9,6 @@
 // Petsc Vector Wrapper //
 //////////////////////////
 
-enum class VectorType
-{
-    SEQUENTIAL,
-    PARALLEL
-};
-
 class PetscVector
 {
     public:
@@ -50,7 +44,7 @@ class Wavefunction : public PetscVector
 {
     public:
         Wavefunction() = default;
-        Wavefunction(int size, VectorType type);
+        Wavefunction(int size, RunMode type);
         std::complex<double> computeNorm(const PetscMatrix& S);
         void normalize(const PetscMatrix& S);
 

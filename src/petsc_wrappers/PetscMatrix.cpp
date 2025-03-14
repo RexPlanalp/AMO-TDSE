@@ -47,7 +47,7 @@ void PetscMatrix::assemble()
 //    Radial Subclass   //
 //////////////////////////
 
-RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type) 
+RadialMatrix::RadialMatrix(const simulation& sim, RunMode type) 
 {
     int n_basis = sim.bspline_params.n_basis;
     int order = sim.bspline_params.order;
@@ -56,7 +56,7 @@ RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type)
 
     switch(type)
     {
-        case MatrixType::SEQUENTIAL:
+        case RunMode::SEQUENTIAL:
             comm = PETSC_COMM_SELF;
 
 
@@ -70,7 +70,7 @@ RadialMatrix::RadialMatrix(const simulation& sim, MatrixType type)
             local_end = n_basis;
             break;
 
-        case MatrixType::PARALLEL:
+        case RunMode::PARALLEL:
             comm = PETSC_COMM_WORLD;
 
             ierr = MatCreate(comm,&matrix); checkErr(ierr,"Error Creating Matrix");

@@ -32,10 +32,10 @@ namespace tdse
         int block_idx = sim.angular_params.lm_to_block.at({state[1], state[2]});
         int total_size = n_basis * n_blocks;
 
-        Wavefunction starting_state(total_size,VectorType::PARALLEL);
+        Wavefunction starting_state(total_size,RunMode::PARALLEL);
         ierr = VecSet(starting_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
-        Wavefunction tise_state(n_basis,VectorType::SEQUENTIAL);
+        Wavefunction tise_state(n_basis,RunMode::SEQUENTIAL);
         ierr = VecSet(tise_state.vector, 0.0); checkErr(ierr,"Error zeroing vector");
 
         std::stringstream ss;

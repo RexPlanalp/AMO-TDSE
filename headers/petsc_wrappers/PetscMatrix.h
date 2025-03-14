@@ -16,11 +16,7 @@ enum class ECSMode
     OFF
 };
 
-enum class MatrixType
-{
-    SEQUENTIAL,
-    PARALLEL
-};
+
 
 
 class PetscMatrix
@@ -59,7 +55,7 @@ class RadialMatrix : public PetscMatrix
     public:
 
     // Explicit Constructor
-    RadialMatrix(const simulation& sim, MatrixType type);
+    RadialMatrix(const simulation& sim, RunMode type);
 
     // Bind matrix element
     void bindElement(radialElement input_element);

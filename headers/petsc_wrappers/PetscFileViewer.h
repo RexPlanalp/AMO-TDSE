@@ -16,6 +16,12 @@ enum class ViewerMode
     HDF5
 };
 
+enum class OpenMode
+{
+    READ,
+    WRITE
+};
+
 class PetscFileViewer
 {
     public:
@@ -39,7 +45,7 @@ class PetscHDF5Viewer : public PetscFileViewer
     public:
 
         // Explicit Constructor
-        PetscHDF5Viewer(const char* filename, MPI_Comm comm, PetscFileMode mode);  
+        PetscHDF5Viewer(const char* filename, RunMode run, OpenMode mode);  
         
         void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
         void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
@@ -58,7 +64,7 @@ class PetscBinaryViewer : public PetscFileViewer
     public:
     
         // Explicit Constructor
-        PetscBinaryViewer(const char* filename, MPI_Comm comm, PetscFileMode mode);  
+        PetscBinaryViewer(const char* filename, RunMode run, OpenMode mode);
         
         void saveMatrix(const PetscMatrix& matrix);
 

@@ -28,10 +28,10 @@ namespace tise
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         
-        RadialMatrix K(sim,MatrixType::PARALLEL);
-        RadialMatrix Inv_r2(sim,MatrixType::PARALLEL);
-        RadialMatrix Potential(sim,MatrixType::PARALLEL);
-        RadialMatrix S(sim,MatrixType::PARALLEL);
+        RadialMatrix K(sim,RunMode::PARALLEL);
+        RadialMatrix Inv_r2(sim,RunMode::PARALLEL);
+        RadialMatrix Potential(sim,RunMode::PARALLEL);
+        RadialMatrix S(sim,RunMode::PARALLEL);
 
         K.bindElement(bsplines::kinetic_integrand);
         Inv_r2.bindElement(bsplines::invr2_integrand);
@@ -61,8 +61,10 @@ namespace tise
 
     
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
+
         
-        PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str(), PETSC_COMM_WORLD,FILE_MODE_WRITE);
+        
+        PetscHDF5Viewer viewTISE((sim.tise_output_path+"/tise_output.h5").c_str(), RunMode::PARALLEL, OpenMode::WRITE);
         
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
@@ -137,11 +139,11 @@ namespace tise
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
 
         
-        RadialMatrix K(sim,MatrixType::PARALLEL);
-        RadialMatrix Inv_r2(sim,MatrixType::PARALLEL);
-        RadialMatrix Inv_r(sim,MatrixType::PARALLEL);
-        RadialMatrix S(sim,MatrixType::PARALLEL);
-        RadialMatrix Der(sim,MatrixType::PARALLEL);
+        RadialMatrix K(sim,RunMode::PARALLEL);
+        RadialMatrix Inv_r2(sim,RunMode::PARALLEL);
+        RadialMatrix Inv_r(sim,RunMode::PARALLEL);
+        RadialMatrix S(sim,RunMode::PARALLEL);
+        RadialMatrix Der(sim,RunMode::PARALLEL);
 
         K.bindElement(bsplines::kinetic_integrand);
         Inv_r2.bindElement(bsplines::invr2_integrand);
@@ -161,12 +163,13 @@ namespace tise
         S.assemble();
         Der.assemble();
 
+
         PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
-        PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str(),PETSC_COMM_WORLD,FILE_MODE_WRITE);
-        PetscBinaryViewer viewInv_r2((sim.tise_output_path+"/Inv_r2.bin").c_str(),PETSC_COMM_WORLD,FILE_MODE_WRITE);
-        PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str(),PETSC_COMM_WORLD,FILE_MODE_WRITE);
-        PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str(),PETSC_COMM_WORLD,FILE_MODE_WRITE);
-        PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str(),PETSC_COMM_WORLD,FILE_MODE_WRITE);
+        PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+        PetscBinaryViewer viewInv_r2((sim.tise_output_path+"/Inv_r2.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+        PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+        PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+        PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
 
         viewK.saveMatrix(K);
         viewInv_r2.saveMatrix(Inv_r2);

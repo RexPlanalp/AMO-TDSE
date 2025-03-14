@@ -3,6 +3,9 @@
 #include "petsc_wrappers/PetscFileViewer.h"
 #include "utility.h"
 #include "mpi.h"
+#include "simulation.h"
+
+
 
 //////////////////////////
 // Petsc Viewer Wrapper //
@@ -18,10 +21,37 @@ PetscFileViewer::~PetscFileViewer()
 //////////////////////////
 
 
-PetscHDF5Viewer::PetscHDF5Viewer(const char* filename, MPI_Comm comm, PetscFileMode mode) : comm(comm)
+PetscHDF5Viewer::PetscHDF5Viewer(const char* filename, RunMode run, OpenMode mode)
 {
     PetscErrorCode ierr;
-    ierr = PetscViewerHDF5Open(comm, filename, mode, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+
+    switch(run)
+    {
+        case RunMode::SEQUENTIAL:
+            comm = PETSC_COMM_SELF;
+            switch(mode)
+            {
+                case OpenMode::READ:
+                    ierr = PetscViewerHDF5Open(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+                case OpenMode::WRITE:
+                    ierr = PetscViewerHDF5Open(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+            }
+            break;
+        case RunMode::PARALLEL:
+            comm = PETSC_COMM_WORLD;
+            switch(mode)
+            {
+                case OpenMode::READ:
+                    ierr = PetscViewerHDF5Open(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+                case OpenMode::WRITE:
+                    ierr = PetscViewerHDF5Open(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+            }
+            break;
+    }
 }
 
 void PetscHDF5Viewer::saveVector(const PetscVector& input_vector, const char* groupname, const char* vectorname)
@@ -53,10 +83,37 @@ void PetscHDF5Viewer::saveValue(std::complex<double> value, const char* groupnam
 // Binary Viewer Wrapper//
 //////////////////////////
 
-PetscBinaryViewer::PetscBinaryViewer(const char* filename, MPI_Comm comm, PetscFileMode mode) : comm(comm)
+PetscBinaryViewer::PetscBinaryViewer(const char* filename, RunMode run, OpenMode mode)
 {
     PetscErrorCode ierr;
-    ierr = PetscViewerBinaryOpen(comm, filename, mode,&viewer); checkErr(ierr, "Error creating binary viewer");
+
+    switch(run)
+    {
+        case RunMode::SEQUENTIAL:
+            comm = PETSC_COMM_SELF;
+            switch(mode)
+            {
+                case OpenMode::READ:
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+                case OpenMode::WRITE:
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+            }
+            break;
+        case RunMode::PARALLEL:
+            comm = PETSC_COMM_WORLD;
+            switch(mode)
+            {
+                case OpenMode::READ:
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+                case OpenMode::WRITE:
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    break;
+            }
+            break;
+    }
 }
 
 void PetscBinaryViewer::saveMatrix(const PetscMatrix& input_matrix)

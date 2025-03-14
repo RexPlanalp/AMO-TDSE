@@ -65,13 +65,13 @@ void Wavefunction::normalize(const PetscMatrix& S)
     ierr = VecScale(vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
 }
 
-Wavefunction::Wavefunction(int size, VectorType type)
+Wavefunction::Wavefunction(int size, RunMode type)
 {
     PetscErrorCode ierr;
 
     switch(type)
     {
-        case VectorType::SEQUENTIAL:
+        case RunMode::SEQUENTIAL:
             comm = PETSC_COMM_SELF;
 
             ierr = VecCreate(comm, &vector); checkErr(ierr, "Error Creating Vector");
@@ -84,7 +84,7 @@ Wavefunction::Wavefunction(int size, VectorType type)
             local_end = size;
             break;
 
-        case VectorType::PARALLEL:
+        case RunMode::PARALLEL:
             comm = PETSC_COMM_WORLD;
 
 

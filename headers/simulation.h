@@ -9,6 +9,12 @@
 #include <nlohmann/json.hpp>
 #include "misc.h"
 
+enum class RunMode
+{
+    PARALLEL,
+    SEQUENTIAL
+};
+
 enum class PotentialType
 {
     H,
