@@ -157,12 +157,14 @@ namespace tise
         PetscBinaryViewer viewInv_r((sim.tise_output_path+"/Inv_r.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
         PetscBinaryViewer viewS((sim.tise_output_path+"/S.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
         PetscBinaryViewer viewDer((sim.tise_output_path+"/Der.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+        PetscBinaryViewer viewPotential((sim.tise_output_path+"/Potential.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
 
         viewK.saveMatrix(K);
         viewInv_r2.saveMatrix(Inv_r2);
         viewInv_r.saveMatrix(Inv_r);
         viewS.saveMatrix(S);
         viewDer.saveMatrix(Der);
+        viewPotential.saveMatrix(Potential);
 
         double time_end = MPI_Wtime();
         PetscPrintf(PETSC_COMM_WORLD,"Time to prepare matrices %.3f\n",time_end-time_start);   

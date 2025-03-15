@@ -74,10 +74,10 @@ int main(int argc, char **argv) {
         tise::solve_tise(sim, rank); 
     }
 
-    // if (run_tdse) 
-    // {
-    //     ierr = tdse::solve_tdse(sim, rank); CHKERRQ(ierr);
-    // }
+    if (run_tdse) 
+    {
+        ierr = tdse::solve_tdse(sim, rank); CHKERRQ(ierr);
+    }
 
     // if (run_block) 
     // {
