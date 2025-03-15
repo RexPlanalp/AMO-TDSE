@@ -155,16 +155,19 @@ namespace tdse
 
     }
 
-    PetscErrorCode _construct_atomic_interaction(const simulation& sim,Mat& H_atomic,Mat& S_atomic, Mat& atomic_left,Mat& atomic_right)
+    std::pair<PetscMatrix,PetscMatrix> construct_atomic_interaction(const simulation& sim,std::complex<double> alpha)
     {   
-        double dt = sim.grid_params.dt;
-        std::complex<double> alpha  = PETSC_i * (dt / 2.0);
         PetscErrorCode ierr;
-        ierr = MatDuplicate(S_atomic,MAT_COPY_VALUES,&atomic_left); CHKERRQ(ierr);
-        ierr = MatDuplicate(S_atomic,MAT_COPY_VALUES,&atomic_right); CHKERRQ(ierr);
-        ierr = MatAXPY(atomic_left,alpha,H_atomic,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
-        ierr = MatAXPY(atomic_right,-alpha,H_atomic,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
-        return ierr;
+        PetscMatrix S_atomic = construct_S_atomic(sim);
+        PetscMatrix H_atomic = construct_H_atomic(sim);
+        
+        PetscMatrix atomic_left(S_atomic);
+        PetscMatrix atomic_right(S_atomic);
+
+        ierr = MatAXPY(atomic_left.matrix,alpha,H_atomic.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+        ierr = MatAXPY(atomic_right.matrix,-alpha,H_atomic.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+        
+        return {atomic_left,atomic_right};
     }
 
     double _a(int l, int m)
@@ -474,7 +477,6 @@ namespace tdse
     //     return ierr;
     // }
 
-
     PetscErrorCode solve_tdse(const simulation& sim, int rank)
     {   
         double time_start = MPI_Wtime();
@@ -484,16 +486,17 @@ namespace tdse
         double dt = sim.grid_params.dt;
         int Nt = sim.grid_params.Nt;
         std::complex<double> alpha = PETSC_i * (dt / 2.0);
+        int total_size = sim.bspline_params.n_basis * sim.angular_params.n_blocks;
+        int degree = sim.bspline_params.degree;
 
 
         PetscVector state = load_starting_state(sim); CHKERRQ(ierr);
         create_directory(rank, sim.tdse_output_path);
         PetscHDF5Viewer viewTDSE((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
         
-        PetscPrintf(PETSC_COMM_WORLD, "Constructing Identity Interaction\n\n");
-        PetscMatrix S_atomic = construct_S_atomic(sim);
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
-        PetscMatrix H_atomic = construct_H_atomic(sim);
+        std::pair<PetscMatrix,PetscMatrix> atomic_matrices = construct_atomic_interaction(sim, alpha);
+
         // ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
 
         // Mat H_z;
@@ -609,5 +612,4 @@ namespace tdse
 
         return ierr;
     }
-
 }
