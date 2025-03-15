@@ -137,3 +137,54 @@ double g(int l, int m)
     int denominator = (2*l-1)*(2*l+1);
     return sqrt(numerator/double(denominator));
 }
+
+double a(int l, int m)
+{
+    int numerator = (l+m);
+    int denominator = (2*l +1) * (2*l-1);
+    double f1 = sqrt(numerator/double(denominator));
+    double f2 = - m * std::sqrt(l+m-1) - std::sqrt((l-m)*(l*(l-1)-m*(m-1)));
+    return f1*f2;
+    
+}
+
+double atilde(int l, int m)
+{
+    int numerator = (l-m);
+    int denominator = (2*l+1)*(2*l-1);
+    double f1 = sqrt(numerator/double(denominator));
+    double f2 = - m * std::sqrt(l-m-1) + std::sqrt((l+m)*(l*(l-1)-m*(m+1)));
+    return f1*f2;
+}
+
+double b(int l, int m)
+{
+    return -atilde(l+1,m-1);
+}
+
+double btilde(int l, int m)
+{
+    return -a(l+1,m+1);
+}
+
+double d(int l, int m)
+{
+    double numerator = (l-m+1)*(l-m+2);
+    double denominator = (2*l+1)*(2*l+3);
+    return std::sqrt(numerator/double(denominator));
+}
+
+double dtilde(int l, int m)
+{
+    return d(l,-m);
+}
+
+double c(int l, int m)
+{
+    return dtilde(l-1,m-1);
+}
+
+double ctilde(int l, int m)
+{
+    return d(l-1,m+1);
+}

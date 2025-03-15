@@ -74,7 +74,11 @@ class RadialMatrix : public PetscMatrix
 enum class AngularMatrixType
 {
     Z_INT_1,
-    Z_INT_2
+    Z_INT_2,
+    XY_INT_1,
+    XY_INT_2,
+    XY_INT_3,
+    XY_INT_4
 };
 
 class AngularMatrix : public PetscMatrix
