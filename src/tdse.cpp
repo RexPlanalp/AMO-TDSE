@@ -375,107 +375,32 @@ namespace tdse
 
     // }
 
-    double _f(int l, int m)
-    {   
-        int numerator = (l+1)*(l+1) - m*m;
-        int denominator = (2*l + 1)*(2*l+3);
-        return sqrt(numerator/(double)denominator);
-    }
+    
 
-    double _g(int l, int m)
+    PetscMatrix construct_z_interaction(const simulation& sim)
     {
-        int numerator = l*l - m*m;
-        int denominator = (2*l-1)*(2*l+1);
-        return sqrt(numerator/(double)denominator);
+        PetscErrorCode ierr;
+        int n_blocks = sim.angular_params.n_blocks;
+
+        AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_1);
+        H_lm_1.populateMatrix(sim);
+
+        AngularMatrix H_lm_2(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_2);
+        H_lm_2.populateMatrix(sim);
+
+
+        PetscBinaryViewer Inv_rViewer((sim.tise_output_path+"/Inv_r.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix Inv_r = Inv_rViewer.loadMatrix();
+
+        PetscBinaryViewer DerViewer((sim.tise_output_path+"/Der.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix Der = DerViewer.loadMatrix();
+
+        PetscMatrix H_z_1 = KroneckerProduct(H_lm_1,Der);
+        PetscMatrix H_z_2 = KroneckerProduct(H_lm_2,Inv_r);
+
+        ierr = MatAXPY(H_z_1.matrix,1.0,H_z_2.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+        return H_z_1;
     }
-
-    // PetscErrorCode _construct_z_interaction(const simulation& sim, Mat& H_z)
-    // {
-    //     PetscErrorCode ierr;
-
-    //     int n_blocks = sim.angular_params.n_blocks;
-
-    //     Mat H_lm_1;
-    //     ierr = MatCreate(PETSC_COMM_SELF, &H_lm_1); CHKERRQ(ierr);
-    //     ierr = MatSetSizes(H_lm_1, PETSC_DECIDE, PETSC_DECIDE, n_blocks, n_blocks); CHKERRQ(ierr);
-    //     ierr = MatSetFromOptions(H_lm_1); CHKERRQ(ierr);
-    //     ierr = MatSeqAIJSetPreallocation(H_lm_1, 2, NULL); CHKERRQ(ierr);
-    //     ierr = MatSetUp(H_lm_1); CHKERRQ(ierr);
-    //     for (int i = 0; i < n_blocks; ++i)
-    //     {
-    //         std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
-    //         int l = lm_pair.first;
-    //         int m = lm_pair.second;
-    //         for (int j = 0; j < n_blocks; ++j)
-    //         {
-    //             std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
-    //             int lprime = lm_pair_prime.first;
-    //             int mprime = lm_pair_prime.second;
-
-    //             if ((l == lprime+1) && (m == mprime))
-    //             {
-    //                 ierr = MatSetValue(H_lm_1, i, j, -PETSC_i * _g(l,m), INSERT_VALUES); CHKERRQ(ierr);
-    //             }
-    //             else if ((l == lprime-1)&&(m == mprime))
-    //             {
-    //                 ierr = MatSetValue(H_lm_1, i, j, -PETSC_i * _f(l,m), INSERT_VALUES); CHKERRQ(ierr);
-    //             }
-    //         }
-    //     }
-    //     ierr = MatAssemblyBegin(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    //     ierr = MatAssemblyEnd(H_lm_1, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-
-
-
-
-    //     Mat H_lm_2;
-    //     ierr = MatCreate(PETSC_COMM_SELF, &H_lm_2); CHKERRQ(ierr);
-    //     ierr = MatSetSizes(H_lm_2, PETSC_DECIDE, PETSC_DECIDE, n_blocks, n_blocks); CHKERRQ(ierr);
-    //     ierr = MatSetFromOptions(H_lm_2); CHKERRQ(ierr);
-    //     ierr = MatSeqAIJSetPreallocation(H_lm_2, 2, NULL); CHKERRQ(ierr);
-    //     ierr = MatSetUp(H_lm_2); CHKERRQ(ierr);
-    //     for (int i = 0; i < n_blocks; ++i)
-    //     {
-    //         std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
-    //         int l = lm_pair.first;
-    //         int m = lm_pair.second;
-    //         for (int j = 0; j < n_blocks; ++j)
-    //         {
-    //             std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
-    //             int lprime = lm_pair_prime.first;
-    //             int mprime = lm_pair_prime.second;
-
-    //             if ((l == lprime+1) && (m == mprime))
-    //             {
-    //                 ierr = MatSetValue(H_lm_2, i, j, -PETSC_i * _g(l,m) * (-l), INSERT_VALUES); CHKERRQ(ierr);
-    //             }
-    //             else if ((l == lprime-1)&&(m == mprime))
-    //             {
-    //                 ierr = MatSetValue(H_lm_2, i, j, -PETSC_i * _f(l,m) * (l+1), INSERT_VALUES); CHKERRQ(ierr);
-    //             }
-    //         }
-    //     }
-    //     ierr = MatAssemblyBegin(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    //     ierr = MatAssemblyEnd(H_lm_2, MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-
-
-    //     Mat Der,Inv_r;
-    //     ierr = load_matrix(sim.tise_output_path+"/Der.bin",&Der); CHKERRQ(ierr);
-    //     ierr = load_matrix(sim.tise_output_path+"/Inv_r.bin",&Inv_r); CHKERRQ(ierr);
-
-    //     Mat H_z_2;
-    //     ierr = KroneckerProductParallel(H_lm_1,Der,&H_z); CHKERRQ(ierr);
-    //     ierr = KroneckerProductParallel(H_lm_2,Inv_r,&H_z_2); CHKERRQ(ierr);
-
-    //     ierr = MatAXPY(H_z,1.0,H_z_2,SAME_NONZERO_PATTERN); CHKERRQ(ierr);
-
-    //     ierr = MatDestroy(&H_lm_1); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&H_lm_2); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&Der); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&Inv_r); CHKERRQ(ierr);
-    //     ierr = MatDestroy(&H_z_2); CHKERRQ(ierr);
-    //     return ierr;
-    // }
 
     PetscErrorCode solve_tdse(const simulation& sim, int rank)
     {   
@@ -497,14 +422,14 @@ namespace tdse
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
         std::pair<PetscMatrix,PetscMatrix> atomic_matrices = construct_atomic_interaction(sim, alpha);
 
-        // ierr = _construct_atomic_interaction(sim, H_atomic, S_atomic, atomic_left, atomic_right); CHKERRQ(ierr);
+        
 
-        // Mat H_z;
-        // if (components[2]) 
-        // {   
-        //     PetscPrintf(PETSC_COMM_WORLD, "Constructing Z Interaction\n\n");
-        //     ierr = _construct_z_interaction(sim, H_z); CHKERRQ(ierr);
-        // }
+        PetscMatrix H_z;
+        if (components[2]) 
+        {   
+            PetscPrintf(PETSC_COMM_WORLD, "Constructing Z Interaction\n\n");
+            H_z = construct_z_interaction(sim); checkErr(ierr,"Error constructing Z interaction");
+        }
         // Mat H_xy, H_xy_tilde;
         // if (components[0] || components[1]) 
         // {

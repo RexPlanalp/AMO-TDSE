@@ -67,6 +67,29 @@ class RadialMatrix : public PetscMatrix
     const ECSMode ecs;
 };  
 
+//////////////////////////
+//    Radial Subclass   //
+//////////////////////////
+
+enum class AngularMatrixType
+{
+    Z_INT_1,
+    Z_INT_2
+};
+
+class AngularMatrix : public PetscMatrix
+{
+    public:
+    AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type);
+    
+    // Populate the matrix
+    void populateMatrix(const simulation& sim);
+
+    const AngularMatrixType type;
+};
+
+
+
 
 
 

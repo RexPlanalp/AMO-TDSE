@@ -131,6 +131,58 @@ void RadialMatrix::populateMatrix(const simulation& sim, radialElement integrand
 
 
 
+AngularMatrix::AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type)
+    : PetscMatrix(sim.angular_params.n_blocks, 2, run), type(type)
+{
+
+}
+
+void AngularMatrix::populateMatrix(const simulation& sim)
+{
+
+    int n_blocks = sim.angular_params.n_blocks;
+
+    PetscErrorCode ierr;
+    for (int i = local_start; i < local_end; ++i)
+        {
+            std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
+            int l = lm_pair.first;
+            int m = lm_pair.second;
+            for (int j = 0; j < n_blocks; ++j)
+            {
+                std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
+                int lprime = lm_pair_prime.first;
+                int mprime = lm_pair_prime.second;
+
+                switch(type)
+                {
+                    case AngularMatrixType::Z_INT_1:
+                        if ((l == lprime+1) && (m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -PETSC_i * g(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1)&&(m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -PETSC_i * f(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                    break;
+                    case AngularMatrixType::Z_INT_2:
+                    if ((l == lprime+1) && (m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -PETSC_i * g(l,m) * (-l), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1)&&(m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -PETSC_i * f(l,m) * (l+1), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                }  
+            }
+        }
+    assemble();
+}
+
+
+
 
 
 

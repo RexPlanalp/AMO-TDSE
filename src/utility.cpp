@@ -123,3 +123,17 @@ PetscMatrix KroneckerProduct(const PetscMatrix& A, const PetscMatrix& B)
 
     return C;
 }
+
+double f(int l, int m)
+{   
+    int numerator = (l+1)*(l+1) - m*m;
+    int denominator = (2*l + 1)*(2*l+3);
+    return sqrt(numerator/double(denominator));
+}
+
+double g(int l, int m)
+{
+    int numerator = l*l - m*m;
+    int denominator = (2*l-1)*(2*l+1);
+    return sqrt(numerator/double(denominator));
+}
