@@ -28,38 +28,27 @@ namespace tise
         PetscErrorCode ierr;
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
         
-        RadialMatrix K(sim,RunMode::PARALLEL);
-        RadialMatrix Inv_r2(sim,RunMode::PARALLEL);
-        RadialMatrix Potential(sim,RunMode::PARALLEL);
-        RadialMatrix S(sim,RunMode::PARALLEL);
+        
+        RadialMatrix K(sim, RunMode::PARALLEL, ECSMode::OFF);
+        RadialMatrix Inv_r2(sim, RunMode::PARALLEL, ECSMode::OFF);
+        RadialMatrix Potential(sim, RunMode::PARALLEL, ECSMode::OFF);
+        RadialMatrix S(sim, RunMode::PARALLEL, ECSMode::OFF);
 
-        K.bindElement(bsplines::kinetic_integrand);
-        Inv_r2.bindElement(bsplines::invr2_integrand);
+        K.populateMatrix(sim,bsplines::kinetic_integrand);
+        Inv_r2.populateMatrix(sim,bsplines::invr2_integrand);
+        S.populateMatrix(sim,bsplines::overlap_integrand);
 
+     
         switch(sim.potential_type)
         {
             case PotentialType::H:
-                Potential.bindElement(bsplines::H_integrand);
+                Potential.populateMatrix(sim,bsplines::H_integrand);
                 break;
             case PotentialType::He:
-                Potential.bindElement(bsplines::He_integrand);
+                Potential.populateMatrix(sim,bsplines::He_integrand);
                 break;
         }
 
-
-        S.bindElement(bsplines::overlap_integrand);
-
-        K.populateMatrix(sim,ECSMode::OFF);
-        Inv_r2.populateMatrix(sim,ECSMode::OFF);
-        Potential.populateMatrix(sim,ECSMode::OFF);
-        S.populateMatrix(sim,ECSMode::OFF);
-
-        K.assemble();
-        Inv_r2.assemble();
-        Potential.assemble();
-        S.assemble();
-
-    
         PetscPrintf(PETSC_COMM_WORLD, "Opening HDF5 File  \n\n");
 
         
@@ -68,7 +57,7 @@ namespace tise
         
 
         PetscPrintf(PETSC_COMM_WORLD, "Setting Up Eigenvalue Problem  \n\n");
-        PetscEPS eps(PETSC_COMM_WORLD);
+        PetscEPS eps(RunMode::PARALLEL);
         eps.setConvergenceParams(sim);
         
         PetscPrintf(PETSC_COMM_WORLD, "Solving TISE  \n\n");
@@ -113,10 +102,10 @@ namespace tise
 
                 std::string eigenvector_name = std::string("psi_") + std::to_string(pair_idx+l+1) + "_" + std::to_string(l);
                 std::string eigenvalue_name = std::string("E_") + std::to_string(pair_idx+l+1) + '_' + std::to_string(l);
-
+                
                 viewTISE.saveValue(eigenvalue, "eigenvalues", eigenvalue_name.c_str());
-
                 Wavefunction eigenvector = eps.getEigenvector(pair_idx,S);
+                
                 eigenvector.normalize(S);
 
                 viewTISE.saveVector(eigenvector, "eigenvectors", eigenvector_name.c_str());
@@ -139,30 +128,28 @@ namespace tise
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Matrices  \n\n");
 
         
-        RadialMatrix K(sim,RunMode::PARALLEL);
-        RadialMatrix Inv_r2(sim,RunMode::PARALLEL);
-        RadialMatrix Inv_r(sim,RunMode::PARALLEL);
-        RadialMatrix S(sim,RunMode::PARALLEL);
-        RadialMatrix Der(sim,RunMode::PARALLEL);
+        RadialMatrix K(sim, RunMode::PARALLEL, ECSMode::ON);
+        RadialMatrix Inv_r2(sim, RunMode::PARALLEL, ECSMode::ON);
+        RadialMatrix Inv_r(sim, RunMode::PARALLEL, ECSMode::ON);
+        RadialMatrix S(sim, RunMode::PARALLEL, ECSMode::ON);
+        RadialMatrix Der(sim, RunMode::PARALLEL, ECSMode::ON);
+        RadialMatrix Potential(sim, RunMode::PARALLEL, ECSMode::ON);
 
-        K.bindElement(bsplines::kinetic_integrand);
-        Inv_r2.bindElement(bsplines::invr2_integrand);
-        Inv_r.bindElement(bsplines::invr_integrand);
-        S.bindElement(bsplines::overlap_integrand);
-        Der.bindElement(bsplines::der_integrand);
+        K.populateMatrix(sim,bsplines::kinetic_integrand);
+        Inv_r2.populateMatrix(sim,bsplines::invr2_integrand);
+        Inv_r.populateMatrix(sim,bsplines::invr_integrand);
+        S.populateMatrix(sim,bsplines::overlap_integrand);
+        Der.populateMatrix(sim,bsplines::der_integrand);
 
-        K.populateMatrix(sim,ECSMode::ON);
-        Inv_r2.populateMatrix(sim,ECSMode::ON);
-        Inv_r.populateMatrix(sim,ECSMode::ON);
-        S.populateMatrix(sim,ECSMode::ON);
-        Der.populateMatrix(sim,ECSMode::ON);
-
-        K.assemble();
-        Inv_r2.assemble();
-        Inv_r.assemble();
-        S.assemble();
-        Der.assemble();
-
+        switch(sim.potential_type)
+        {
+            case PotentialType::H:
+                Potential.populateMatrix(sim,bsplines::H_integrand);
+                break;
+            case PotentialType::He:
+                Potential.populateMatrix(sim,bsplines::He_integrand);
+                break;
+        }
 
         PetscPrintf(PETSC_COMM_WORLD, "Saving Matrices  \n\n");
         PetscBinaryViewer viewK((sim.tise_output_path+"/K.bin").c_str(),RunMode::PARALLEL,OpenMode::WRITE);

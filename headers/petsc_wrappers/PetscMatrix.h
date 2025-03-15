@@ -10,11 +10,6 @@
 
 
 
-enum class ECSMode
-{
-    ON,
-    OFF
-};
 
 
 
@@ -24,7 +19,10 @@ class PetscMatrix
     public:
 
         // Default Constructor
-        PetscMatrix() = default;
+        PetscMatrix() : matrix(nullptr), comm(MPI_COMM_NULL), local_start(0), local_end(0){}
+
+        // Explicit Constructor
+        PetscMatrix(int size, int nnz, RunMode type);
 
         // Copy Constructor
         PetscMatrix(const PetscMatrix& other);
@@ -39,13 +37,21 @@ class PetscMatrix
         void assemble();
 
         // Internal matrix
-        Mat matrix = nullptr;
+        Mat matrix;
+        MPI_Comm comm;
+        int local_start,local_end;
 
 };
 
 //////////////////////////
 //    Radial Subclass   //
 //////////////////////////
+enum class ECSMode
+{
+    ON,
+    OFF
+};
+
 
 using radialElement = std::function<std::complex<double>(int,int,std::complex<double>,int,const std::vector<std::complex<double>>&)>;
 
@@ -53,24 +59,12 @@ using radialElement = std::function<std::complex<double>(int,int,std::complex<do
 class RadialMatrix : public PetscMatrix
 {
     public:
-
-    // Explicit Constructor
-    RadialMatrix(const simulation& sim, RunMode type);
-
-    // Bind matrix element
-    void bindElement(radialElement input_element);
-
+    RadialMatrix(const simulation& sim, RunMode run, ECSMode ecs);
+    
     // Populate the matrix
-    void populateMatrix(const simulation& sim, ECSMode ecs);
+    void populateMatrix(const simulation& sim, radialElement integrand);
 
-    // locally owned rows
-    int local_start, local_end;
-
-    // Matrix element function
-    radialElement element;
-
-    // Internal communicator
-    MPI_Comm comm = MPI_COMM_NULL;
+    const ECSMode ecs;
 };  
 
 

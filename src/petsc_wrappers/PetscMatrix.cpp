@@ -13,26 +13,75 @@ PetscMatrix::PetscMatrix(const PetscMatrix& other)
 {   
     PetscErrorCode ierr;
     ierr = MatDuplicate(other.matrix, MAT_COPY_VALUES, &matrix); checkErr(ierr,"Error Copying Matrix"); 
+
+    comm = other.comm;
+    local_start = other.local_start;
+    local_end = other.local_end;
+}
+
+PetscMatrix::PetscMatrix(int size, int nnz, RunMode type) 
+{
+    PetscErrorCode ierr;
+
+    switch(type)
+    {
+        case RunMode::SEQUENTIAL:
+            comm = PETSC_COMM_SELF;
+
+            ierr = MatCreate(comm, &matrix); checkErr(ierr,"Error Creating Matrix");
+            ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,size,size); checkErr(ierr,"Error Setting Matrix Size");
+            ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
+            ierr = MatSeqAIJSetPreallocation(matrix,nnz,NULL); checkErr(ierr,"Error Preallocating Matrix");
+            ierr = MatSetUp(matrix); checkErr(ierr,"Error Setting Up Matrix");
+
+            local_start = 0;
+            local_end = size;
+            break;
+
+        case RunMode::PARALLEL:
+            comm = PETSC_COMM_WORLD;
+
+            ierr = MatCreate(comm,&matrix); checkErr(ierr,"Error Creating Matrix");
+            ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,size,size); checkErr(ierr,"Error Setting Matrix Size");
+            ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
+            ierr = MatMPIAIJSetPreallocation(matrix,nnz,NULL,nnz,NULL); checkErr(ierr,"Error Preallocating Matrix");
+            ierr = MatSetUp(matrix); checkErr(ierr,"Error Setting Up Matrix");
+            ierr = MatGetOwnershipRange(matrix,&local_start,&local_end); checkErr(ierr,"Error Getting Ownership Range");
+            break;
+    }
 }
 
 PetscMatrix& PetscMatrix::operator=(const PetscMatrix& other)
 {
     if (this != &other)  
     {
+        Mat tempMatrix;
+        PetscErrorCode ierr = MatDuplicate(other.matrix, MAT_COPY_VALUES, &tempMatrix);
+        checkErr(ierr, "Error duplicating matrix");
+
         if (matrix) {
             MatDestroy(&matrix);
         }
-        MatDuplicate(other.matrix,MAT_COPY_VALUES, &matrix);
+        matrix = tempMatrix;
+
+        comm = other.comm;
+        local_start = other.local_start;
+        local_end = other.local_end;
     }
     return *this;
 }
 
 
-
 PetscMatrix::~PetscMatrix()
-{
-    PetscErrorCode ierr;
-    ierr = MatDestroy(&matrix); checkErr(ierr,"Error Destroying Matrix");
+{   
+
+    if (matrix) 
+    {
+        PetscErrorCode ierr;
+        ierr = MatDestroy(&matrix); checkErr(ierr,"Error Destroying Matrix");
+        matrix = nullptr;
+    }
+    
 }
 
 void PetscMatrix::assemble()
@@ -42,71 +91,25 @@ void PetscMatrix::assemble()
     ierr = MatAssemblyEnd(matrix, MAT_FINAL_ASSEMBLY); checkErr(ierr,"Error Assembling Matrix");
 }
 
-
 //////////////////////////
 //    Radial Subclass   //
 //////////////////////////
 
-RadialMatrix::RadialMatrix(const simulation& sim, RunMode type) 
+RadialMatrix::RadialMatrix(const simulation& sim, RunMode run, ECSMode ecs)
+    : PetscMatrix(sim.bspline_params.n_basis, 2*sim.bspline_params.degree+1, run), ecs(ecs)
 {
-    int n_basis = sim.bspline_params.n_basis;
-    int order = sim.bspline_params.order;
 
-    PetscErrorCode ierr;
-
-    switch(type)
-    {
-        case RunMode::SEQUENTIAL:
-            comm = PETSC_COMM_SELF;
-
-
-            ierr = MatCreate(comm, &matrix); checkErr(ierr,"Error Creating Matrix");
-            ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,n_basis,n_basis); checkErr(ierr,"Error Setting Matrix Size");
-            ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
-            ierr = MatSeqAIJSetPreallocation(matrix,2*order+1,NULL); checkErr(ierr,"Error Preallocating Matrix");
-            ierr = MatSetUp(matrix); checkErr(ierr,"Error Setting Up Matrix");
-
-            local_start = 0;
-            local_end = n_basis;
-            break;
-
-        case RunMode::PARALLEL:
-            comm = PETSC_COMM_WORLD;
-
-            ierr = MatCreate(comm,&matrix); checkErr(ierr,"Error Creating Matrix");
-            ierr = MatSetSizes(matrix,PETSC_DECIDE,PETSC_DECIDE,n_basis,n_basis); checkErr(ierr,"Error Setting Matrix Size");
-            ierr = MatSetFromOptions(matrix); checkErr(ierr,"Error Setting Matrix Options");
-            ierr = MatMPIAIJSetPreallocation(matrix,2*order+1,NULL,2*order+1,NULL); checkErr(ierr,"Error Preallocating Matrix");
-            ierr = MatSetUp(matrix); checkErr(ierr,"Error Setting Up Matrix");
-            ierr = MatGetOwnershipRange(matrix,&local_start,&local_end); checkErr(ierr,"Error Getting Ownership Range");
-            break;
-    }
 }
 
-void RadialMatrix::bindElement(radialElement input_element)
-{
-    element = input_element;
-}
-
-void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
+void RadialMatrix::populateMatrix(const simulation& sim, radialElement integrand)
 {   
     int n_basis = sim.bspline_params.n_basis;
     int order = sim.bspline_params.order;
 
-    bool use_ecs = false;
-    switch(ecs)
-    {
-        case ECSMode::ON:
-        use_ecs = true;
-        break;
-
-        case ECSMode::OFF:
-        use_ecs = false;
-        break;
-    }
-
 
     PetscErrorCode ierr;
+
+    bool use_ecs = (ecs == ECSMode::ON);
     
     for (int i = local_start; i < local_end; i++) 
     {
@@ -115,10 +118,11 @@ void RadialMatrix::populateMatrix(const simulation& sim,ECSMode ecs)
 
         for (int j = col_start; j < col_end; j++) 
         {
-            std::complex<double> result = bsplines::integrate_matrix_element(i, j, element, sim,use_ecs);
+            std::complex<double> result = bsplines::integrate_matrix_element(i, j, integrand, sim,use_ecs);
             ierr = MatSetValue(matrix, i, j, result, INSERT_VALUES); checkErr(ierr, "Error Setting Matrix Value");
         }
     }
+    assemble();
 }
 
 //////////////////////////

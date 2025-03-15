@@ -8,64 +8,7 @@
 // Petsc Vector Wrapper //
 //////////////////////////
 
-
-PetscVector::PetscVector(const PetscVector& other)
-{
-    VecDuplicate(other.vector, &vector);
-}
-
-PetscVector& PetscVector::operator=(const PetscVector& other)
-{
-    if (this != &other)  
-    {
-        if (vector) {
-            VecDestroy(&vector);
-        }
-        VecDuplicate(other.vector, &vector);
-    }
-    return *this;
-}
-
-PetscVector::~PetscVector()
-{
-    VecDestroy(&vector);
-}
-
-void PetscVector::assemble()
-{
-    VecAssemblyBegin(vector);
-    VecAssemblyEnd(vector);
-}
-
-void PetscVector::setName(const char* name)
-{
-    PetscErrorCode ierr;
-    ierr = PetscObjectSetName((PetscObject)vector,name); checkErr(ierr,"Error setting name");
-}
-
-//////////////////////////
-// Wavefunction Subclass//
-//////////////////////////
-
-
-std::complex<double> Wavefunction::computeNorm(const PetscMatrix& S)
-{
-    PetscErrorCode ierr;
-    std::complex<double> norm = 0;
-    PetscVector temp(*this);
-    ierr = MatMult(S.matrix, vector,temp.vector); checkErr(ierr, "Error in MatMult");
-    ierr = VecDot(vector, temp.vector, &norm); checkErr(ierr, "Error in VecDot");
-    return std::sqrt(norm);
-}
-
-void Wavefunction::normalize(const PetscMatrix& S)
-{
-    PetscErrorCode ierr;
-    std::complex<double> norm = computeNorm(S);
-    ierr = VecScale(vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
-}
-
-Wavefunction::Wavefunction(int size, RunMode type)
+PetscVector::PetscVector(int size, RunMode type)
 {
     PetscErrorCode ierr;
 
@@ -96,6 +39,85 @@ Wavefunction::Wavefunction(int size, RunMode type)
             ierr = VecGetOwnershipRange(vector, &local_start, &local_end); checkErr(ierr, "Error Getting Ownership Range");
             break;
     }
+}
+
+PetscVector::PetscVector(const PetscVector& other)
+{
+    PetscErrorCode ierr;
+    ierr = VecDuplicate(other.vector, &vector); checkErr(ierr, "Error duplicating vector");
+    comm = other.comm;
+    local_start = other.local_start;
+    local_end = other.local_end;
+}
+
+PetscVector& PetscVector::operator=(const PetscVector& other)
+{
+    if (this != &other)  
+    {
+        Vec tempVector;
+        PetscErrorCode ierr = VecDuplicate(other.vector, &tempVector);
+        checkErr(ierr, "Error duplicating vector");
+
+        if (vector) 
+        {
+            VecDestroy(&vector);
+        }
+        vector = tempVector;
+
+        comm = other.comm;
+        local_start = other.local_start;
+        local_end = other.local_end;
+    }
+    return *this;
+}
+
+PetscVector::~PetscVector()
+{
+    if (vector) 
+    {
+        PetscErrorCode ierr;
+        ierr = VecDestroy(&vector); checkErr(ierr, "Error destroying vector");
+        vector = nullptr;
+    }
+}
+
+void PetscVector::assemble()
+{
+    VecAssemblyBegin(vector);
+    VecAssemblyEnd(vector);
+}
+
+void PetscVector::setName(const char* name)
+{
+    PetscErrorCode ierr;
+    ierr = PetscObjectSetName((PetscObject)vector,name); checkErr(ierr,"Error setting name");
+}
+
+//////////////////////////
+// Wavefunction Subclass//
+//////////////////////////
+
+
+std::complex<double> Wavefunction::computeNorm(const PetscMatrix& S) const
+{
+    PetscErrorCode ierr;
+    std::complex<double> normValue = 0.0;
+
+    // Allocate the temporary vector using S.matrix
+    PetscVector temp;
+    ierr = MatCreateVecs(S.matrix, &temp.vector, NULL); checkErr(ierr, "Error creating temporary vector");
+
+    ierr = MatMult(S.matrix, vector, temp.vector); checkErr(ierr, "Error in MatMult");
+    ierr = VecDot(vector, temp.vector, &normValue); checkErr(ierr, "Error in VecDot");
+    
+    return std::sqrt(normValue);
+}
+
+void Wavefunction::normalize(const PetscMatrix& S)
+{
+    PetscErrorCode ierr;
+    std::complex<double> norm = computeNorm(S);
+    ierr = VecScale(vector,1.0/norm); checkErr(ierr, "Error scaling eigenvector");
 }
 
 

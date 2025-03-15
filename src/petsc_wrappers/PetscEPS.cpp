@@ -3,14 +3,26 @@
 #include "petsc_wrappers/PetscVector.h"
 #include "petsc_wrappers/PetscMatrix.h"
 #include "mpi.h"
+#include "simulation.h"
 
 //////////////////////////
 // Petsc EPS Wrapper   //
 //////////////////////////
 
-PetscEPS::PetscEPS(MPI_Comm comm) : comm(comm)
+PetscEPS::PetscEPS(RunMode run) 
 {   
     PetscErrorCode ierr;
+
+    switch(run)
+    {
+        case RunMode::SEQUENTIAL:
+            comm = PETSC_COMM_SELF;
+            break;
+        case RunMode::PARALLEL:
+            comm = PETSC_COMM_WORLD;
+            break;
+    }
+
     ierr = EPSCreate(comm, &eps); checkErr(ierr, "Error creating EPS object");
     ierr = EPSSetProblemType(eps,EPS_GNHEP); checkErr(ierr, "Error setting problem type");
     ierr = EPSSetWhichEigenpairs(eps,EPS_SMALLEST_REAL); checkErr(ierr, "Error setting which eigenpairs");
@@ -19,7 +31,11 @@ PetscEPS::PetscEPS(MPI_Comm comm) : comm(comm)
 
 PetscEPS::~PetscEPS()
 {
-    EPSDestroy(&eps);
+    if (eps) 
+    {
+        EPSDestroy(&eps);
+        eps = nullptr;
+    }
 }
 
 void PetscEPS::setConvergenceParams(const simulation& sim)
@@ -64,8 +80,9 @@ Wavefunction PetscEPS::getEigenvector(int i, const PetscMatrix& S)
     PetscErrorCode ierr;
     Wavefunction eigenvector;
 
-    ierr = MatCreateVecs(S.matrix,&eigenvector.vector,NULL); checkErr(ierr, "Error creating eigenvector");
-    ierr = EPSGetEigenvector(eps,i,eigenvector.vector,NULL); checkErr(ierr, "Error getting eigenvector");
+    ierr = MatCreateVecs(S.matrix,&eigenvector.vector,NULL); checkErr(ierr, "Error creating vector");
+    ierr = EPSGetEigenvector(eps, i, eigenvector.vector, NULL);
+    checkErr(ierr, "Error getting eigenvector");
 
     return eigenvector;
 }

@@ -13,9 +13,12 @@
 
 PetscFileViewer::~PetscFileViewer()
 {
-    PetscViewerDestroy(&viewer);
+    if (viewer) 
+    {
+        PetscViewerDestroy(&viewer);
+        viewer = nullptr;
+    }
 }
-
 //////////////////////////
 // HDF5 Viewer Wrapper  //
 //////////////////////////
@@ -94,10 +97,10 @@ PetscBinaryViewer::PetscBinaryViewer(const char* filename, RunMode run, OpenMode
             switch(mode)
             {
                 case OpenMode::READ:
-                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_READ, &viewer); checkErr(ierr, "Error creating Binary viewer");
                     break;
                 case OpenMode::WRITE:
-                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating HDF5 viewer");
+                    ierr = PetscViewerBinaryOpen(comm, filename, FILE_MODE_WRITE, &viewer); checkErr(ierr, "Error creating Binary viewer");
                     break;
             }
             break;

@@ -16,7 +16,7 @@ class PetscEPS
     public:
 
         // Default Constructor
-        PetscEPS(MPI_Comm comm);
+        PetscEPS(RunMode run);
 
         // Destructor
         ~PetscEPS();
@@ -40,7 +40,7 @@ class PetscEPS
         Wavefunction getEigenvector(int i, const PetscMatrix& S);
 
         // Internal EPS 
-        EPS eps;
+        EPS eps = nullptr;
 
         // Internal communicator
         MPI_Comm comm = MPI_COMM_NULL;

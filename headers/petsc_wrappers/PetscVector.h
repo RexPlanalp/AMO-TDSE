@@ -14,10 +14,13 @@ class PetscVector
     public:
 
         // Default Constructor
-        PetscVector() = default;
+        PetscVector() : vector(nullptr), comm(MPI_COMM_NULL), local_start(0), local_end(0) { }
 
         // Copy Constructor
         PetscVector(const PetscVector& other);
+
+        // Explicit Constructor
+        PetscVector(int size, RunMode type);
 
         // Copy assignment operator
         PetscVector& operator=(const PetscVector& other);
@@ -31,8 +34,10 @@ class PetscVector
         // Set petsc name
         void setName(const char* name);
 
-        // Internal vector
-        Vec vector = nullptr;
+        // Internal Data
+        Vec vector;
+        MPI_Comm comm;
+        int local_start,local_end;
 };
 
 //////////////////////////
@@ -43,11 +48,8 @@ class PetscVector
 class Wavefunction : public PetscVector
 {
     public:
-        Wavefunction() = default;
-        Wavefunction(int size, RunMode type);
-        std::complex<double> computeNorm(const PetscMatrix& S);
-        void normalize(const PetscMatrix& S);
+        using PetscVector::PetscVector;
 
-        int local_start,local_end;
-        MPI_Comm comm = MPI_COMM_NULL;
+        std::complex<double> computeNorm(const PetscMatrix& S) const;
+        void normalize(const PetscMatrix& S);
 };

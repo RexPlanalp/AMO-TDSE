@@ -27,7 +27,7 @@ class PetscFileViewer
     public:
 
         // Default constructor
-        PetscFileViewer() = default;
+        PetscFileViewer() : viewer(nullptr) {}
 
         // Destructor
         ~PetscFileViewer();
