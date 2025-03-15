@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-../headers/laser.h
-simulation.h
-../headers/simulation.h
-
 ../headers/misc.h
 map
 -
@@ -66,47 +62,23 @@ nlohmann/json.hpp
 misc.h
 ../headers/misc.h
 
-../headers/tdse.h
-petscmat.h
--
-simulation.h
-../headers/simulation.h
-
 ../headers/utility.h
 petscsys.h
 -
 
-/users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp
-iostream
--
-fstream
--
-sys/stat.h
--
-sys/types.h
--
-petscmat.h
--
-petscvec.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscFileViewer.cpp
+petscviewer.h
 -
 petscviewerhdf5.h
 -
-petscksp.h
--
-tdse.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.h
-simulation.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/simulation.h
-laser.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/laser.h
-petsc_wrappers/PetscVector.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscVector.h
-utility.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/utility.h
 petsc_wrappers/PetscFileViewer.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscFileViewer.h
-petsc_wrappers/PetscMatrix.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscMatrix.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/petsc_wrappers/PetscFileViewer.h
+utility.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/utility.h
+mpi.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/mpi.h
+simulation.h
+/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/simulation.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi.h
 stddef.h
@@ -151,8 +123,6 @@ petscstring.h
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdevicetypes.h
 petscsys.h
 -
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmtypes.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdrawtypes.h
 
@@ -265,12 +235,6 @@ petscistypes.h
 -
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscistypes.h
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscksp.h
-petscpc.h
--
-petscdrawtypes.h
--
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsclog.h
 petscsys.h
@@ -469,16 +433,6 @@ petscoptions.h
 -
 petscoptions.h
 -
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpc.h
-petscmat.h
--
-petscdmtypes.h
--
-petscpctypes.h
--
-
-/users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpctypes.h
 
 /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpkg_version.h
 

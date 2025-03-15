@@ -128,7 +128,7 @@ PetscMatrix PetscBinaryViewer::loadMatrix()
     PetscMatrix M;
     ierr = MatCreate(comm,&M.matrix); checkErr(ierr, "Error creating matrix");
     
-    if (comm = PETSC_COMM_SELF)
+    if (comm == PETSC_COMM_SELF)
     {
         ierr = MatSetType(M.matrix,MATSEQAIJ); checkErr(ierr, "Error setting matrix type");
     }
