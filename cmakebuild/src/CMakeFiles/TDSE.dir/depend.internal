@@ -600,6 +600,115 @@ src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscFileViewer.cpp.o
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/ordered_map.hpp
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/thirdparty/hedley/hedley.hpp
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
+src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscKSP.cpp.o
+ ../headers/misc.h
+ ../headers/petsc_wrappers/PetscKSP.h
+ ../headers/petsc_wrappers/PetscMatrix.h
+ ../headers/petsc_wrappers/PetscVector.h
+ ../headers/simulation.h
+ ../headers/utility.h
+ /users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscKSP.cpp
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi_portable_platform.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsc/private/petscadvancedmacros.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsc/private/petscfptimpl.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscbt.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscconf.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscconf_poison.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsccxxcomplexfix.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdevicetypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmdatypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdrawtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscerror.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscfix.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscfvtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscis.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscistypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscksp.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsclog.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsclogdeprecated.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsclogtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscmacros.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscmat.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscmatcoarsen.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscmath.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscoptions.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpc.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpctypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpkg_version.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsectiontypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsftypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsnes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsnestypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscstring.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsys.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsystypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsctime.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscvec.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscversion.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscviewer.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscviewertypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcbv.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcconf.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcds.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepceps.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcfn.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepclme.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcmat.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcmath.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcrg.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcrgtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcsc.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcst.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcsys.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcvec.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcversion.h
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/adl_serializer.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/byte_container_with_subtype.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/abi_macros.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/conversions/from_json.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/conversions/to_chars.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/conversions/to_json.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/exceptions.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/hash.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/binary_reader.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/input_adapters.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/json_sax.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/lexer.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/parser.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/input/position_t.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/internal_iterator.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/iter_impl.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/iteration_proxy.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/iterator_traits.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/json_reverse_iterator.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/iterators/primitive_iterator.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/json_custom_base_class.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/json_pointer.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/json_ref.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/macro_scope.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/macro_unscope.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/call_std/begin.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/call_std/end.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/cpp_future.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/detected.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/identity_tag.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/is_sax.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/std_fs.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/type_traits.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/meta/void_t.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/output/binary_writer.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/output/output_adapters.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/output/serializer.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/string_concat.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/string_escape.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/detail/value_t.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/json.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/json_fwd.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/ordered_map.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/thirdparty/hedley/hedley.hpp
+ /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
 src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscMatrix.cpp.o
  ../headers/bsplines.h
  ../headers/misc.h
@@ -823,6 +932,7 @@ src/CMakeFiles/TDSE.dir/tdse.cpp.o
  ../headers/laser.h
  ../headers/misc.h
  ../headers/petsc_wrappers/PetscFileViewer.h
+ ../headers/petsc_wrappers/PetscKSP.h
  ../headers/petsc_wrappers/PetscMatrix.h
  ../headers/petsc_wrappers/PetscVector.h
  ../headers/simulation.h
@@ -838,10 +948,12 @@ src/CMakeFiles/TDSE.dir/tdse.cpp.o
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscconf_poison.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petsccxxcomplexfix.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdevicetypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmdatypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdmtypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscdrawtypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscerror.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscfix.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscfvtypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscis.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscistypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscksp.h
@@ -858,6 +970,8 @@ src/CMakeFiles/TDSE.dir/tdse.cpp.o
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscpkg_version.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsectiontypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsftypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsnes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsnestypes.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscstring.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsys.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscsystypes.h
@@ -867,6 +981,21 @@ src/CMakeFiles/TDSE.dir/tdse.cpp.o
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscviewer.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscviewerhdf5.h
  /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/petsc-3.22.3-72capmzvctrc45sae2nfjvkz6lttauxa/include/petscviewertypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcbv.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcconf.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcds.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepceps.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcfn.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepclme.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcmat.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcmath.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcrg.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcrgtypes.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcsc.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcst.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcsys.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcvec.h
+ /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/slepc-3.22.2-5osoodrkkyhkhnznom7y6l366w4xg5dv/include/slepcversion.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5ACpublic.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5Apublic.h
  /users/becker/dopl4670/spack/var/spack/environments/TDSE/.spack-env/view/include/H5Cpublic.h

@@ -287,6 +287,33 @@ petsc_wrappers/PetscFileViewer.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscFileViewer.cpp.s
 .PHONY : petsc_wrappers/PetscFileViewer.cpp.s
 
+petsc_wrappers/PetscKSP.o: petsc_wrappers/PetscKSP.cpp.o
+
+.PHONY : petsc_wrappers/PetscKSP.o
+
+# target to build an object file
+petsc_wrappers/PetscKSP.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscKSP.cpp.o
+.PHONY : petsc_wrappers/PetscKSP.cpp.o
+
+petsc_wrappers/PetscKSP.i: petsc_wrappers/PetscKSP.cpp.i
+
+.PHONY : petsc_wrappers/PetscKSP.i
+
+# target to preprocess a source file
+petsc_wrappers/PetscKSP.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscKSP.cpp.i
+.PHONY : petsc_wrappers/PetscKSP.cpp.i
+
+petsc_wrappers/PetscKSP.s: petsc_wrappers/PetscKSP.cpp.s
+
+.PHONY : petsc_wrappers/PetscKSP.s
+
+# target to generate assembly for a file
+petsc_wrappers/PetscKSP.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/petsc_wrappers/PetscKSP.cpp.s
+.PHONY : petsc_wrappers/PetscKSP.cpp.s
+
 petsc_wrappers/PetscMatrix.o: petsc_wrappers/PetscMatrix.cpp.o
 
 .PHONY : petsc_wrappers/PetscMatrix.o
@@ -476,6 +503,9 @@ help:
 	@echo "... petsc_wrappers/PetscFileViewer.o"
 	@echo "... petsc_wrappers/PetscFileViewer.i"
 	@echo "... petsc_wrappers/PetscFileViewer.s"
+	@echo "... petsc_wrappers/PetscKSP.o"
+	@echo "... petsc_wrappers/PetscKSP.i"
+	@echo "... petsc_wrappers/PetscKSP.s"
 	@echo "... petsc_wrappers/PetscMatrix.o"
 	@echo "... petsc_wrappers/PetscMatrix.i"
 	@echo "... petsc_wrappers/PetscMatrix.s"

@@ -16,6 +16,7 @@
 #include "utility.h"
 #include "petsc_wrappers/PetscFileViewer.h"
 #include "petsc_wrappers/PetscMatrix.h"
+#include "petsc_wrappers/PetscKSP.h"
 
 using Vec3 = std::array<double, 3>;
 
@@ -329,11 +330,9 @@ namespace tdse
         PetscPrintf(PETSC_COMM_WORLD, "Norm of Initial State: (%.4f,%.4f)\n\n", norm.real(), norm.imag());
 
 
-        // PetscPrintf(PETSC_COMM_WORLD, "Setting up Linear Solver\n\n");
-        // KSP ksp;
-        // ierr = KSPCreate(PETSC_COMM_WORLD, &ksp); CHKERRQ(ierr);
-        // ierr = KSPSetTolerances(ksp, sim.schrodinger_params.tdse_tol, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); CHKERRQ(ierr);
-        // ierr = KSPSetFromOptions(ksp); CHKERRQ(ierr);
+        PetscPrintf(PETSC_COMM_WORLD, "Setting up Linear Solver\n\n");
+        PetscKSP ksp(RunMode::PARALLEL);
+        ksp.setConvergenceParams(sim);
 
         // PetscPrintf(PETSC_COMM_WORLD, "Preallocating Temporary Petsc Objects\n\n");
         // Vec state_temp;
