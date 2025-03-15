@@ -8,6 +8,8 @@
 #include "bsplines.h"
 #include <map>
 #include <iomanip>
+#include "petsc_wrappers/PetscMatrix.h"
+#include "bsplines.h"
 
 
 
@@ -103,8 +105,8 @@ namespace block
         file << std::fixed << std::setprecision(15);
 
         std::cout << "Constructing Overlap Matrix" << std::endl;
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
+        RadialMatrix S(sim, RunMode::SEQUENTIAL, ECSMode::OFF);
+        S.populateMatrix(sim,bsplines::overlap_integrand);
 
         std::cout << "Loading Final State" << std::endl;
         Vec state;
@@ -112,7 +114,7 @@ namespace block
 
         if (sim.observable_params.cont)
         {
-            ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5", S, state,sim); CHKERRQ(ierr);
+            ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5", S.matrix, state,sim); CHKERRQ(ierr);
         }
         
         Vec state_block,temp;
@@ -127,7 +129,7 @@ namespace block
             ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
             ierr = VecGetSubVector(state, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
-            ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
+            ierr = MatMult(S.matrix,state_block,temp); CHKERRQ(ierr);
             ierr = VecDot(state_block,temp,&block_norm); CHKERRQ(ierr);
             file << block_norm.real() << " " << block_norm.imag() << "\n";
             ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);

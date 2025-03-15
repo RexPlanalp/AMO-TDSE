@@ -14,6 +14,7 @@
 
 #include "simulation.h"
 #include "bsplines.h"
+#include "petsc_wrappers/PetscMatrix.h"
 #include "misc.h"
 
 using lm_pair = std::pair<int, int>;
@@ -60,8 +61,8 @@ namespace pes
         // Open HDF5 file for reading
         ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
 
-        Mat S;
-        ierr = bsplines::construct_matrix(sim,S,bsplines::overlap_integrand,false,false); CHKERRQ(ierr);
+        RadialMatrix S(sim, RunMode::SEQUENTIAL, ECSMode::OFF);
+        S.populateMatrix(sim,bsplines::overlap_integrand);
 
         const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
@@ -91,7 +92,7 @@ namespace pes
                     ierr = PetscObjectSetName((PetscObject)tise_state, dataset_name.str().c_str()); CHKERRQ(ierr);
                     ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
 
-                    ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
+                    ierr = MatMult(S.matrix,state_block,temp); CHKERRQ(ierr);
                     ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
                     ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); 
                 }
@@ -141,7 +142,7 @@ namespace pes
 
     for (int idx = 2; idx < Nr; ++idx) {
         const double r_val = idx * dr;
-        const double term = dr2 * (lterm/(r_val*r_val) + 2.0*H(r_val) - 2.0*E);
+        const double term = dr2 * (lterm/(r_val*r_val) + 2.0*H(r_val).real() - 2.0*E);
         wave[idx] = wave[idx - 1] * (term + 2.0) - wave[idx - 2];
 
         // Match Python's overflow handling

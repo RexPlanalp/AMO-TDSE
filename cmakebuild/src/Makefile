@@ -125,6 +125,33 @@ TDSE/fast:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/build
 .PHONY : TDSE/fast
 
+block.o: block.cpp.o
+
+.PHONY : block.o
+
+# target to build an object file
+block.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.o
+.PHONY : block.cpp.o
+
+block.i: block.cpp.i
+
+.PHONY : block.i
+
+# target to preprocess a source file
+block.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.i
+.PHONY : block.cpp.i
+
+block.s: block.cpp.s
+
+.PHONY : block.s
+
+# target to generate assembly for a file
+block.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/block.cpp.s
+.PHONY : block.cpp.s
+
 bsplines.o: bsplines.cpp.o
 
 .PHONY : bsplines.o
@@ -232,6 +259,33 @@ misc.s: misc.cpp.s
 misc.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.s
 .PHONY : misc.cpp.s
+
+pes.o: pes.cpp.o
+
+.PHONY : pes.o
+
+# target to build an object file
+pes.cpp.o:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.o
+.PHONY : pes.cpp.o
+
+pes.i: pes.cpp.i
+
+.PHONY : pes.i
+
+# target to preprocess a source file
+pes.cpp.i:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.i
+.PHONY : pes.cpp.i
+
+pes.s: pes.cpp.s
+
+.PHONY : pes.s
+
+# target to generate assembly for a file
+pes.cpp.s:
+	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/pes.cpp.s
+.PHONY : pes.cpp.s
 
 petsc_wrappers/PetscEPS.o: petsc_wrappers/PetscEPS.cpp.o
 
@@ -485,6 +539,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... TDSE"
+	@echo "... block.o"
+	@echo "... block.i"
+	@echo "... block.s"
 	@echo "... bsplines.o"
 	@echo "... bsplines.i"
 	@echo "... bsplines.s"
@@ -497,6 +554,9 @@ help:
 	@echo "... misc.o"
 	@echo "... misc.i"
 	@echo "... misc.s"
+	@echo "... pes.o"
+	@echo "... pes.i"
+	@echo "... pes.s"
 	@echo "... petsc_wrappers/PetscEPS.o"
 	@echo "... petsc_wrappers/PetscEPS.i"
 	@echo "... petsc_wrappers/PetscEPS.s"
