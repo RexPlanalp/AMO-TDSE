@@ -381,7 +381,7 @@ namespace tdse
         }
 
         norm = state.computeNorm(S_atomic);
-        PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
+        PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", double(norm.real()), double(norm.imag()));
 
         PetscPrintf(PETSC_COMM_WORLD, "Saving Final State\n\n");
         viewTDSE.saveVector(state,"","final_state");
