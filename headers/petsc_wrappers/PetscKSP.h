@@ -24,14 +24,11 @@ class PetscKSP
         // Set convergence params
         void setConvergenceParams(const simulation& sim); 
 
-        // Set parameters for solver
-        void setSolverParams(int requested_pairs);
-
         // Set operators
-        void setOperators(const PetscMatrix& H, const PetscMatrix& S);
+        void setOperators(const PetscMatrix& L);
 
         // Solve the eigenvalue problem
-        int solve();
+        void solve();
 
         // Internal EPS 
         KSP ksp = nullptr;

@@ -226,8 +226,6 @@ namespace tdse
     {
         PetscErrorCode ierr;
 
-        int n_blocks = sim.angular_params.n_blocks;
-
         PetscBinaryViewer Inv_rViewer((sim.tise_output_path+"/Inv_r.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
         PetscMatrix Inv_r = Inv_rViewer.loadMatrix();
 
@@ -267,7 +265,6 @@ namespace tdse
     PetscMatrix construct_z_interaction(const simulation& sim)
     {
         PetscErrorCode ierr;
-        int n_blocks = sim.angular_params.n_blocks;
 
         AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_1);
         H_lm_1.populateMatrix(sim);
@@ -298,8 +295,8 @@ namespace tdse
         double dt = sim.grid_params.dt;
         int Nt = sim.grid_params.Nt;
         std::complex<double> alpha = PETSC_i * (dt / 2.0);
-        int total_size = sim.bspline_params.n_basis * sim.angular_params.n_blocks;
-        int degree = sim.bspline_params.degree;
+        
+        
 
 
         Wavefunction state = load_starting_state(sim); CHKERRQ(ierr);
@@ -307,7 +304,8 @@ namespace tdse
         PetscHDF5Viewer viewTDSE((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
         
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
-        std::pair<PetscMatrix,PetscMatrix> atomic_matrices = construct_atomic_interaction(sim, alpha);
+        PetscMatrix atomic_left,atomic_right;
+        std::tie(atomic_left, atomic_right) = construct_atomic_interaction(sim, alpha);
 
         PetscMatrix S_atomic = construct_S_atomic(sim);
 
@@ -334,89 +332,63 @@ namespace tdse
         PetscKSP ksp(RunMode::PARALLEL);
         ksp.setConvergenceParams(sim);
 
-        // PetscPrintf(PETSC_COMM_WORLD, "Preallocating Temporary Petsc Objects\n\n");
-        // Vec state_temp;
-        // Mat atomic_left_temp, atomic_right_temp;
-        // ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
-        // ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
-        // ierr = VecDuplicate(state.vector, &state_temp); CHKERRQ(ierr);
-
-        // PetscPrintf(PETSC_COMM_WORLD, "Solving TDSE\n\n");
-        // for (int idx = 0; idx < Nt; ++idx) 
-        // {   
-        //     if (sim.debug)
-        //     {
-        //         PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d/%d\n", idx,Nt);
-        //     }
+        PetscPrintf(PETSC_COMM_WORLD, "Preallocating Temporary Petsc Objects\n\n");
+        PetscVector state_temp(state);
+        
+        PetscPrintf(PETSC_COMM_WORLD, "Solving TDSE\n\n");
+        for (int idx = 0; idx < Nt; idx++) 
+        {   
+            if (sim.debug)
+            {
+                PetscPrintf(PETSC_COMM_WORLD, "Time Step: %d/%d\n", idx,Nt);
+            }
             
-        //     double t = idx * dt;
+            double t = idx * dt;
 
-        //     // Destroy and recreate temp matrices to avoid accumulation of structural changes
-        //     ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
-        //     ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
-        //     ierr = MatDuplicate(atomic_left, MAT_COPY_VALUES, &atomic_left_temp); CHKERRQ(ierr);
-        //     ierr = MatDuplicate(atomic_right, MAT_COPY_VALUES, &atomic_right_temp); CHKERRQ(ierr);
+            // Destroy and recreate temp matrices to avoid accumulation of structural changes
+           
+            PetscMatrix atomic_left_temp(atomic_left);
+            PetscMatrix atomic_right_temp(atomic_right);
 
-        //     if (components[2]) 
-        //     {
 
-        //         double laser_val = laser::A(t+dt/2.0, sim, 2);
-        //         ierr = MatAXPY(atomic_left_temp, alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-        //         ierr = MatAXPY(atomic_right_temp, -alpha * laser_val, H_z, DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-        //     }
-        //     else if (components[0] || components[1])
-        //     {
-        //         std::complex<double> A_tilde = laser::A(t+dt/2.0, sim, 0) + PETSC_i*laser::A(t+dt/2.0, sim, 1);
-        //         std::complex<double> A_tilde_star = laser::A(t+dt/2.0, sim, 0) - PETSC_i*laser::A(t+dt/2.0, sim, 1);
+            if (components[2]) 
+            {
 
-        //         ierr = MatAXPY(atomic_left_temp,alpha*A_tilde_star,H_xy,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-        //         ierr = MatAXPY(atomic_right_temp,-alpha*A_tilde_star,H_xy,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+                double laser_val = laser::A(t+dt/2.0, sim, 2);
+                ierr = MatAXPY(atomic_left_temp.matrix, alpha * laser_val, H_z.matrix, DIFFERENT_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+                ierr = MatAXPY(atomic_right_temp.matrix, -alpha * laser_val, H_z.matrix, DIFFERENT_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+            }
+            else if (components[0] || components[1])
+            {
+                std::complex<double> A_tilde = laser::A(t+dt/2.0, sim, 0) + PETSC_i*laser::A(t+dt/2.0, sim, 1);
+                std::complex<double> A_tilde_star = laser::A(t+dt/2.0, sim, 0) - PETSC_i*laser::A(t+dt/2.0, sim, 1);
 
-        //         ierr = MatAXPY(atomic_left_temp,alpha*A_tilde,H_xy_tilde,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
-        //         ierr = MatAXPY(atomic_right_temp,-alpha*A_tilde,H_xy_tilde,DIFFERENT_NONZERO_PATTERN); CHKERRQ(ierr);
+                ierr = MatAXPY(atomic_left_temp.matrix,alpha*A_tilde_star,H_xy.matrix,DIFFERENT_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
+                ierr = MatAXPY(atomic_right_temp.matrix,-alpha*A_tilde_star,H_xy.matrix,DIFFERENT_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
 
-        //     }
+                ierr = MatAXPY(atomic_left_temp.matrix,alpha*A_tilde,H_xy_tilde.matrix,DIFFERENT_NONZERO_PATTERN);  checkErr(ierr,"Error in MatAXPY");
+                ierr = MatAXPY(atomic_right_temp.matrix,-alpha*A_tilde,H_xy_tilde.matrix,DIFFERENT_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
 
-        //     ierr = MatMult(atomic_right_temp, state.vector, state_temp); CHKERRQ(ierr);
+            }
 
-        //     // Reuse KSP operator
-        //     ierr = KSPSetOperators(ksp, atomic_left_temp, atomic_left_temp); CHKERRQ(ierr);
-        //     ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); CHKERRQ(ierr);
+            ierr = MatMult(atomic_right_temp.matrix, state.vector, state_temp.vector); checkErr(ierr,"Error in MatMult");
 
-        //     ierr = KSPSolve(ksp, state_temp, state.vector); CHKERRQ(ierr);
+            ksp.setOperators(atomic_left_temp);
+
+            ierr = KSPSolve(ksp.ksp, state_temp.vector, state.vector); checkErr(ierr,"Error in KSPSolve");
 
             
-        // }
+        }
 
-        // PetscPrintf(PETSC_COMM_WORLD, "Computing Norm...\n\n");
-        // ierr = MatMult(S_atomic, state.vector, y); CHKERRQ(ierr);
-        // ierr = VecDot(state.vector, y, &norm); CHKERRQ(ierr);
-        // PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
+        norm = state.computeNorm(S_atomic);
+        PetscPrintf(PETSC_COMM_WORLD, "Norm of Final State: (%.15f,%.15f)\n\n", (double)norm.real(), (double)norm.imag());
 
-        // ierr = PetscObjectSetName((PetscObject)state.vector,"final_state"); CHKERRQ(ierr);
-        // ierr = VecView(state.vector, viewTDSE.viewer); CHKERRQ(ierr);
+        PetscPrintf(PETSC_COMM_WORLD, "Saving Final State\n\n");
+        viewTDSE.saveVector(state,"","final_state");
 
-        // PetscPrintf(PETSC_COMM_WORLD, "Destroying Petsc Objects\n\n");
-        // ierr = VecDestroy(&y); CHKERRQ(ierr);
-        // ierr = VecDestroy(&state_temp); CHKERRQ(ierr);
-        // ierr = MatDestroy(&atomic_left_temp); CHKERRQ(ierr);
-        // ierr = MatDestroy(&atomic_right_temp); CHKERRQ(ierr);
-        // if (components[0] || components[1]) 
-        // {
-        //     ierr = MatDestroy(&H_xy); CHKERRQ(ierr);
-        //     ierr = MatDestroy(&H_xy_tilde); CHKERRQ(ierr);
-        // }
-        // if (components[2]) 
-        // {
-        //     ierr = MatDestroy(&H_z); CHKERRQ(ierr);
-        // }
-        // ierr = MatDestroy(&H_atomic); CHKERRQ(ierr);
-        // ierr = MatDestroy(&S_atomic); CHKERRQ(ierr);
-        // ierr = MatDestroy(&atomic_left); CHKERRQ(ierr);
-        // ierr = MatDestroy(&atomic_right); CHKERRQ(ierr);
-        // ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
-        // double time_end = MPI_Wtime();
-        // PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",time_end-time_start);
+
+        double time_end = MPI_Wtime();
+        PetscPrintf(PETSC_COMM_WORLD,"Time to solve TDSE %.3f\n",time_end-time_start);
 
         return ierr;
     }

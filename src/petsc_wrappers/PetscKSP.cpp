@@ -1,5 +1,3 @@
-#pragma once
-
 #include <slepceps.h>
 #include "simulation.h"
 #include "petsc_wrappers/PetscMatrix.h"
@@ -41,3 +39,11 @@ void PetscKSP::setConvergenceParams(const simulation& sim)
     ierr = KSPSetTolerances(ksp, sim.schrodinger_params.tdse_tol, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT); checkErr(ierr,"Error setting tolerances");
     ierr = KSPSetFromOptions(ksp); checkErr(ierr,"Error setting options");
 }
+
+void PetscKSP::setOperators(const PetscMatrix& L)
+{   
+    PetscErrorCode ierr;
+    ierr = KSPSetOperators(ksp, L.matrix, L.matrix); checkErr(ierr,"Error setting operators");
+    ierr = KSPSetReusePreconditioner(ksp, PETSC_TRUE); checkErr(ierr,"Error setting reuse preconditioner");
+}
+

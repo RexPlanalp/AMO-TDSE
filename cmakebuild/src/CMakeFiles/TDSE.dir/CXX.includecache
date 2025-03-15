@@ -90,22 +90,6 @@ petscsys.h
 petsc_wrappers/PetscMatrix.h
 ../headers/petsc_wrappers/PetscMatrix.h
 
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/PetscKSP.cpp
-slepceps.h
--
-simulation.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/simulation.h
-petsc_wrappers/PetscMatrix.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/petsc_wrappers/PetscMatrix.h
-petsc_wrappers/PetscVector.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/petsc_wrappers/PetscVector.h
-mpi.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/mpi.h
-petsc_wrappers/PetscKSP.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/petsc_wrappers/PetscKSP.h
-utility.h
-/users/becker/dopl4670/Research/TDSE_PETSC/src/petsc_wrappers/utility.h
-
 /users/becker/dopl4670/Research/TDSE_PETSC/src/tdse.cpp
 iostream
 -
