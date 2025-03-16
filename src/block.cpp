@@ -9,6 +9,7 @@
 #include <map>
 #include <iomanip>
 #include "petsc_wrappers/PetscMatrix.h"
+#include "petsc_wrappers/PetscFileViewer.h"
 #include "bsplines.h"
 
 
@@ -17,26 +18,26 @@
 
 namespace block 
 {   
-    PetscErrorCode load_final_state(std::string filename, Vec* state, int total_size) 
-    {   
-        PetscErrorCode ierr;
-        PetscViewer viewer;
+    // PetscErrorCode load_final_state(std::string filename, Vec* state, int total_size) 
+    // {   
+    //     PetscErrorCode ierr;
+    //     PetscViewer viewer;
 
-        ierr = VecCreate(PETSC_COMM_SELF, state); CHKERRQ(ierr);
-        ierr = VecSetSizes(*state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
-        ierr = VecSetFromOptions(*state); CHKERRQ(ierr);
-        ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
-        ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
-
-
-        ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-        ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
-        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
+    //     ierr = VecCreate(PETSC_COMM_SELF, state); CHKERRQ(ierr);
+    //     ierr = VecSetSizes(*state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
+    //     ierr = VecSetFromOptions(*state); CHKERRQ(ierr);
+    //     ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
+    //     ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
 
 
-        return ierr;
-    }
+    //     ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
+    //     ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+    //     ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
+    //     ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
+
+
+    //     return ierr;
+    // }
 
     PetscErrorCode project_out_bound(std::string filename, Mat& S, Vec& state, const simulation& sim)
     {
@@ -109,12 +110,14 @@ namespace block
         S.populateMatrix(sim,bsplines::overlap_integrand);
 
         std::cout << "Loading Final State" << std::endl;
-        Vec state;
-        ierr = load_final_state(sim.tdse_output_path+"/tdse_output.h5", &state, sim.angular_params.n_blocks*sim.bspline_params.n_basis); CHKERRQ(ierr);
+        //Vec state;
+        //ierr = load_final_state(sim.tdse_output_path+"/tdse_output.h5", &state, sim.angular_params.n_blocks*sim.bspline_params.n_basis); CHKERRQ(ierr);
+        PetscHDF5Viewer finalStateViewer((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
+        PetscVector state = finalStateViewer.loadVector(sim.angular_params.n_blocks*sim.bspline_params.n_basis,"","final_state");
 
         if (sim.observable_params.cont)
         {
-            ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5", S.matrix, state,sim); CHKERRQ(ierr);
+            ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5", S.matrix, state.vector,sim); CHKERRQ(ierr);
         }
         
         Vec state_block,temp;
@@ -127,12 +130,12 @@ namespace block
            
             int start = idx*sim.bspline_params.n_basis;
             ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
-            ierr = VecGetSubVector(state, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
+            ierr = VecGetSubVector(state.vector, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
             ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
             ierr = MatMult(S.matrix,state_block,temp); CHKERRQ(ierr);
             ierr = VecDot(state_block,temp,&block_norm); CHKERRQ(ierr);
             file << block_norm.real() << " " << block_norm.imag() << "\n";
-            ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);
+            ierr = VecRestoreSubVector(state.vector, is, &state_block); CHKERRQ(ierr);
 
         }
         file.close();

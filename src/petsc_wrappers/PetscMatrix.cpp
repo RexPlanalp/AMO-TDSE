@@ -143,12 +143,12 @@ void AngularMatrix::populateMatrix(const simulation& sim)
     int n_blocks = sim.angular_params.n_blocks;
 
     PetscErrorCode ierr;
-    for (int i = local_start; i < local_end; ++i)
+    for (int i = local_start; i < local_end; i++)
         {
             std::pair<int,int> lm_pair = sim.angular_params.block_to_lm.at(i);
             int l = lm_pair.first;
             int m = lm_pair.second;
-            for (int j = 0; j < n_blocks; ++j)
+            for (int j = 0; j < n_blocks; j++)
             {
                 std::pair<int,int> lm_pair_prime = sim.angular_params.block_to_lm.at(j);
                 int lprime = lm_pair_prime.first;

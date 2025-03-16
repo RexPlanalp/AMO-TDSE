@@ -4,7 +4,9 @@
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/block.h
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/bsplines.h
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/misc.h
+src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/petsc_wrappers/PetscFileViewer.h
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/petsc_wrappers/PetscMatrix.h
+src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/petsc_wrappers/PetscVector.h
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../headers/simulation.h
 src/CMakeFiles/TDSE.dir/block.cpp.o: ../src/block.cpp
 src/CMakeFiles/TDSE.dir/block.cpp.o: /users/becker/dopl4670/spack/opt/spack/linux-rhel7-ivybridge/gcc-6.3.0/openmpi-5.0.6-3kjaqngca756j3wj7y3pns3fps6d4a5f/include/mpi.h

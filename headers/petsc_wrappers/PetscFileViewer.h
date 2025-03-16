@@ -49,6 +49,7 @@ class PetscHDF5Viewer : public PetscFileViewer
         
         void saveVector(const PetscVector& vector, const char* groupname, const char* vectorname);
         void saveValue(std::complex<double> value, const char* groupname, const char* valuename);
+        PetscVector loadVector(int size,const char* groupname, const char* vectorname);
 
         // Internal communicator
         MPI_Comm comm = MPI_COMM_NULL;

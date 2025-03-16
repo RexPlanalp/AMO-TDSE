@@ -82,6 +82,26 @@ void PetscHDF5Viewer::saveValue(std::complex<double> value, const char* groupnam
    
 }
 
+PetscVector PetscHDF5Viewer::loadVector(int size, const char* groupname, const char* vectorname)
+{
+    PetscErrorCode ierr;
+    PetscVector V;
+
+    ierr = VecCreate(comm, &V.vector); checkErr(ierr, "Error creating vector");
+    ierr = VecSetSizes(V.vector, PETSC_DECIDE, size); checkErr(ierr, "Error setting vector sizes");
+    ierr = VecSetFromOptions(V.vector); checkErr(ierr, "Error setting vector options");
+
+    ierr = PetscViewerHDF5PushGroup(viewer, groupname); checkErr(ierr, "Error pushing group");
+
+    ierr = PetscObjectSetName((PetscObject)V.vector, vectorname); checkErr(ierr, "Error setting vector name");
+    ierr = VecLoad(V.vector, viewer); checkErr(ierr, "Error loading vector");
+    
+    ierr = PetscViewerHDF5PopGroup(viewer); checkErr(ierr, "Error popping group");
+
+    return V;     
+}
+
+
 //////////////////////////
 // Binary Viewer Wrapper//
 //////////////////////////
