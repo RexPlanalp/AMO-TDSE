@@ -14,6 +14,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/TDSE.dir/petsc_wrappers/PetscEPS.cpp.o"
   "CMakeFiles/TDSE.dir/petsc_wrappers/PetscFileViewer.cpp.o"
   "CMakeFiles/TDSE.dir/petsc_wrappers/PetscKSP.cpp.o"
+  "CMakeFiles/TDSE.dir/petsc_wrappers/PetscIS.cpp.o"
   "../bin/simulation.exe.pdb"
   "../bin/simulation.exe"
 )

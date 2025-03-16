@@ -10,91 +10,63 @@
 #include <iomanip>
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscFileViewer.h"
+#include "petsc_wrappers/PetscVector.h"
+#include "petsc_wrappers/PetscIS.h"
 #include "bsplines.h"
-
+#include "utility.h"
 
 
 
 
 namespace block 
 {   
-    // PetscErrorCode load_final_state(std::string filename, Vec* state, int total_size) 
-    // {   
-    //     PetscErrorCode ierr;
-    //     PetscViewer viewer;
-
-    //     ierr = VecCreate(PETSC_COMM_SELF, state); CHKERRQ(ierr);
-    //     ierr = VecSetSizes(*state, PETSC_DECIDE, total_size); CHKERRQ(ierr);
-    //     ierr = VecSetFromOptions(*state); CHKERRQ(ierr);
-    //     ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
-    //     ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
-
-
-    //     ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-    //     ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-    //     ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
-    //     ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
-
-
-    //     return ierr;
-    // }
-
-    PetscErrorCode project_out_bound(std::string filename, Mat& S, Vec& state, const simulation& sim)
+    PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim)
     {
+      
+    
+
         PetscErrorCode ierr;
-        Vec state_block, tise_state,temp;
-        IS is;
         std::complex<double> inner_product;
         PetscBool has_dataset;
-        PetscViewer viewer;
+        
 
-        // Open HDF5 file for reading
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
+        PetscHDF5Viewer viewEigenvectors((sim.tise_output_path+"/tise_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
+        PetscVector state_block;
 
-        const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
 
-        for (int idx = 0; idx < sim.angular_params.n_blocks; ++idx)
+        for (int block = 0; block < sim.angular_params.n_blocks; block++)
         {
-            std::pair<int, int> lm_pair = sim.angular_params.block_to_lm.at(idx);
+            std::pair<int, int> lm_pair = sim.angular_params.block_to_lm.at(block);
             int l = lm_pair.first;
+            int start = block * sim.bspline_params.n_basis;
+
+            PetscIS indexSet(sim.bspline_params.n_basis, start, 1, RunMode::SEQUENTIAL);
             
-
-            int start = idx * sim.bspline_params.n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
-            ierr = VecGetSubVector(state, is, &state_block); CHKERRQ(ierr);
-            ierr = VecDuplicate(state_block, &temp); CHKERRQ(ierr);
-
-          
-
+            ierr = VecGetSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecGetSubVector");
+            PetscVector temp(state_block);
+            
             for (int n = 0; n <= sim.angular_params.nmax; ++n)
             {
-                std::ostringstream dataset_name;
-                dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
-                ierr = PetscViewerHDF5HasDataset(viewer, dataset_name.str().c_str(), &has_dataset); CHKERRQ(ierr);
+                std::ostringstream dataset_ss;
+                dataset_ss << "/eigenvectors" << "/psi_" << n << "_" << l;
+                std::string dataset_name = dataset_ss.str();
+
+
+                ierr = PetscViewerHDF5HasDataset(viewEigenvectors.viewer, dataset_name.c_str(), &has_dataset); checkErr(ierr, "Error in PetscViewerHDF5HasDataset");
                 if (has_dataset)
                 {   
-                    ierr = VecDuplicate(state_block, &tise_state); CHKERRQ(ierr);
-                    ierr = VecSet(tise_state, 0.0); CHKERRQ(ierr);
+                    PetscVector tise_state = viewEigenvectors.loadVector(sim.bspline_params.n_basis, "eigenvectors", dataset_name.c_str());
 
-                    ierr = PetscObjectSetName((PetscObject)tise_state, dataset_name.str().c_str()); CHKERRQ(ierr);
-                    ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
-
-                    ierr = MatMult(S,state_block,temp); CHKERRQ(ierr);
-                    ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
-                    ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); // Subtract projection 
+                    ierr = MatMult(S.matrix,state_block.vector,temp.vector); checkErr(ierr, "Error in MatMult");
+                    ierr = VecDot(temp.vector,tise_state.vector,&inner_product); checkErr(ierr, "Error in VecDot");
+                    ierr = VecAXPY(state_block.vector,-inner_product,tise_state.vector); checkErr(ierr, "Error in VecAXPY");
                 }
             }
             
             
 
-            ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);
-            ierr = ISDestroy(&is); CHKERRQ(ierr);
-            ierr = VecDestroy(&temp); CHKERRQ(ierr);
+            ierr = VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecRestoreSubVector");
         }
-
-        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
-        ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
-
         return ierr;
     }
 
@@ -117,7 +89,7 @@ namespace block
 
         if (sim.observable_params.cont)
         {
-            ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5", S.matrix, state.vector,sim); CHKERRQ(ierr);
+            ierr = project_out_bound(S, state,sim); checkErr(ierr, "Error in project_out_bound");
         }
         
         Vec state_block,temp;
