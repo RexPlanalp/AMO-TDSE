@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <complex>
 
-#include <gsl/gsl_sf_legendre.h>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -25,35 +25,13 @@ using energy_l_pair = std::pair<double, int>;
 
 namespace pes
 {
-
-
     struct coulomb_wave 
     {
         double phase;
         std::vector<double> wave;
     };
 
-    std::complex<double> compute_Ylm(int l, int m, double theta, double phi) {
-
-    
-    // Using m parity identity to evaluate for negative m
-    if (m < 0) 
-    {
-        int abs_m = -m;
-        std::complex<double> Ylm = 
-                                  gsl_sf_legendre_sphPlm(l, abs_m, std::cos(theta)) * 
-                                  std::exp(std::complex<double>(0, -abs_m * phi));
-
-        return std::pow(-1.0, abs_m) * std::conj(Ylm);
-    }
-    
-    // For positive m evaluate as normal
-    return  
-           gsl_sf_legendre_sphPlm(l, m, std::cos(theta)) * 
-           std::exp(std::complex<double>(0, m * phi));
-}
-
-    coulomb_wave compute_coulomb_wave(double E, int l, int Nr, double dr) {
+    coulomb_wave compute_coulomb_wave(double E, int l, int Nr, double dr, std::function<std::complex<double>(double)> Pot){
     std::vector<double> wave(Nr, 0.0);
     const double dr2 = dr * dr;
     const double k = std::sqrt(2.0 * E);
@@ -64,7 +42,7 @@ namespace pes
 
     for (int idx = 2; idx < Nr; ++idx) {
         const double r_val = idx * dr;
-        const double term = dr2 * (lterm/(r_val*r_val) + 2.0*H(r_val).real() - 2.0*E);
+        const double term = dr2 * (lterm/(r_val*r_val) + 2.0*Pot(r_val).real() - 2.0*E);
         wave[idx] = wave[idx - 1] * (term + 2.0) - wave[idx - 2];
 
         // Match Python's overflow handling
@@ -100,11 +78,13 @@ namespace pes
     return coulomb_wave{phase, wave};
 }
     
-    PetscErrorCode expand_state(Vec& state,std::vector<std::complex<double>>& expanded_state, const simulation& sim)
+    std::vector<std::complex<double>> expand_state(const PetscVector& state, const simulation& sim)
     {   
         PetscErrorCode ierr;
         const std::complex<double>* state_array;
-        ierr =  VecGetArrayRead(state, reinterpret_cast<const PetscScalar**>(&state_array)); CHKERRQ(ierr);
+        ierr =  VecGetArrayRead(state.vector, reinterpret_cast<const PetscScalar**>(&state_array)); checkErr(ierr, "Error in VecGetArrayRead");
+        
+        std::vector<std::complex<double>> expanded_state(sim.grid_params.Nr * sim.angular_params.n_blocks,0.0);
 
         // Loop over all bspline basis function
         for (int bspline_idx = 0; bspline_idx < sim.bspline_params.n_basis; ++bspline_idx)
@@ -140,7 +120,7 @@ namespace pes
                 }
             }
         }
-        return ierr;
+        return  expanded_state;
     }
 
     void compute_partial_spectra(const std::vector<std::complex<double>>& expanded_state,std::map<lm_pair,std::vector<std::complex<double>>>& partial_spectra,std::map<energy_l_pair,double> phases, const simulation& sim)
@@ -152,6 +132,17 @@ namespace pes
             int l = lm_pair.first;
             int m = lm_pair.second;
             partial_spectra[std::make_pair(l, m)].reserve(sim.observable_params.Ne); 
+        }
+
+        std::function<std::complex<double>(std::complex<double>)> Pot;
+        switch(sim.potential_type)
+        {
+            case PotentialType::H:
+                Pot = H;
+                break;
+            case PotentialType::He:
+                Pot = He;
+                break;
         }
 
         for (int E_idx = 1; E_idx <= sim.observable_params.Ne; ++E_idx)
@@ -168,7 +159,7 @@ namespace pes
                 lm_pair lm_pair = sim.angular_params.block_to_lm.at(block);
                 int l = lm_pair.first;
                 int m = lm_pair.second;
-                coulomb_wave coulomb_result = compute_coulomb_wave(E_idx*sim.observable_params.dE, l, sim.grid_params.Nr, sim.grid_params.dr);
+                coulomb_wave coulomb_result = compute_coulomb_wave(E_idx*sim.observable_params.dE, l, sim.grid_params.Nr, sim.grid_params.dr,Pot);
                 
                 phases[std::make_pair(E_idx*sim.observable_params.dE,l)] = coulomb_result.phase;
 
@@ -316,11 +307,9 @@ namespace pes
         std::cout << "Projecting out bound states" << "\n\n";
         project_out_bound(S,final_state,sim);
 
-        // LEFT OFF HERE
+        
         std::cout << "Expanding State in Position Space" << "\n\n";
-        std::vector<std::complex<double>> expanded_state (sim.grid_params.Nr * sim.angular_params.n_blocks,0.0);
-        expand_state(final_state.vector,expanded_state,sim);
-
+        std::vector<std::complex<double>> expanded_state = expand_state(final_state,sim);
 
         std::cout << "Computing Partial Spectra" << "\n\n";
         std::map<energy_l_pair,double> phases;

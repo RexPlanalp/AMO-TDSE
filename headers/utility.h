@@ -1,4 +1,5 @@
 #include <petscsys.h>
+
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscVector.h"
 
@@ -27,3 +28,5 @@ double c(int l, int m);
 double ctilde(int l, int m);
 
 PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim);
+
+std::complex<double> compute_Ylm(int l, int m, double theta, double phi);

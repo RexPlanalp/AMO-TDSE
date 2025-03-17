@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <petscsys.h>
-
+#include <gsl/gsl_sf_legendre.h>
 #include "utility.h"
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscVector.h"
@@ -243,3 +243,25 @@ PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const
         }
         return ierr;
     }
+
+std::complex<double> compute_Ylm(int l, int m, double theta, double phi)
+{
+
+
+// Compute negative m using identity Y_{l,-m} = (-1)^m Y_{l,m}^*
+if (m < 0) 
+{
+    int abs_m = -m;
+    std::complex<double> Ylm = 
+                                gsl_sf_legendre_sphPlm(l, abs_m, std::cos(theta)) * 
+                                std::exp(std::complex<double>(0, -abs_m * phi));
+
+    return std::pow(-1.0, abs_m) * std::conj(Ylm);
+}
+
+// For positive m evaluate as normal
+return  
+        gsl_sf_legendre_sphPlm(l, m, std::cos(theta)) * 
+        std::exp(std::complex<double>(0, m * phi));
+}
+

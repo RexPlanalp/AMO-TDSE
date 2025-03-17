@@ -197,8 +197,6 @@ algorithm
 -
 complex
 -
-gsl/gsl_sf_legendre.h
--
 sys/stat.h
 -
 sys/types.h
@@ -366,6 +364,8 @@ utility.h
 iostream
 -
 petscsys.h
+-
+gsl/gsl_sf_legendre.h
 -
 utility.h
 /users/becker/dopl4670/Research/TDSE_PETSC/src/utility.h
