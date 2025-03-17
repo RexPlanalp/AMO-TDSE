@@ -10,7 +10,7 @@
 #include "tise.h"
 #include "simulation.h"
 #include "bsplines.h"
-#include "misc.h"
+#include "utility.h"
 
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscFileViewer.h"

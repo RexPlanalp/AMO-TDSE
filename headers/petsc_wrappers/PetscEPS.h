@@ -1,10 +1,13 @@
 #pragma once
 
+enum class RunMode;
+
 #include <slepceps.h>
 #include "simulation.h"
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscVector.h"
 #include "mpi.h"
+
 
 //////////////////////////
 // Petsc EPS Wrapper   //

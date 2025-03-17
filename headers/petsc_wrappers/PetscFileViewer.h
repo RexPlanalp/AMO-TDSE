@@ -1,5 +1,7 @@
 #pragma once
 
+enum class RunMode;
+
 #include <petscviewer.h>
 #include <petscviewerhdf5.h>
 

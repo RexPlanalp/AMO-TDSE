@@ -6,7 +6,7 @@
 
 #include "bsplines.h"
 #include "simulation.h"
-#include "misc.h"
+#include "utility.h"
 
 namespace bsplines 
 {

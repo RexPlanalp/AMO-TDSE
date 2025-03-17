@@ -233,33 +233,6 @@ main.cpp.s:
 	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-misc.o: misc.cpp.o
-
-.PHONY : misc.o
-
-# target to build an object file
-misc.cpp.o:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.o
-.PHONY : misc.cpp.o
-
-misc.i: misc.cpp.i
-
-.PHONY : misc.i
-
-# target to preprocess a source file
-misc.cpp.i:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.i
-.PHONY : misc.cpp.i
-
-misc.s: misc.cpp.s
-
-.PHONY : misc.s
-
-# target to generate assembly for a file
-misc.cpp.s:
-	cd /users/becker/dopl4670/Research/TDSE_PETSC/cmakebuild && $(MAKE) -f src/CMakeFiles/TDSE.dir/build.make src/CMakeFiles/TDSE.dir/misc.cpp.s
-.PHONY : misc.cpp.s
-
 pes.o: pes.cpp.o
 
 .PHONY : pes.o
@@ -578,9 +551,6 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... misc.o"
-	@echo "... misc.i"
-	@echo "... misc.s"
 	@echo "... pes.o"
 	@echo "... pes.i"
 	@echo "... pes.s"

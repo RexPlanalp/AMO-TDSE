@@ -54,7 +54,7 @@ if "PES" in sys.argv:
     e_cpp  = data[:,0]
     plt.semilogy(e_cpp,pes_cpp,label = "C++")
     plt.legend()
-    plt.savefig("pes.png")
+    plt.savefig("images/pes.png")
     # os.system("mv pes.png ~/Research/TDSE_PETSC/")
     os.system("code pes.png")
 
@@ -85,7 +85,7 @@ if "PES" in sys.argv:
     #sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
     ax.set_aspect("equal",adjustable = "box")
     fig.colorbar(sc,ax=ax)
-    fig.savefig("pad.png")
+    fig.savefig("images/pad.png")
     #os.system("mv pad.png ~/Research/TDSE_PETSC/")
     os.system("code pad.png")
 

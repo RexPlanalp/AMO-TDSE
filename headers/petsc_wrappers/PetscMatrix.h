@@ -1,5 +1,8 @@
 #pragma once
 
+enum class RunMode;
+class PetscVector;
+
 #include <petscmat.h>
 #include "simulation.h"
 #include <functional>

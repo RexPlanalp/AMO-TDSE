@@ -1,5 +1,7 @@
 #pragma once
 
+enum class RunMode;
+
 #include <slepceps.h>
 #include "simulation.h"
 #include "petsc_wrappers/PetscMatrix.h"

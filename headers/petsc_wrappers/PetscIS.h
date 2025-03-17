@@ -1,5 +1,7 @@
 #pragma once
 
+enum class RunMode;
+
 #include "mpi.h"
 #include "petscis.h"
 #include "simulation.h"

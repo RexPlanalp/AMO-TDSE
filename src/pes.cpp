@@ -17,7 +17,7 @@
 #include "petsc_wrappers/PetscMatrix.h"
 #include "petsc_wrappers/PetscVector.h"
 #include "petsc_wrappers/PetscFileViewer.h"
-#include "misc.h"
+#include "utility.h"
 #include "utility.h"
 
 using lm_pair = std::pair<int, int>;
@@ -314,6 +314,7 @@ namespace pes
         std::cout << "Computing Partial Spectra" << "\n\n";
         std::map<energy_l_pair,double> phases;
         std::map<lm_pair,std::vector<std::complex<double>>> partial_spectra;
+        
         compute_partial_spectra(expanded_state,partial_spectra,phases,sim);
 
         std::cout << "Computing Angle Integrated Spectrum" << "\n\n";

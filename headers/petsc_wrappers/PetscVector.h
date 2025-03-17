@@ -1,5 +1,9 @@
 #pragma once
 
+enum class RunMode;
+
+class PetscMatrix;
+
 #include <petscvec.h>
 #include <complex>
 #include "petsc_wrappers/PetscMatrix.h"
