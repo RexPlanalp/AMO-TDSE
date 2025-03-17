@@ -15,7 +15,10 @@
 #include "simulation.h"
 #include "bsplines.h"
 #include "petsc_wrappers/PetscMatrix.h"
+#include "petsc_wrappers/PetscVector.h"
+#include "petsc_wrappers/PetscFileViewer.h"
 #include "misc.h"
+#include "utility.h"
 
 using lm_pair = std::pair<int, int>;
 using energy_l_pair = std::pair<double, int>;
@@ -29,87 +32,6 @@ namespace pes
         double phase;
         std::vector<double> wave;
     };
-
-    PetscErrorCode load_final_state(std::string filename, Vec* state, const simulation& sim) 
-    {   
-        PetscErrorCode ierr;
-        PetscViewer viewer;
-
-        ierr = VecCreate(PETSC_COMM_SELF, state); CHKERRQ(ierr);
-        ierr = VecSetSizes(*state, PETSC_DECIDE, sim.bspline_params.n_basis*sim.angular_params.n_blocks); CHKERRQ(ierr);
-        ierr = VecSetFromOptions(*state); CHKERRQ(ierr);
-        ierr = VecSetType(*state, VECMPI); CHKERRQ(ierr);
-        ierr = VecSet(*state, 0.0); CHKERRQ(ierr);
-
-        ierr = PetscObjectSetName((PetscObject)*state, "final_state"); CHKERRQ(ierr);
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-        ierr = VecLoad(*state, viewer); CHKERRQ(ierr);
-        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
-
-        return ierr;
-    }
-
-    PetscErrorCode project_out_bound(std::string filename,Vec& state,const simulation& sim)
-    {
-        PetscErrorCode ierr;
-        Vec state_block, tise_state,temp;
-        IS is;
-        std::complex<double> inner_product;
-        PetscBool has_dataset;
-        PetscViewer viewer;
-
-        // Open HDF5 file for reading
-        ierr = PetscViewerHDF5Open(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &viewer); CHKERRQ(ierr);
-
-        RadialMatrix S(sim, RunMode::SEQUENTIAL, ECSMode::OFF);
-        S.populateMatrix(sim,bsplines::overlap_integrand);
-
-        const char GROUP_PATH[] = "/eigenvectors";  // Path to the datasets
-
-        for (int idx = 0; idx < sim.angular_params.n_blocks; idx++)
-        {
-            std::pair<int, int> lm_pair = sim.angular_params.block_to_lm.at(idx);
-            int l = lm_pair.first;
-            
-
-            int start = idx * sim.bspline_params.n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
-            ierr = VecGetSubVector(state, is, &state_block); CHKERRQ(ierr);
-            ierr = VecDuplicate(state_block, &temp); CHKERRQ(ierr);
-
-          
-
-            for (int n = 0; n <= sim.angular_params.nmax; ++n)
-            {
-                std::ostringstream dataset_name;
-                 dataset_name << GROUP_PATH << "/psi_" << n << "_" << l;
-                ierr = PetscViewerHDF5HasDataset(viewer, dataset_name.str().c_str(), &has_dataset); CHKERRQ(ierr);
-                if (has_dataset)
-                {   
-                    ierr = VecDuplicate(state_block, &tise_state); CHKERRQ(ierr);
-                    ierr = VecSet(tise_state, 0.0); CHKERRQ(ierr);
-
-                    ierr = PetscObjectSetName((PetscObject)tise_state, dataset_name.str().c_str()); CHKERRQ(ierr);
-                    ierr = VecLoad(tise_state, viewer); CHKERRQ(ierr);
-
-                    ierr = MatMult(S.matrix,state_block,temp); CHKERRQ(ierr);
-                    ierr = VecDot(temp,tise_state,&inner_product); CHKERRQ(ierr);
-                    ierr = VecAXPY(state_block,-inner_product,tise_state); CHKERRQ(ierr); 
-                }
-            }
-            
-            
-
-            ierr = VecRestoreSubVector(state, is, &state_block); CHKERRQ(ierr);
-            ierr = ISDestroy(&is); CHKERRQ(ierr);
-            ierr = VecDestroy(&temp); CHKERRQ(ierr);
-        }
-
-        ierr = PetscViewerDestroy(&viewer); CHKERRQ(ierr);
-        ierr = VecDestroy(&tise_state); CHKERRQ(ierr);
-
-        return ierr;
-    }
 
     std::complex<double> compute_Ylm(int l, int m, double theta, double phi) {
 
@@ -380,19 +302,24 @@ namespace pes
         create_directory(rank,sim.pes_output_path);
 
         PetscErrorCode ierr;
-        Vec final_state;
+
+        std::cout << "Constructing Overlap Matrix" << std::endl;
+        RadialMatrix S(sim, RunMode::SEQUENTIAL, ECSMode::OFF);
+        S.populateMatrix(sim,bsplines::overlap_integrand);
+        
 
         std::cout << "Loading Final State" << "\n\n";
-        ierr = load_final_state(sim.tdse_output_path+"/tdse_output.h5", &final_state,sim);
-
+        PetscHDF5Viewer finalStateViewer((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
+        PetscVector final_state = finalStateViewer.loadVector(sim.angular_params.n_blocks*sim.bspline_params.n_basis,"","final_state");
         
-        std::cout << "Projecting out Bound States" << "\n\n";
-        ierr = project_out_bound(sim.tise_output_path+"/tise_output.h5",final_state,sim); CHKERRQ(ierr);
 
+        std::cout << "Projecting out bound states" << "\n\n";
+        project_out_bound(S,final_state,sim);
 
+        // LEFT OFF HERE
         std::cout << "Expanding State in Position Space" << "\n\n";
         std::vector<std::complex<double>> expanded_state (sim.grid_params.Nr * sim.angular_params.n_blocks,0.0);
-        expand_state(final_state,expanded_state,sim);
+        expand_state(final_state.vector,expanded_state,sim);
 
 
         std::cout << "Computing Partial Spectra" << "\n\n";

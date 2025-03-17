@@ -1,5 +1,6 @@
 #include <petscsys.h>
 #include "petsc_wrappers/PetscMatrix.h"
+#include "petsc_wrappers/PetscVector.h"
 
 void checkErr(PetscErrorCode ierr, const char* msg);
 
@@ -24,3 +25,5 @@ double dtilde(int l, int m);
 double c(int l, int m);
 
 double ctilde(int l, int m);
+
+PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim);

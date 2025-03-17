@@ -20,56 +20,6 @@
 
 namespace block 
 {   
-    PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim)
-    {
-      
-    
-
-        PetscErrorCode ierr;
-        std::complex<double> inner_product;
-        PetscBool has_dataset;
-        
-
-        PetscHDF5Viewer viewEigenvectors((sim.tise_output_path+"/tise_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
-        PetscVector state_block;
-
-
-        for (int block = 0; block < sim.angular_params.n_blocks; block++)
-        {
-            std::pair<int, int> lm_pair = sim.angular_params.block_to_lm.at(block);
-            int l = lm_pair.first;
-            int start = block * sim.bspline_params.n_basis;
-
-            PetscIS indexSet(sim.bspline_params.n_basis, start, 1, RunMode::SEQUENTIAL);
-            
-            ierr = VecGetSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecGetSubVector");
-            PetscVector temp(state_block);
-            
-            for (int n = 0; n <= sim.angular_params.nmax; ++n)
-            {
-                std::ostringstream dataset_ss;
-                dataset_ss << "/eigenvectors" << "/psi_" << n << "_" << l;
-                std::string dataset_name = dataset_ss.str();
-
-
-                ierr = PetscViewerHDF5HasDataset(viewEigenvectors.viewer, dataset_name.c_str(), &has_dataset); checkErr(ierr, "Error in PetscViewerHDF5HasDataset");
-                if (has_dataset)
-                {   
-                    PetscVector tise_state = viewEigenvectors.loadVector(sim.bspline_params.n_basis, "eigenvectors", dataset_name.c_str());
-
-                    ierr = MatMult(S.matrix,state_block.vector,temp.vector); checkErr(ierr, "Error in MatMult");
-                    ierr = VecDot(temp.vector,tise_state.vector,&inner_product); checkErr(ierr, "Error in VecDot");
-                    ierr = VecAXPY(state_block.vector,-inner_product,tise_state.vector); checkErr(ierr, "Error in VecAXPY");
-                }
-            }
-            
-            
-
-            ierr = VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecRestoreSubVector");
-        }
-        return ierr;
-    }
-
     PetscErrorCode compute_block_distribution(int rank,const simulation& sim)
     {
 
