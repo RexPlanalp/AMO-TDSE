@@ -70,10 +70,20 @@ namespace block
         return ierr;
     }
 
-    PetscErrorCode compute_probabilities(const simulation& sim)
+    PetscErrorCode compute_block_distribution(int rank,const simulation& sim)
     {
+
+        if (rank!=0)
+        {
+            return 0;
+        }
+
+        std::cout << "Computing Distribution" << std::endl;
+
+
         PetscErrorCode ierr;
 
+        create_directory(rank,sim.block_output_path);
         std::ofstream file(sim.block_output_path+"/block_norms.txt");
         file << std::fixed << std::setprecision(15);
 
@@ -82,8 +92,6 @@ namespace block
         S.populateMatrix(sim,bsplines::overlap_integrand);
 
         std::cout << "Loading Final State" << std::endl;
-        //Vec state;
-        //ierr = load_final_state(sim.tdse_output_path+"/tdse_output.h5", &state, sim.angular_params.n_blocks*sim.bspline_params.n_basis); CHKERRQ(ierr);
         PetscHDF5Viewer finalStateViewer((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::SEQUENTIAL,OpenMode::READ);
         PetscVector state = finalStateViewer.loadVector(sim.angular_params.n_blocks*sim.bspline_params.n_basis,"","final_state");
 
@@ -92,22 +100,25 @@ namespace block
             ierr = project_out_bound(S, state,sim); checkErr(ierr, "Error in project_out_bound");
         }
         
-        Vec state_block,temp;
+        PetscVector state_block,temp;
         std::complex<double> block_norm;
-        IS is;
-        for (int idx = 0; idx<sim.angular_params.n_blocks; idx++)
+        for (int block = 0; block<sim.angular_params.n_blocks; block++)
         {   
-            std::cout << "Computing norm for block " << idx << std::endl;   
+            std::cout << "Computing norm for block: " << block << std::endl;   
             
-           
-            int start = idx*sim.bspline_params.n_basis;
-            ierr = ISCreateStride(PETSC_COMM_SELF, sim.bspline_params.n_basis, start, 1, &is); CHKERRQ(ierr);
-            ierr = VecGetSubVector(state.vector, is,&state_block); CHKERRQ(ierr); CHKERRQ(ierr);
-            ierr = VecDuplicate(state_block,&temp); CHKERRQ(ierr);
-            ierr = MatMult(S.matrix,state_block,temp); CHKERRQ(ierr);
-            ierr = VecDot(state_block,temp,&block_norm); CHKERRQ(ierr);
+            int start = block*sim.bspline_params.n_basis;
+            PetscIS indexSet(sim.bspline_params.n_basis, start, 1, RunMode::SEQUENTIAL);
+
+            ierr = VecGetSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecGetSubVector");
+
+            PetscVector temp(state_block);
+
+            ierr = MatMult(S.matrix,state_block.vector,temp.vector); checkErr(ierr, "Error in MatMult");
+
+            ierr = VecDot(state_block.vector,temp.vector,&block_norm); checkErr(ierr, "Error in VecDot");
+
             file << block_norm.real() << " " << block_norm.imag() << "\n";
-            ierr = VecRestoreSubVector(state.vector, is, &state_block); CHKERRQ(ierr);
+            ierr = VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecRestoreSubVector");
 
         }
         file.close();
@@ -125,25 +136,6 @@ namespace block
         }
         map_file.close();
 
-        ierr = VecDestroy(&state_block); CHKERRQ(ierr);
-        ierr = VecDestroy(&temp); CHKERRQ(ierr);
-        ierr = ISDestroy(&is); CHKERRQ(ierr);
         return ierr;
     }
-
-    PetscErrorCode compute_block_distribution(int rank,const simulation& sim)
-    {   
-        if (rank!=0)
-        {
-            return 0;
-        }
-
-        create_directory(rank,sim.block_output_path);
-
-        PetscErrorCode ierr;
-        std::cout << "Computing Distribution" << std::endl;
-        ierr = compute_probabilities(sim); CHKERRQ(ierr);
-        return ierr;
-    }
-
 }
