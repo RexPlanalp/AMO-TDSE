@@ -11,6 +11,7 @@
 #include "block.h"
 #include "pes.h"
 #include <petscviewerhdf5.h>
+#include "bound.h"
 
 #include <string>
 #include <iostream>
@@ -34,6 +35,7 @@ int main(int argc, char **argv) {
     bool run_tdse = false;
     bool run_block = false;
     bool run_pes = false;
+    bool run_bound = false;
 
     for (int i = 1; i < argc; ++i) 
     {
@@ -41,16 +43,24 @@ int main(int argc, char **argv) {
         if (arg == "--tise") 
         {
             run_tise = true;
-        } else if (arg == "--tdse") 
+        } 
+        else if (arg == "--tdse") 
         {
             run_tdse = true;
-        } else if (arg == "--block") 
+        } 
+        else if (arg == "--block") 
         {
             run_block = true;
-        } else if (arg == "--pes") 
+        } 
+        else if (arg == "--pes") 
         {
             run_pes = true;
-        } else if (arg == "--all") 
+        } 
+        else if (arg == "--bound") 
+        {
+            run_bound = true;
+        }
+        else if (arg == "--all") 
         {
             run_tise = true;
             run_tdse = true;
@@ -60,12 +70,13 @@ int main(int argc, char **argv) {
     }
 
     // If no flags are provided, default to running everything
-    if (!run_tise && !run_tdse && !run_block && !run_pes) 
+    if (!run_tise && !run_tdse && !run_block && !run_pes && !run_bound) 
     {
         run_tise = true;
         run_tdse = true;
         run_block = true;
         run_pes = true;
+        run_bound = true;
     }
 
     // Execute selected computations
@@ -92,6 +103,10 @@ int main(int argc, char **argv) {
         {
             std::cerr << "Error in computing PES" << std::endl;
         }
+    }
+    if (run_bound)
+    {
+        bound::computeBoundDistribution(rank,sim);
     }
 
     ierr = SlepcFinalize(); CHKERRQ(ierr);

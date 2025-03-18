@@ -56,7 +56,7 @@ if "PES" in sys.argv:
     plt.legend()
     plt.savefig("images/pes.png")
     # os.system("mv pes.png ~/Research/TDSE_PETSC/")
-    os.system("code pes.png")
+    os.system("code images/pes.png")
 
 
 
@@ -72,7 +72,7 @@ if "PES" in sys.argv:
     kz = pad_k*np.cos(pad_theta)
 
     max_val = np.max(pad_p)
-    min_val = max_val*1e-6
+    min_val = max_val*1e-3
 
     cmap = "hot_r"
 
@@ -87,7 +87,114 @@ if "PES" in sys.argv:
     fig.colorbar(sc,ax=ax)
     fig.savefig("images/pad.png")
     #os.system("mv pad.png ~/Research/TDSE_PETSC/")
-    os.system("code pad.png")
+    os.system("code images/pad.png")
+
+if "BOUND" in sys.argv:
+
+    name_map = {}
+
+    if True:
+        name_map[(1,0)] = "1s"
+        name_map[(2,0)] = "2s"
+        name_map[(2,1)] = "2p"
+        name_map[(3,0)] = "3s"
+        name_map[(3,1)] = "3p"
+        name_map[(3,2)] = "3d"
+        name_map[(4,0)] = "4s"
+        name_map[(4,1)] = "4p"
+        name_map[(4,2)] = "4d"
+        name_map[(4,3)] = "4f"
+        name_map[(5,0)] = "5s"
+        name_map[(5,1)] = "5p"
+        name_map[(5,2)] = "5d"
+        name_map[(5,3)] = "5f"
+        name_map[(5,4)] = "5g"
+        name_map[(6,0)] = "6s"
+        name_map[(6,1)] = "6p"
+        name_map[(6,2)] = "6d"
+        name_map[(6,3)] = "6f"
+        name_map[(6,4)] = "6g"
+        name_map[(6,5)] = "6h"
+        name_map[(7,0)] = "7s"
+        name_map[(7,1)] = "7p"
+        name_map[(7,2)] = "7d"
+        name_map[(7,3)] = "7f"
+        name_map[(7,4)] = "7g"
+        name_map[(7,5)] = "7h"
+        name_map[(7,6)] = "7i"
+        name_map[(8,0)] = "8s"
+        name_map[(8,1)] = "8p"
+        name_map[(8,2)] = "8d"
+        name_map[(8,3)] = "8f"
+        name_map[(8,4)] = "8g"
+        name_map[(8,5)] = "8h"
+        name_map[(8,6)] = "8i"
+        name_map[(8,7)] = "8j"
+        name_map[(9,0)] = "9s"
+        name_map[(9,1)] = "9p"
+        name_map[(9,2)] = "9d"
+        name_map[(9,3)] = "9f"
+        name_map[(9,4)] = "9g"
+        name_map[(9,5)] = "9h"
+        name_map[(9,6)] = "9i"
+        name_map[(9,7)] = "9j"
+        name_map[(9,8)] = "9k"
+        name_map[(10,0)] = "10s"
+        name_map[(10,1)] = "10p"
+        name_map[(10,2)] = "10d"
+        name_map[(10,3)] = "10f"
+        name_map[(10,4)] = "10g"
+        name_map[(10,5)] = "10h"
+        name_map[(10,6)] = "10i"
+        name_map[(10,7)] = "10j"
+        name_map[(10,8)] = "10k"
+        name_map[(10,9)] = "10l"
+
+    bound_pops = np.loadtxt("BOUND_files/bound_pops.txt")
+
+    rows,cols = bound_pops.shape
+
+    values = []
+    names = []
+
+    for i in range(rows):
+        n = bound_pops[i,0]
+        l = bound_pops[i,1]
+        pop = bound_pops[i,2]
+
+        print(n,l,pop)
+
+        if (n,l) in name_map:
+            name = name_map[(n,l)]
+
+            values.append(pop)
+            names.append(name)
+        
+    ####
+    x = np.arange(len(names))
+    width = 0.2  # Adjust width to create more space between bars
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Create bar plot
+    bars = ax.bar(x, values, width=width, color='skyblue', edgecolor='black')
+
+    # Set y-axis to log scale
+    ax.set_yscale('log')
+
+    # Set the x-ticks with category labels and rotate them for clarity.
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, rotation=45, ha='right')
+    ax.tick_params(axis='both', which='major', labelsize=8)
+
+
+    # Labels and title
+    ax.set_ylabel('Value (log scale)')
+    ax.set_title('Bar Plot with Log Scale and Spaced Labels')
+
+    # Adjust layout so labels don't get cut off
+    plt.tight_layout()
+    plt.savefig("images/bound_pops.png")
 
 
 

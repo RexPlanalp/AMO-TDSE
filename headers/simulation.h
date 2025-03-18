@@ -32,6 +32,7 @@ class simulation
     std::string tdse_output_path = "TDSE_files";
     std::string pes_output_path = "PES_files";
     std::string block_output_path = "BLOCK_files";
+    std::string bound_output_path = "BOUND_files";
 
 
     nlohmann::json processed_input_par;

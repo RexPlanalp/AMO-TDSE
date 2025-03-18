@@ -45,6 +45,7 @@ PetscVector::PetscVector(const PetscVector& other)
 {
     PetscErrorCode ierr;
     ierr = VecDuplicate(other.vector, &vector); checkErr(ierr, "Error duplicating vector");
+    ierr = VecCopy(other.vector,vector); checkErr(ierr, "Error copying vector");
     comm = other.comm;
     local_start = other.local_start;
     local_end = other.local_end;
@@ -54,15 +55,15 @@ PetscVector& PetscVector::operator=(const PetscVector& other)
 {
     if (this != &other)  
     {
-        Vec tempVector;
-        PetscErrorCode ierr = VecDuplicate(other.vector, &tempVector);
+        PetscErrorCode ierr;
+        ierr = VecDuplicate(other.vector, &vector);
+        ierr = VecCopy(other.vector,vector); checkErr(ierr, "Error copying vector");
         checkErr(ierr, "Error duplicating vector");
 
         if (vector) 
         {
             VecDestroy(&vector);
         }
-        vector = tempVector;
 
         comm = other.comm;
         local_start = other.local_start;
