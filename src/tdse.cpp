@@ -232,10 +232,10 @@ namespace tdse
         PetscBinaryViewer DerViewer((sim.tise_output_path+"/Der.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
         PetscMatrix Der = DerViewer.loadMatrix();
 
-        AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_1);
+        AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_1,2);
         H_lm_1.populateMatrix(sim);
 
-        AngularMatrix H_lm_2(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_2);
+        AngularMatrix H_lm_2(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_2,2);
         H_lm_2.populateMatrix(sim);
 
 
@@ -246,10 +246,10 @@ namespace tdse
         ierr = MatAXPY(H_xy_1.matrix,1.0,H_xy_2.matrix,SAME_NONZERO_PATTERN); checkErr(ierr,"Error in MatAXPY");
         
 
-        AngularMatrix H_lm_3(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_3);
+        AngularMatrix H_lm_3(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_3,2);
         H_lm_3.populateMatrix(sim);
 
-        AngularMatrix H_lm_4(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_4);
+        AngularMatrix H_lm_4(sim,RunMode::SEQUENTIAL,AngularMatrixType::XY_INT_4,2);
         H_lm_4.populateMatrix(sim);
 
         PetscMatrix H_xy_tilde_1 = KroneckerProduct(H_lm_3,Inv_r);
@@ -266,10 +266,10 @@ namespace tdse
     {
         PetscErrorCode ierr;
 
-        AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_1);
+        AngularMatrix H_lm_1(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_1,2);
         H_lm_1.populateMatrix(sim);
 
-        AngularMatrix H_lm_2(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_2);
+        AngularMatrix H_lm_2(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_INT_2,2);
         H_lm_2.populateMatrix(sim);
 
 

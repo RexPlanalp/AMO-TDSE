@@ -131,7 +131,7 @@ void RadialMatrix::populateMatrix(const simulation& sim, radialElement integrand
 
 
 
-AngularMatrix::AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type)
+AngularMatrix::AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type, int nnz)
     : PetscMatrix(sim.angular_params.n_blocks, 2, run), type(type)
 {
 
@@ -214,6 +214,52 @@ void AngularMatrix::populateMatrix(const simulation& sim)
                         else if ((l == lprime-1)&&(m == mprime-1))
                         {
                             ierr = MatSetValue(matrix, i, j, PETSC_i*dtilde(l,m)/2, INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                    break;
+                    case AngularMatrixType::X_HHG:
+                        if ((l == lprime+1) && (m == mprime-1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, charlie(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1) && (m == mprime-1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, delta(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime+1) && (m == mprime+1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -alpha(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1) && (m == mprime+1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, -beta(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                    break;
+                    case AngularMatrixType::Y_HHG:
+                        if ((l == lprime+1) && (m == mprime-1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, charlie(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1) && (m == mprime-1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, delta(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime+1) && (m == mprime+1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, alpha(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1) && (m == mprime+1))
+                        {
+                            ierr = MatSetValue(matrix, i, j, beta(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                    break;
+                    case AngularMatrixType::Z_HHG:
+                        if ((l == lprime+1) && (m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, echo(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
+                        }
+                        else if ((l == lprime-1) && (m == mprime))
+                        {
+                            ierr = MatSetValue(matrix, i, j, foxtrot(l,m), INSERT_VALUES); checkErr(ierr,"Error Setting Matrix Value");
                         }
                     break;
                         

@@ -56,6 +56,18 @@ double c(int l, int m);
 
 double ctilde(int l, int m);
 
+double alpha(int l, int m);
+
+double beta(int l, int m);
+
+double charlie(int l, int m);
+
+double delta(int l, int m);
+
+double echo(int l, int m);
+
+double foxtrot(int l, int m);
+
 PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim);
 
 std::complex<double> compute_Ylm(int l, int m, double theta, double phi);

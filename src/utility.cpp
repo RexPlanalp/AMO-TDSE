@@ -306,7 +306,6 @@ void create_directory(int rank, const std::string& directory)
     }
 }
 
-
 void normalize_array(std::array<double,3>& vec)
 {      
     double norm = std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
@@ -393,4 +392,47 @@ void scale_vector(std::vector<double>& vec, double scale)
     {
         val *= scale;
     }
+}
+
+
+double alpha(int l, int m)
+{
+    double numerator = (l+m-1)*(l+m);
+    double denominator = 4*(2*l+1)*(2*l-1);
+    return std::sqrt(numerator/denominator);
+}
+
+double beta(int l, int m)
+{
+    double numerator = (l-m+1)*(l-m+2)*(l+1);
+    double denominator = 2*(2*l+1)*(2*l+2)*(2*l+3);
+    return -std::sqrt(numerator/denominator);
+}
+
+double charlie(int l, int m)
+{
+    double numerator = (l-m-1)*(l-m);
+    double denominator = 4*(2*l+1)*(2*l-1);
+    return std::sqrt(numerator/denominator);
+}
+
+double delta(int l, int m)
+{
+    double numerator = (l+m+1)*(l+m+2)*(l+1);
+    double denominator = 2*(2*l+1)*(2*l+2)*(2*l+3);
+    return -std::sqrt(numerator/denominator);
+}
+
+double echo(int l, int m)
+{
+    double numerator = (l+m)*(l-m);
+    double denominator = (2*l-1)*(2*l+1);
+    return std::sqrt(numerator/denominator);
+}
+
+double foxtrot(int l, int m)
+{
+    double numerator = (l+m+1)*(l-m+1);
+    double denominator = (2*l+1)*(2*l+3);
+    return std::sqrt(numerator/denominator);
 }

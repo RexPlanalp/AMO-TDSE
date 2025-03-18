@@ -81,13 +81,16 @@ enum class AngularMatrixType
     XY_INT_1,
     XY_INT_2,
     XY_INT_3,
-    XY_INT_4
+    XY_INT_4,
+    X_HHG,
+    Y_HHG,
+    Z_HHG
 };
 
 class AngularMatrix : public PetscMatrix
 {
     public:
-    AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type);
+    AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type, int nnz);
     
     // Populate the matrix
     void populateMatrix(const simulation& sim);
