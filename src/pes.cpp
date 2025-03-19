@@ -292,8 +292,6 @@ namespace pes
         
         create_directory(rank,sim.pes_output_path);
 
-        PetscErrorCode ierr;
-
         std::cout << "Constructing Overlap Matrix" << std::endl;
         RadialMatrix S(sim, RunMode::SEQUENTIAL, ECSMode::OFF);
         S.populateMatrix(sim,bsplines::overlap_integrand);

@@ -197,7 +197,7 @@ double ctilde(int l, int m)
 }
 
 // Function to project out bound states
-PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim)
+void project_out_bound(const PetscMatrix& S, PetscVector& state, const simulation& sim)
     {
       
     
@@ -244,7 +244,6 @@ PetscErrorCode project_out_bound(const PetscMatrix& S, PetscVector& state, const
 
             ierr = VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecRestoreSubVector");
         }
-        return ierr;
     }
 
 // Wrapper for gsl spherical harmonics

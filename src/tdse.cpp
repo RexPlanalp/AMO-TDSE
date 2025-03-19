@@ -170,58 +170,7 @@ namespace tdse
         
         return {atomic_left,atomic_right};
     }
-
-    double _a(int l, int m)
-    {
-        int numerator = (l+m);
-        int denominator = (2*l +1) * (2*l-1);
-        double f1 = sqrt(numerator/(double)denominator);
-        double f2 = - m * std::sqrt(l+m-1) - std::sqrt((l-m)*(l*(l-1)-m*(m-1)));
-        return f1*f2;
-        
-    }
-
-    double _atilde(int l, int m)
-    {
-        int numerator = (l-m);
-        int denominator = (2*l+1)*(2*l-1);
-        double f1 = sqrt(numerator/(double)denominator);
-        double f2 = - m * std::sqrt(l-m-1) + std::sqrt((l+m)*(l*(l-1)-m*(m+1)));
-        return f1*f2;
-    }
-
-    double _b(int l, int m)
-    {
-        return -_atilde(l+1,m-1);
-    }
-
-    double _btilde(int l, int m)
-    {
-        return -_a(l+1,m+1);
-    }
-
-    double _d(int l, int m)
-    {
-        double numerator = (l-m+1)*(l-m+2);
-        double denominator = (2*l+1)*(2*l+3);
-        return std::sqrt(numerator/(double)denominator);
-    }
-
-    double _dtilde(int l, int m)
-    {
-        return _d(l,-m);
-    }
-
-    double _c(int l, int m)
-    {
-        return _dtilde(l-1,m-1);
-    }
-
-    double _ctilde(int l, int m)
-    {
-        return _d(l-1,m+1);
-    }
-
+ 
     std::pair<PetscMatrix,PetscMatrix> construct_xy_interaction(const simulation& sim)
     {
         PetscErrorCode ierr;
@@ -286,6 +235,48 @@ namespace tdse
         return H_z_1;
     }
 
+    PetscMatrix construct_x_hhg(const simulation& sim)
+    {
+        AngularMatrix H_lm_x(sim,RunMode::SEQUENTIAL,AngularMatrixType::X_HHG,4);
+        H_lm_x.populateMatrix(sim);
+
+        PetscBinaryViewer Inv_r2Viewer((sim.tise_output_path+"/Inv_r2.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix Inv_r2 = Inv_r2Viewer.loadMatrix();
+
+        PetscMatrix H_x = KroneckerProduct(H_lm_x,Inv_r2);
+
+        return H_x;
+    }
+
+    PetscMatrix construct_y_hhg(const simulation& sim)
+    {
+        AngularMatrix H_lm_y(sim,RunMode::SEQUENTIAL,AngularMatrixType::Y_HHG,4);
+        H_lm_y.populateMatrix(sim);
+
+        PetscBinaryViewer Inv_r2Viewer((sim.tise_output_path+"/Inv_r2.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix Inv_r2 = Inv_r2Viewer.loadMatrix();
+
+        PetscMatrix H_y = KroneckerProduct(H_lm_y,Inv_r2);
+
+        return H_y;
+    }
+
+    PetscMatrix construt_z_hhg(const simulation& sim)
+    {
+        AngularMatrix H_lm_z(sim,RunMode::SEQUENTIAL,AngularMatrixType::Z_HHG,2);
+        H_lm_z.populateMatrix(sim);
+
+        PetscBinaryViewer Inv_r2Viewer((sim.tise_output_path+"/Inv_r2.bin").c_str(), RunMode::SEQUENTIAL, OpenMode::READ);
+        PetscMatrix Inv_r2 = Inv_r2Viewer.loadMatrix();
+
+        PetscMatrix H_z = KroneckerProduct(H_lm_z,Inv_r2);
+
+        return H_z;
+    }
+
+
+
+
     PetscErrorCode solve_tdse(const simulation& sim, int rank)
     {   
         double time_start = MPI_Wtime();
@@ -297,11 +288,19 @@ namespace tdse
         std::complex<double> alpha = PETSC_i * (dt / 2.0);
         
         
-
+        
 
         Wavefunction state = load_starting_state(sim); CHKERRQ(ierr);
         create_directory(rank, sim.tdse_output_path);
         PetscHDF5Viewer viewTDSE((sim.tdse_output_path+"/tdse_output.h5").c_str(),RunMode::PARALLEL,OpenMode::WRITE);
+
+        std::ofstream hhg_file; 
+
+        if (sim.observable_params.hhg && rank == 0)
+        {
+            hhg_file.open(sim.tdse_output_path + "/hhg_data.txt");
+            hhg_file << std::fixed << std::setprecision(15);
+        }
         
         PetscPrintf(PETSC_COMM_WORLD, "Constructing Atomic Interaction\n\n");
         PetscMatrix atomic_left,atomic_right;
@@ -309,7 +308,56 @@ namespace tdse
 
         PetscMatrix S_atomic = construct_S_atomic(sim);
 
-        
+        std::cout << sim.observable_params.hhg << std::endl;
+
+        PetscMatrix H_x_hhg;
+        if (components[0] && sim.observable_params.hhg)
+        {
+            PetscPrintf(PETSC_COMM_WORLD, "Constructing X HHG Interaction\n\n");
+            H_x_hhg = construct_x_hhg(sim);
+        }
+
+        PetscMatrix H_y_hhg;
+        if (components[1] && sim.observable_params.hhg)
+        {
+            PetscPrintf(PETSC_COMM_WORLD, "Constructing Y HHG Interaction\n\n");
+            H_y_hhg = construct_y_hhg(sim);
+        }
+
+        PetscMatrix H_z_hhg;
+        if (components[2] && sim.observable_params.hhg)
+        {
+            PetscPrintf(PETSC_COMM_WORLD, "Constructing Z HHG Interaction\n\n");
+            H_z_hhg = construt_z_hhg(sim);
+        }
+
+        if (sim.observable_params.hhg)
+        {
+            std::complex<double> x_val = 0.0;
+            std::complex<double> y_val = 0.0;
+            std::complex<double> z_val = 0.0;
+
+            if (components[0])
+            {
+                x_val = state.computeNorm(H_x_hhg);
+            }
+            if (components[1])
+            {
+                y_val = state.computeNorm(H_y_hhg);
+            }
+            if (components[2])
+            {
+                z_val = state.computeNorm(H_z_hhg);
+            }
+
+            if (rank == 0)
+            {
+                hhg_file << 0.0 << " " << x_val.real() << " "  << laser::A(0.0,sim,0) << " " << y_val.real() << " " << laser::A(0.0,sim,1)  << " " << z_val.real() << " " << laser::A(0.0,sim,2) << std::endl;
+            }
+        }
+
+       
+
 
         PetscMatrix H_z;
         if (components[2]) 
@@ -377,6 +425,31 @@ namespace tdse
 
             ierr = KSPSolve(ksp.ksp, state_temp.vector, state.vector); checkErr(ierr,"Error in KSPSolve");
 
+            if (sim.observable_params.hhg)
+            {
+                std::complex<double> x_val = 0.0;
+                std::complex<double> y_val = 0.0;
+                std::complex<double> z_val = 0.0;
+
+                if (components[0])
+                {
+                    x_val = state.computeNorm(H_x_hhg);
+                }
+                if (components[1])
+                {
+                    y_val = state.computeNorm(H_y_hhg);
+                }
+                if (components[2])
+                {
+                    z_val = state.computeNorm(H_z_hhg);
+                }
+
+                if (rank == 0)
+                {
+                    hhg_file << 0.0 << " " << x_val.real() << " "  << laser::A(t,sim,0) << " " << y_val.real() << " " << laser::A(t,sim,1)  << " " << z_val.real() << " " << laser::A(t,sim,2) << std::endl;
+                }
+            }
+
             
         }
 
@@ -385,6 +458,11 @@ namespace tdse
 
         PetscPrintf(PETSC_COMM_WORLD, "Saving Final State\n\n");
         viewTDSE.saveVector(state,"","final_state");
+
+        if (sim.observable_params.hhg && rank == 0)
+        {
+            hhg_file.close();
+        }
 
 
         double time_end = MPI_Wtime();

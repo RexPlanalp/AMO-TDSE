@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
 
     if (run_block) 
     {
-        ierr = block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
+        block::compute_block_distribution(rank, sim); CHKERRQ(ierr);
     }
     
     if (run_pes) 

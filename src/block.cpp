@@ -20,18 +20,15 @@
 
 namespace block 
 {   
-    PetscErrorCode compute_block_distribution(int rank,const simulation& sim)
+    void compute_block_distribution(int rank,const simulation& sim)
     {
 
         if (rank!=0)
         {
-            return 0;
+            return;
         }
 
         std::cout << "Computing Distribution" << std::endl;
-
-
-        PetscErrorCode ierr;
 
         create_directory(rank,sim.block_output_path);
         std::ofstream file(sim.block_output_path+"/block_norms.txt");
@@ -47,7 +44,7 @@ namespace block
 
         if (sim.observable_params.cont)
         {
-            ierr = project_out_bound(S, state,sim); checkErr(ierr, "Error in project_out_bound");
+            project_out_bound(S, state,sim); 
         }
         
         PetscVector state_block,temp;
@@ -59,16 +56,16 @@ namespace block
             int start = block*sim.bspline_params.n_basis;
             PetscIS indexSet(sim.bspline_params.n_basis, start, 1, RunMode::SEQUENTIAL);
 
-            ierr = VecGetSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecGetSubVector");
+            VecGetSubVector(state.vector, indexSet.is, &state_block.vector); 
 
             PetscVector temp(state_block);
 
-            ierr = MatMult(S.matrix,state_block.vector,temp.vector); checkErr(ierr, "Error in MatMult");
+            MatMult(S.matrix,state_block.vector,temp.vector); 
 
-            ierr = VecDot(state_block.vector,temp.vector,&block_norm); checkErr(ierr, "Error in VecDot");
+            VecDot(state_block.vector,temp.vector,&block_norm); 
 
             file << block_norm.real() << " " << block_norm.imag() << "\n";
-            ierr = VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); checkErr(ierr, "Error in VecRestoreSubVector");
+            VecRestoreSubVector(state.vector, indexSet.is, &state_block.vector); 
 
         }
         file.close();
@@ -85,7 +82,5 @@ namespace block
                     << pair.second << "\n";
         }
         map_file.close();
-
-        return ierr;
     }
 }

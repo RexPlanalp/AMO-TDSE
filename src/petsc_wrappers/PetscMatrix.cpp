@@ -132,7 +132,7 @@ void RadialMatrix::populateMatrix(const simulation& sim, radialElement integrand
 
 
 AngularMatrix::AngularMatrix(const simulation& sim, RunMode run, AngularMatrixType type, int nnz)
-    : PetscMatrix(sim.angular_params.n_blocks, 2, run), type(type)
+    : PetscMatrix(sim.angular_params.n_blocks, nnz, run), type(type)
 {
 
 }
