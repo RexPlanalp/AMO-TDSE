@@ -23,10 +23,21 @@ To achieve these results, the following techniques were implemented:
 2. **Exterior Complex Scaling:** To establish a perfect absorbing boundary condition at the simulation box’s edge.
 3. **Crank-Nicolson Time Propagation:** For stability and high-order accuracy during time evolution.
 
-**Technologies Used:**
+It should be noted that this project takes advantage of the PETSc and SLEPc parallel numerical libraries, 
+and as such this code has been tested and designed to be used on large computing clusters. 
 
-- **CMake:** Currently tested with Version 3.14.
-- **Spack:** Currently tested with Version 1.0.0.dev0.
-- **PETSc:** Currently tested with Version 3.22.2.
-- **SLEPc:** Currently tested with Version 3.22.2.
-- **Nlohmann Json:** For JSON parsing.
+## Installation & Prerequisites
+
+### Dependencies
+- **CMake:** Version 3.14 or higher
+- **Spack:** Version 1.0.0.dev0 or compatible
+- **PETSc:** Version 3.22.2 or higher
+- **SLEPc:** Version 3.22.2 or higher
+- **Nlohmann Json:** For JSON parsing
+
+### Installation Steps
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/RexPlanalp/TDSE-Solver-for-Laser-Atomic-Interactionsgit
+   cd tdse-project
