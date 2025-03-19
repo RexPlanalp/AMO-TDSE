@@ -337,15 +337,15 @@ namespace tdse
 
             if (components[0])
             {
-                x_val = state.computeNorm(H_x_hhg);
+                x_val = state.computeNorm(H_x_hhg)*state.computeNorm(H_x_hhg);
             }
             if (components[1])
             {
-                y_val = state.computeNorm(H_y_hhg);
+                y_val = state.computeNorm(H_y_hhg)*state.computeNorm(H_y_hhg);
             }
             if (components[2])
             {
-                z_val = state.computeNorm(H_z_hhg);
+                z_val = state.computeNorm(H_z_hhg)*state.computeNorm(H_z_hhg);
             }
 
             if (rank == 0)
@@ -431,15 +431,15 @@ namespace tdse
 
                 if (components[0])
                 {
-                    x_val = state.computeNorm(H_x_hhg);
+                    x_val = state.computeNorm(H_x_hhg)*state.computeNorm(H_x_hhg);
                 }
                 if (components[1])
                 {
-                    y_val = state.computeNorm(H_y_hhg);
+                    y_val = state.computeNorm(H_y_hhg)*state.computeNorm(H_y_hhg);
                 }
                 if (components[2])
                 {
-                    z_val = state.computeNorm(H_z_hhg);
+                    z_val = state.computeNorm(H_z_hhg)*state.computeNorm(H_z_hhg);
                 }
 
                 if (rank == 0)
