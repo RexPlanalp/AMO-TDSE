@@ -308,8 +308,6 @@ namespace tdse
 
         PetscMatrix S_atomic = construct_S_atomic(sim);
 
-        std::cout << sim.observable_params.hhg << std::endl;
-
         PetscMatrix H_x_hhg;
         if (components[0] && sim.observable_params.hhg)
         {
@@ -446,7 +444,7 @@ namespace tdse
 
                 if (rank == 0)
                 {
-                    hhg_file << 0.0 << " " << x_val.real() << " "  << laser::A(t,sim,0) << " " << y_val.real() << " " << laser::A(t,sim,1)  << " " << z_val.real() << " " << laser::A(t,sim,2) << std::endl;
+                    hhg_file << (idx+1)*dt << " " << x_val.real() << " "  << laser::A(t,sim,0) << " " << y_val.real() << " " << laser::A(t,sim,1)  << " " << z_val.real() << " " << laser::A(t,sim,2) << std::endl;
                 }
             }
 
