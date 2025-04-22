@@ -1,6 +1,10 @@
 # AMO-TDSE
 
-This repository contains classes and namespaces used to solve both the Time-Independent Schrödinger Equation (TISE) and the Time-Dependent Schrödinger Equation (TDSE) for an atomic systems.
+## What is it?
+
+** AMO_TDSE is a project written in C++ designed to solve both the Time-Indepdendent Schrödinger Equation (TISE) and the Time-Dependent Schrödinger Equation  (TDSE) for atomic systems interacting with ultrashort, intensie, laser pulses**
+
+
 
 The TISE and TDSE not only work for simulating Hydrogen, but are designed to work with Hydrogen as well as Single Active Electron (SAE) Potentials in order to accurately approximate energy eigenstates and electron dynamics of more complex atoms. 
 
