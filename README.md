@@ -35,54 +35,131 @@ Photoelectron spectra are analyzed in two ways:
 
 **Important features of these phenomena are reproduced, such as the classical HHG cutoff, and Above-Threshold Ionization (ATI) peaks in the photoelectron spectra.**
 
-**Techniques Employed:**
+## Techniques Used
 
-**Spherical Harmonic Expansion**
+### Exterior Complex Scaling
 
-As a 3D object the wavefunction can be written as a function of spherical coordinates. Expanding the angular coordinates in complex spherical harmonics not only allows
-for a reduction in the required dimensionality to converge, but also provides an accurate mathematical representation of "selection rules" which determines how angular
-momentum can be absorbed/emitted. 
+#### What is it?
 
+**Exterior Complex Scaling is a technique for absorbing parts of the wavefunction that get too close to the boundary box of the simulation.**
 
-**B-Spline Basis Functions:**
+#### Why?
 
-While expanding on a grid for the radial coordinate presents fewer challenges that for the angular coordinates, a B-Spline basis was chosen for a few key reasons. First, B-Splines are able to capture more structure of the wavefunctions than a single grid point. This allows for a significant reduction in dimensionality at the cost of sightly decreased sparsity in the hamiltonian. 
+**There are various techniques for achieving this result. One of which are Masking Functions, which at each time step multiply the wavefunction 
+in a region (in this case near the boundary) by a dampening term. Another technique is introducing a Complex Potential which causes the wavefunction
+to naturally decay after some cutoff similar to Exterior Scaling. While each of those other methods are used in literature, Exterior Complex Scaling is
+unique in that it does not produce any artifacts that can leave an imprint on the final result, and it adapts its absorption to ensure even fast moving 
+wavepackets can't reach the boundary. All of this comes at the cost of it being more difficult to implement.**
 
-The second key reason is that the spacing between B-Spline basis functions are easily controlled via the knot vector. This allows for the density of B-Splines in particular regions to be fine-tuned as necessary. For example, when working with SAE potentials for atoms such as Argon, the potential is so deep near r = 0 that the bound states oscillate very quickly. By putting many B-Splines near the core, the wavefunction can be more accurately represented in this region. Adjusting the density of points with a finite-difference grid is far more challenging. 
+### B-Spline Basis functions
 
-**Exterior Complex Scaling:**
+#### What is it? 
 
-One of the problems with solving the TDSE numerically is that we cannot use an infinitely large box. Since we have parts of the wavefunction becoming ionized
-and flying away from the core, these parts of the wavefunction may hit that boundary. To avoid these unphysical reflections there are many techniques 
-employed to absorb the wavefunction near the boundary. Some such techniques include Masking Functions, Complex Potentials, and Exterior Complex Scaling. 
-Among these choices Exterior Complex Scaling is the most difficult to implement in practice, but provides the most robust and consistent absorption when
-compared to the other methods. 
+**B-Spline basis functions are a set of non-orthonormal functions that the radial component of the wavefunction are projected onto. This is in contrast to 
+finite-difference approaches used in literature which effectively expand in Dirac delta functions.**
 
-Exterior Complex Scaling works by rotating part of our grid into the complex plane after some cutoff radius. This rotation effectively takes outgoing momentum com
+#### Why?
 
+**B-Spline basis functions are able to capture more structure of the radial wavefunction when compared to a Dirac delta, and in practice this means less of 
+them are needed to accurately represent the wavefunction, reducing dimensionality. They also have the desirable property of being extensively tunable, being able to adjust their density in certain regions by modifying the knot vector. Compared to other basis function expansions, they are also piecewise polynomial which makes computing matrix elements fast (although not as fast as a Dirac delta function basis, since those are analytic). **
 
+### Crank-Nicolson Time Propagation
 
+#### What is it?
 
-To achieve these results, the following techniques were implemented:
-1. **B-Spline Basis Functions:** For adaptive grid spacing and dimensionality reduction.
-2. **Exterior Complex Scaling:** To establish a perfect absorbing boundary condition at the simulation box’s edge.
-3. **Crank-Nicolson Time Propagation:** For stability and high-order accuracy during time evolution.
+**Crank-Nicolson Time Propagation is a time propagation scheme that takes the wavefunction at some earlier time, and relates it to the wavefunction at
+a later point in time which are seeking.**
 
-It should be noted that this project takes advantage of the PETSc and SLEPc parallel numerical libraries, 
-and as such this code has been tested and designed to be used on large computing clusters. 
+#### Why?
+
+**There are other time propagation schemes such as the Forward Euler Approach. However the advanatges of Crank-Nicolson over a much simpler approach are numerous. First, Forward Euler is accurate to first order in time, while Crank-Nicolson is accurate to second order in time. In practice this means that the amount of time we evolve by (dt) at each step can be much larger for Crank-Nicolson Propagation, reducing the amount of linear solves we have to do. In addition, Forward Euler is not a unitary transofmration, so the norm of our wavefunction will not be preserved after each time step. This is important because in quantum mechanics time evolution inherently unitary. Without this we would need to renormalize the wavefunction at each step which costs resources, and we would lose information about how much of our 
+wavefunction has reached the absorbing boundary.**
+
+**Other techniues that avoid these pitfalls also exist such as the Split-Step Operator method, and I am in the process of investigating how viable this propagation scheme is for this particular system.**
 
 ## Installation & Prerequisites
 
 ### Dependencies
-- **CMake:** Version 3.14 or higher
-- **Spack:** Version 1.0.0.dev0 or compatible
-- **PETSc:** Version 3.22.2 or higher
-- **SLEPc:** Version 3.22.2 or higher
-- **Nlohmann Json:** For JSON parsing
+- **CMake:** Version 3.14 
+- **PETSc:** Version 3.22.2 
+- **SLEPc:** Version 3.22.2
+- **GSL** Version 2.8
+- **Nlohmann Json:** 
 
-### Installation Steps
+## Input File Guide
 
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/RexPlanalp/TDSE-Solver-for-Laser-Atomic-Interactionsgit
-   cd tdse-project
+**Below is a brief description on what each part of the input file controls. If a value is to be given in atomic units or SI units it will have an (au) or (SI) next to it respectively.**
+
+### "species" - Determines which atom to solve the TISE for. Currently Supports Hydrogen and Argon via SAE potentials. 
+
+### "grid"
+
+#### "grid_size" - Sets the size of the spherical box to simulation on (au)
+
+#### "grid_spacing" - Sets the distance between Dirac Delta Functions where finite difference is necessary, only used in analysis after TISE and TDSE. (au)
+
+#### "N" - Controls duration of the laser pulse by specifying the number of periods of the central frequency (see laser) 
+
+#### "time_spacing" - Sets the amount of time to evolve over during each time step (au)
+
+### "bsplines"
+
+#### "n_basis" - Sets the number of bsplines basis functions to expand the radial wavefunction in.
+
+#### "order" - Sets the order of the bspline basis functions
+
+#### "R0_input" - Sets the desired distance for ECS to turn on (au)
+
+#### "eta" - Sets how much ECS will rotate the basis into the complex plane
+
+#### "debug" - Toggles whether the bspline basis functions are fully evaluated and dumped to a file. Simulation wide debug must also be enabled (see debug).
+
+### "angular"
+
+#### "lmax" - Sets the largest l value to expand up to in Spherical Harmonics
+
+#### "mmin" - Sets the smallest m value to expand up to in Spherical Harmonics
+
+#### "mmax" - Sets the largest m value to expand up to in Spherical Harmonics
+
+#### "nmax" - Sets the largest energy state to solve for during the TISE
+
+### "laser" 
+
+#### "w" - Sets the central frequency of the laser pulse (au)
+
+#### "I" - Sets the intensity of the laser pulse in W/cm^2 (SI)
+
+#### "polarization" - Specifies polarization vector for laser pulse. Will be internally normalized. 
+
+#### "poynting" - Specifies poynting vector for laser pulse. Will be internally normalized. 
+
+#### "ell" - Sets ellipticity of laser pulse, 1 being circular and 0 being linear. 
+
+#### "CEP" - Sets carrier envelope phase between the carrier wave and the envelope function
+
+### "TISE" 
+
+#### "tolerance" - Sets the tolerance for which to solve the eigenvalue problem
+
+#### "max_iter" - Sets the maximum number of iterations to converge an eigenvalue/vector pair
+
+### "TDSE"
+
+#### "tolerance" - Sets the tolerance for the linear solver during time propgation
+
+#### "state" - Sets which state from the TISE will be used as the initial state during time propagation
+
+### "observables" 
+
+#### "E" - Sets the range of energy values to evaluate the photoelectron spectrum over
+
+#### "SLICE" - Sets which plane to compute and plot the angularly resolved photoelectron spectrum over
+
+#### "HHG" - Toggles whether HHG data will be computed during time propagation
+
+#### "CONT" - Toggles whether the final distribution of the wavefunction will be plotted with or without the bound state contributions projected out
+
+### "debug" - Toggles whether debug info will be dumped during runtimeto help find bugs or issues
+
+
