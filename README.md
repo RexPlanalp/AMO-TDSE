@@ -1,4 +1,4 @@
-#AMO-TDSE
+# AMO-TDSE
 
 This repository contains classes and namespaces used to solve both the Time-Independent Schrödinger Equation (TISE) and the Time-Dependent Schrödinger Equation (TDSE) for an atomic systems.
 
