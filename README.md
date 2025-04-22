@@ -2,23 +2,30 @@
 
 ## What is it?
 
-**AMO_TDSE is a project written in C++ designed to solve both the Time-Indepdendent Schrödinger Equation (TISE) and the Time-Dependent Schrödinger Equation (TDSE) for atomic systems interacting with ultrashort, intensie, laser pulses**
+**AMO-TDSE is a project written in C++ designed to solve both the Time-Indepdendent Schrödinger Equation (TISE) and the Time-Dependent Schrödinger Equation (TDSE) for atomic systems interacting with ultrashort, intensie, laser pulses**
 
 ## Why? 
 
 **This project started as a barebones iteration on previous software I was using for my research in Ulrafast AMO Physics at JILA. Since then I've improved upon it and cleaned it up as I learned better coding practices**
 
-The TISE and TDSE not only work for simulating Hydrogen, but are designed to work with Hydrogen as well as Single Active Electron (SAE) Potentials in order to accurately approximate energy eigenstates and electron dynamics of more complex atoms. 
+## How does it work?
 
-The TISE is capable of computing the radial component of all energy eigenstates contained within the spectrum of the discretized hamiltonian. Due to the discrete nature of the hamiltonian, the continuum states (E > 0) are less useful that the bound states (E < 0) when computing this way, so those are usually suppressed in the input file to save time/space. 
+**The code has two main branches corresponding to the TISE and TDSE respectively, each of which are controlled by an input JSON file. The code uses Spherical Harmonic Expansions for the angular coordinates, as well as a B-Spline expnsion for the radial coordinate to construct hamiltonians as matrices. Due to the large dimensionality and sparsity of these hamiltonians, the Portable, Extensible Toolkit for Scientific Computation (PETSc) is used to store these matrices as well as the vectors associated with the wavefunction of the electron.**
 
-The TDSE is solved in the context of an atom interacting with an ultrashort, intense laser pulse. In AMO physics, lasers of this type are frequently used to study phenomena that occur on short timescales such as electron dynamics. Two key phenomena that this code is designed to simulation are Microscopic High Harmonic Generation (HHG), and Photoelectron Spectra
+**Specifically, Scalable Library for Eigenvalue Problem Computations (SLEPc) is used to setup and solve a generalized eigenvalue problem for the TISE to find eigenstates/eigenvalues, while the PETSc implementation of the Generalized Minimal Residual Method (GMRES) is used for solving the linear system used in Crank-Nicolson Time Propgation for the TDSE.**
 
-**High Harmonic Generation (HHG):**
+## What does it produce? 
+
+**The TISE branch of the code outputs the eigenstates and eigenvalues of the atomic hamiltonian to an HDF5 file. The number of eigenstates/eigenvalues to request is controlled via the associated entry in the input file. The code also saves various matrices to binary that are necessary to run the TDSE.**
+
+**The TDSE branch of the code takes one of the eigenstates output by the TISE and propagates the state through time, under the influence of an laser pulse. This final state is them output to an HDF5 file. This final state can then be further processed to evaluate various phenomena of electron dynamics that occured during the laser pulse. Examples are given below: **
+
+
+### High Harmonic Generation (HHG):
 
 From classical electromagnetism,it is known that accelerating charges emit radiation. Although electrons in an atom are described by quantum wavefunctions, the underlying principle still holds. When a laser passes by an atom, the probability distribution of the electron oscillates, and this oscillation causes radiation to be emitted. This code allows for the expectation value of acceleration to be computed at each time step. A Fourier Transform of which reveals the emitted frequencies of light. 
 
-**Photoelectron Spectra:**
+### Photoelectron Spectra:
 
 When the atom interacts with the laser pulse, it can absorb energy in discrete quanta (photons). With sufficient energy absorption, the electron transitions from a bound state to an ionized, continuum state.
 
