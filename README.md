@@ -30,11 +30,10 @@ From classical electromagnetism,it is known that accelerating charges emit radia
 When the atom interacts with the laser pulse, it can absorb energy in discrete quanta (photons). With sufficient energy absorption, the electron transitions from a bound state to an ionized, continuum state.
 
 Photoelectron spectra are analyzed in two ways:
-1. **Angle-integrated:** Determines how much of the wavefunction ionizes at a given energy.
-2. **Angle-resolved:** Determines how much of the wavefunction ionizes at a given energy, in a given direction.
+**Angle-integrated:** Determines how much of the wavefunction ionizes at a given energy.
+**Angle-resolved:** Determines how much of the wavefunction ionizes at a given energy, in a given direction.
 
-
-Important features of these phenomena are reproduced, such as the classical HHG cutoff, and Above-Threshold Ionization (ATI) peaks in the photoelectron spectra.
+**Important features of these phenomena are reproduced, such as the classical HHG cutoff, and Above-Threshold Ionization (ATI) peaks in the photoelectron spectra.**
 
 **Techniques Employed:**
 
