@@ -10,15 +10,15 @@
 
 ## How does it work?
 
-**The code has two main branches corresponding to the TISE and TDSE respectively, each of which are controlled by an input JSON file. The code uses Spherical Harmonic Expansions for the angular coordinates, as well as a B-Spline expnsion for the radial coordinate to construct hamiltonians as matrices. Due to the large dimensionality and sparsity of these hamiltonians, the Portable, Extensible Toolkit for Scientific Computation (PETSc) is used to store these matrices as well as the vectors associated with the wavefunction of the electron.**
+**The code has two main branches corresponding to the TISE and TDSE respectively, each of which are controlled by an input JSON file. The code uses Spherical Harmonic Expansions for the angular coordinates, as well as a B-Spline expnsion for the radial coordinate to construct hamiltonians as matrices. Due to the large dimensionality and sparsity of these matrices, the Portable, Extensible Toolkit for Scientific Computation (PETSc) is used both for its convenient storage formats, but also to take advantage of MPI parallelism to speed up the linear algebra**
 
-**Specifically, Scalable Library for Eigenvalue Problem Computations (SLEPc) is used to setup and solve a generalized eigenvalue problem for the TISE to find eigenstates/eigenvalues, while the PETSc implementation of the Generalized Minimal Residual Method (GMRES) is used for solving the linear system used in Crank-Nicolson Time Propgation for the TDSE.**
+**Specifically, Scalable Library for Eigenvalue Problem Computations (SLEPc) is used to setup and solve a generalized eigenvalue problem to find eigenstates/eigenvalues during the TISE, while the PETSc implementation of the Generalized Minimal Residual Method (GMRES) is used for solving the linear system used in Crank-Nicolson Time Propgation for the TDSE.**
 
 ## What does it produce? 
 
 **The TISE branch of the code outputs the eigenstates and eigenvalues of the atomic hamiltonian to an HDF5 file. The number of eigenstates/eigenvalues to request is controlled via the associated entry in the input file. The code also saves various matrices to binary that are necessary to run the TDSE.**
 
-**The TDSE branch of the code takes one of the eigenstates output by the TISE and propagates the state through time, under the influence of an laser pulse. This final state is them output to an HDF5 file. This final state can then be further processed to evaluate various phenomena of electron dynamics that occured during the laser pulse. Examples are given below: **
+**The TDSE branch of the code takes one of the eigenstates output by the TISE and propagates the state through time, under the influence of an laser pulse. This final state is them output to an HDF5 file. This final state can then be further processed to evaluate various phenomena of electron dynamics that occured during the laser pulse. Examples are given below:**
 
 
 ### High Harmonic Generation (HHG):
