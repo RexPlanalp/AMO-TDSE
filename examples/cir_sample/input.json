@@ -1,0 +1,46 @@
+{
+    "species": "H",
+    "grid": {
+        "grid_size": 500.0,
+        "grid_spacing": 0.05,
+        "N": 2,
+        "time_spacing": 0.05
+    },
+    "bsplines": {
+        "n_basis": 400,
+        "order": 7,
+        "R0_input": 495.0,
+        "eta": 0.25,
+        "debug":0
+    },
+    "angular": {
+        "lmax": 25,
+        "mmin": -25,
+        "mmax": 25,
+        "nmax": 10
+    },
+    "laser": {
+        "w": 0.114,
+        "I": 2.0E14,
+        "polarization": [1,1,0],
+        "poynting": [0,0,1],
+        "ell": 1,
+        "CEP": 0
+    },
+    "TISE": {
+        "tolerance": 1.0E-15,
+        "max_iter": 3000
+    },
+    "TDSE": {
+        "tolerance": 1.0E-15,
+        "state": [1, 0, 0]
+    },
+    "observables":{
+        "E": [0.001, 0.5],
+        "SLICE": "XY",
+        "HHG": 0,
+        "CONT": 1
+    } ,
+
+    "debug": 1
+}

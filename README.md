@@ -169,10 +169,18 @@ wavefunction has reached the absorbing boundary.**
 
 ### Photoelectron Spectra
 
-**Below is the energy resolved an the angle resolved photoelectron spectrum for a linearly polarized laser.**
+**Below is the energy resolved an the angle resolved photoelectron spectrum for a linearly and circularly polarized polarized laser.**
 
 #### Linear Sample 
 ![Alt text for your image](examples/lin_sample/pes.png)
+
+#### Circular Sample 
+| ![Alt text for your image](examples/cir_sample/pes.png) | ![Alt text for your image](examples/cir_sample/pad.png) |
+|-----------------------------------|-----------------------------------|
+
+### High Harmonic Generation
+
+**Below is the harmonic spectrum for a linearly polarized laser pulse. Also labeled is the classical HHG cutoff**
 
 #### HHG Sample
 ![Alt text for your image](examples/hhg_sample/harmonic_spectrum.png)
