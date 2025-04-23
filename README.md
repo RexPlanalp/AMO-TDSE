@@ -172,7 +172,8 @@ wavefunction has reached the absorbing boundary.**
 **Below is the energy resolved an the angle resolved photoelectron spectrum for a linearly and circularly polarized polarized laser.**
 
 #### Linear Sample 
-![Alt text for your image](examples/lin_sample/pes.png)
+| ![Alt text for your image](examples/lin_sample/pes.png) | ![Alt text for your image](examples/lin_sample/pad.png) |
+|-----------------------------------|-----------------------------------|
 
 #### Circular Sample 
 | ![Alt text for your image](examples/cir_sample/pes.png) | ![Alt text for your image](examples/cir_sample/pad.png) |
