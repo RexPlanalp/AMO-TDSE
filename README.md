@@ -84,7 +84,7 @@ wavefunction has reached the absorbing boundary.**
 - **PETSc:** Version 3.22.2 
 - **SLEPc:** Version 3.22.2
 - **GSL:** Version 2.8
-- **Nlohmann Json** 
+- **Nlohmann Json:**  Version 3.11.3
 
 ## Input File Guide
 
