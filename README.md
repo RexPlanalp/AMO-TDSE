@@ -163,3 +163,12 @@ wavefunction has reached the absorbing boundary.**
 ### "debug" - Toggles whether debug info will be dumped during runtimeto help find bugs or issues
 
 
+## Examples
+
+**Note: For more details on the simulations that were run to get these results can be found in the input files in the examples directory**
+
+### Photoelectron Spectra
+
+**Below is the energy resolved an the angle resolved photoelectron spectrum for a linearly polarized laser.**
+
+![Alt text for your image](examples/lin_sample/pes.png)
