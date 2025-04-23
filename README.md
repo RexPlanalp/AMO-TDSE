@@ -171,4 +171,8 @@ wavefunction has reached the absorbing boundary.**
 
 **Below is the energy resolved an the angle resolved photoelectron spectrum for a linearly polarized laser.**
 
+#### Linear Sample 
 ![Alt text for your image](examples/lin_sample/pes.png)
+
+#### HHG Sample
+![Alt text for your image](examples/hhg_sample/harmonic_spectrum.png)
