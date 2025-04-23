@@ -2,7 +2,7 @@
 #SBATCH --job-name testing
 #SBATCH --output run.log
 #SBATCH --nodes 1
-#SBATCH --ntasks 32
+#SBATCH --ntasks 16
 #SBATCH --mem=64G
 
 source ~/.bashrc

@@ -1,3 +1,10 @@
+# VSCode config
+.vscode/
+
+# Build directories
+build/
+cmakebuild/
+
 *.txt
 *.png
 *.json

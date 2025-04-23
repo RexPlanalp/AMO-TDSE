@@ -79,10 +79,10 @@ if "PES" in sys.argv:
 
     fig,ax = plt.subplots()
 
-    norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
+    #norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
     #norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
 
-    sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
+    #sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
     #sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
     ax.set_aspect("equal",adjustable = "box")
     fig.colorbar(sc,ax=ax)
@@ -116,7 +116,7 @@ if "BOUND" in sys.argv:
     cmap = cm.viridis
     cmap.set_bad(color='white')  # Make masked values white
 
-    im = ax.imshow(pop_matrix, cmap=cmap, origin="lower", norm=Normalize(), aspect='auto')
+    im = ax.imshow(pop_matrix, cmap=cmap, origin="lower", norm=LogNorm(), aspect='auto')
 
     # Add colorbar
     cbar = plt.colorbar(im)
@@ -143,6 +143,8 @@ if "HHG" in sys.argv:
         Ip = -0.5
     elif data["species"] == "Ar":
         Ip = -0.5791546178
+    elif data["species"] == "He":
+        Ip = -0.9443
 
     Up = I_max/(4*w**2)
 
