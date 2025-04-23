@@ -53,7 +53,7 @@ if "PES" in sys.argv:
     data = np.loadtxt("PES_files/pes.txt")
     pes_cpp = data[:,1]
     e_cpp  = data[:,0]
-    plt.semilogy(e_cpp,pes_cpp,label = "C++")
+    plt.semilogy(e_cpp,pes_cpp,label = "PES")
     plt.legend()
     plt.savefig("images/pes.png")
     # os.system("mv pes.png ~/Research/TDSE_PETSC/")
@@ -73,16 +73,16 @@ if "PES" in sys.argv:
     kz = pad_k*np.cos(pad_theta)
 
     max_val = np.max(pad_p)
-    min_val = max_val*1e-3
+    min_val = max_val*1e-6
 
     cmap = "hot_r"
 
     fig,ax = plt.subplots()
 
-    #norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
+    norm = mcolors.LogNorm(vmin=min_val,vmax=max_val)
     #norm = mcolors.Normalize(vmin=min_val,vmax=max_val)
 
-    #sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
+    sc = ax.scatter(kx,kz,c=pad_p,norm=norm,cmap=cmap)
     #sc = ax.scatter(kx,ky,c=pad_p,norm=norm,cmap=cmap)
     ax.set_aspect("equal",adjustable = "box")
     fig.colorbar(sc,ax=ax)
@@ -207,6 +207,7 @@ if "HHG" in sys.argv:
     plt.ylabel('Intensity (arb. units)')
     plt.title('Harmonic Spectrum')
     plt.grid(True, which='both', ls='--', lw=0.5)
+    plt.legend()
     plt.savefig("images/harmonic_spectrum.png")
     plt.clf()
 

@@ -83,8 +83,8 @@ wavefunction has reached the absorbing boundary.**
 - **CMake:** Version 3.14 
 - **PETSc:** Version 3.22.2 
 - **SLEPc:** Version 3.22.2
-- **GSL** Version 2.8
-- **Nlohmann Json:** 
+- **GSL:** Version 2.8
+- **Nlohmann Json** 
 
 ## Input File Guide
 
